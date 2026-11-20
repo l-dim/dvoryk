@@ -620,6 +620,26 @@ function takeInbox() {
   renderBoard(); renderInbox(); renderOrders(); save();
 }
 
+/* Хто з сусідів стоїть у дворику: ті, хто найбільше говорить у розділі (до трьох) */
+function yardPeople(ch, all) {
+  const count = {};
+  [ch.intro || [], ...ch.tasks.map(t => t.lines || [])].forEach(lines => lines.forEach(([who]) => {
+    if (CHARS[who] && who !== "cat" && PORTRAITS_FULL.includes(who)) count[who] = (count[who] || 0) + 1;
+  }));
+  if (all.some(d => d.e === "👰")) { delete count.liza; delete count.taras; }
+  const who = Object.keys(count).sort((a, b) => count[b] - count[a]).slice(0, 3);
+  const slots = [[27, 72], [73, 72], [36, 87], [64, 87], [17, 60], [83, 60], [50, 64], [24, 86], [76, 86]];
+  const taken = all.filter(d => d.y >= 34).map(d => [d.x, d.y, d.s]);
+  const out = [];
+  for (const w of who) {
+    const s = 10;
+    const free = slots.find(([x, y]) => taken.every(([tx, ty, ts]) => Math.hypot(tx - x, (ty - y) * 1.4) > (ts + s) * 0.55));
+    if (!free) break;
+    taken.push([free[0], free[1], s]);
+    out.push({ key: "p-" + w, who: w, x: free[0], y: free[1], s });
+  }
+  return out;
+}
 function renderStory(animateLast) {
   const ch = curChapter();
   const scene = $("scene");
@@ -638,6 +658,7 @@ function renderStory(animateLast) {
     ...added
   ];
   if (window.Yard3D) {
+    all.push(...yardPeople(ch, all));
     // справжній 3D-дворик
     scene.classList.add("is3d");
     if (!scene.querySelector("canvas")) scene.innerHTML = "";

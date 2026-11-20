@@ -198,6 +198,62 @@ function tint(obj, color) {
   });
 }
 
+/* ---------- мальовані персонажі (портрети) ---------- */
+const picCache = new Map();
+function portraitTexture(who, fade) {
+  const k = who + (fade ? ":f" : "");
+  if (!picCache.has(k)) {
+    picCache.set(k, new Promise((res, rej) => {
+      const img = new Image();
+      img.onload = () => {
+        const c = document.createElement("canvas");
+        c.width = img.naturalWidth; c.height = img.naturalHeight;
+        const g = c.getContext("2d");
+        g.drawImage(img, 0, 0);
+        if (fade) {
+          // низ портрета (по пояс) м'яко розчиняється, щоб не було «обрізаної» фігури
+          g.globalCompositeOperation = "destination-out";
+          const gr = g.createLinearGradient(0, c.height * 0.62, 0, c.height * 0.9);
+          gr.addColorStop(0, "rgba(0,0,0,0)"); gr.addColorStop(1, "rgba(0,0,0,1)");
+          g.fillStyle = gr; g.fillRect(0, 0, c.width, c.height);
+        }
+        const t = new THREE.CanvasTexture(c);
+        t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
+        res({ tex: t, aspect: c.width / c.height });
+      };
+      img.onerror = rej;
+      img.src = BASE + "portraits/" + who + (fade || who === "cat" ? "" : "-full") + ".webp";
+    }));
+  }
+  return picCache.get(k);
+}
+async function portraitFigure(who, height, full) {
+  const { tex, aspect } = await portraitTexture(who, !full);
+  const g = new THREE.Group();
+  const geo = new THREE.PlaneGeometry(height * aspect, height);
+  geo.translate(0, height / 2 - (full ? 0 : height * 0.16), 0);
+  const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, alphaTest: 0.03, side: THREE.DoubleSide, toneMapped: false });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.castShadow = true;
+  mesh.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: tex, alphaTest: 0.5 });
+  billboards.add(mesh);
+  g.add(mesh);
+  if (!full) {
+    // пухкий кущик біля ніг
+    try {
+      const src = await loadModel("nature/plant_bushLarge");
+      [[-0.22, 0.2, 0.62, 0x4e9e2b], [0.24, 0.16, 0.56, 0x5cad33], [0, 0.3, 0.5, 0x66b83a]].forEach(([x, z, k, col]) => {
+        const b = paint(src.clone(true), col);
+        normalize(b, height * k);
+        const h = new THREE.Group(); h.add(b); h.position.set(x * height, 0, z * height);
+        h.rotation.y = x * 7;
+        g.add(h);
+      });
+    } catch (e) {}
+  }
+  return g;
+}
+
 /* ---------- фігурки з 3D-іконок ---------- */
 function iconTexture(e) {
   const k = key(e);
@@ -240,6 +296,10 @@ async function build(d) {
   const size = d.s * SIZE * (SCALE[d.e] || 1);
   let spec = indoorNow && d.y < 34 ? null : MODELS[d.e];
   if (typeof spec === "function") spec = spec(d);
+  if (d.who || (d.e === "🐱" && typeof PORTRAITS !== "undefined" && PORTRAITS.includes("cat"))) {
+    try { holder.add(await portraitFigure(d.who || "cat", d.who ? size * 2.1 : size * 1.6, true)); return holder; }
+    catch (e) { if (d.who) return holder; }
+  }
   if (d.e === "☁️") holder.add(cloud(size * 1.6));
   else if (spec) {
     const path = typeof spec === "string" ? spec : spec.m;
