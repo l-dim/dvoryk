@@ -193,7 +193,7 @@ window.QUEST = (() => {
       `<span class="dq-n">${q.n >= q.t ? "✅" : q.n + "/" + q.t}</span></div>`).join("");
     const shown = d.claimed ? d.streak : d.lastClaim === yesterday() ? d.streak : 0;
     const week = Array.from({ length: 7 }, (_, i) => `<i class="${i < shown ? "on" : ""}">${i === 6 ? "💝" : ""}</i>`).join("");
-    const m = S.map, pieces = Array.from({ length: TREASURE.pieces }, (_, i) => `<i class="${i < m.n ? "on" : ""}"></i>`).join("");
+    const m = S.map, pieces = Array.from({ length: TREASURE.pieces }, (_, i) => `<i class="${m.done || i < m.n ? "on" : ""}"></i>`).join("");
     modal({
       title: "Завдання дня 📋",
       html: `<div class="dq-list">${rows}</div>` +
