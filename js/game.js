@@ -900,6 +900,78 @@ function nextLine() {
   sfx.pop();
 }
 
+/* ---------------- Резервна копія прогресу ----------------
+   Код = "DVORYK1:" + base64(gzip(JSON)) або "DVORYK0:" + base64(JSON), якщо стискання недоступне. */
+const b64 = bytes => { let s = ""; for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000)); return btoa(s); };
+const unb64 = str => Uint8Array.from(atob(str), c => c.charCodeAt(0));
+async function pipeBytes(bytes, stream) {
+  const out = await new Response(new Blob([bytes]).stream().pipeThrough(stream)).arrayBuffer();
+  return new Uint8Array(out);
+}
+async function makeBackup() {
+  saveNow();
+  const json = new TextEncoder().encode(JSON.stringify(S));
+  if (window.CompressionStream) {
+    try { return "DVORYK1:" + b64(await pipeBytes(json, new CompressionStream("gzip"))); } catch (e) {}
+  }
+  return "DVORYK0:" + b64(json);
+}
+async function readBackup(code) {
+  code = (code || "").replace(/\s+/g, "");
+  const m = code.match(/DVORYK([01]):([A-Za-z0-9+/=]+)/);
+  if (!m) throw new Error("bad");
+  let bytes = unb64(m[2]);
+  if (m[1] === "1") bytes = await pipeBytes(bytes, new DecompressionStream("gzip"));
+  const data = JSON.parse(new TextDecoder().decode(bytes));
+  if (!data || typeof data !== "object" || !Array.isArray(data.board) || data.board.length !== N) throw new Error("bad");
+  return data;
+}
+async function showExport() {
+  const code = await makeBackup();
+  modal({
+    title: "Зберегти прогрес 💾",
+    html: `<p>Це твій код прогресу (рівень ${S.level}, розділ ${Math.min(S.chapter, STORY.length - 1) + 1}). Збережи його в Нотатки або надішли собі в месенджер.</p>
+      <textarea class="backup-code" id="bkCode" readonly>${code}</textarea>`,
+    buttons: [
+      ...(navigator.share ? [{ label: "📤 Поділитися (Нотатки, Telegram…)", onClick: () => navigator.share({ title: "Затишний дворик — прогрес", text: code }).catch(() => {}) }] : []),
+      { label: "📋 Скопіювати", cls: navigator.share ? "ghost" : "", onClick: () => copyText(code) },
+      { label: "Закрити", cls: "ghost" }
+    ]
+  });
+  const ta = $("bkCode"); ta.onfocus = () => ta.select();
+}
+function copyText(t) {
+  const ok = () => toast("Скопійовано 📋 Встав у Нотатки");
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, () => fallbackCopy(t, ok));
+  else fallbackCopy(t, ok);
+}
+function fallbackCopy(t, ok) {
+  const ta = document.createElement("textarea"); ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); ok(); } catch (e) { toast("Не вдалося скопіювати — виділи код вручну"); }
+  ta.remove();
+}
+function showImport() {
+  modal({
+    title: "Відновити прогрес 📥",
+    html: `<p>Встав сюди код прогресу, який ти зберігала раніше.</p>
+      <textarea class="backup-code" id="bkIn" placeholder="DVORYK1:…"></textarea>
+      <p class="hint-s">Увага: поточна гра на цьому телефоні заміниться збереженою.</p>`,
+    buttons: [
+      { label: "Відновити", onClick: async () => {
+        const code = $("bkIn").value;
+        try {
+          const data = await readBackup(code);
+          if (!confirm(`Відновити гру: рівень ${data.level}, розділ ${(data.chapter || 0) + 1}? Поточний прогрес на цьому телефоні заміниться.`)) return;
+          S = null; // щоб автозбереження не перезаписало відновлене
+          localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+          location.reload();
+        } catch (e) { toast("Код не підходить 🙈 Перевір, що скопіювала його повністю"); }
+      } },
+      { label: "Скасувати", cls: "ghost" }
+    ]
+  });
+}
+
 /* ---------------- Налаштування ---------------- */
 function openSettings() {
   modal({
@@ -907,6 +979,12 @@ function openSettings() {
     html: `
       <label class="set-row">Ім'я <input id="setName" value="${(S.name || "").replace(/"/g, "&quot;")}" maxlength="20"></label>
       <label class="set-row">🔊 Звук <input type="checkbox" id="setSound" ${S.sound ? "checked" : ""}></label>
+      <div class="set-backup">
+        <b>Прогрес гри</b>
+        <p class="hint-s">Збережи код прогресу в Нотатки — і зможеш відновити гру на новому телефоні чи після перевстановлення.</p>
+        <button class="btn small" id="setExport">💾 Зберегти прогрес</button>
+        <button class="btn ghost small" id="setImport">📥 Відновити прогрес</button>
+      </div>
       <p class="hint-s">Тут немає жодних справжніх покупок — тільки ігрові монетки 💛</p>
       <button class="btn ghost small" id="setReset">Почати гру спочатку</button>`,
     buttons: [{ label: "Зберегти", onClick: () => {
@@ -915,6 +993,8 @@ function openSettings() {
       renderAll(); save();
     } }]
   });
+  $("setExport").onclick = showExport;
+  $("setImport").onclick = showImport;
   $("setReset").onclick = () => {
     if (!confirm("Точно почати спочатку? Весь прогрес буде видалено.")) return;
     localStorage.removeItem(SAVE_KEY);
