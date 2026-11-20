@@ -39,7 +39,9 @@ function load() {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return null;
-    return Object.assign(defaultState(), JSON.parse(raw));
+    const data = JSON.parse(raw);
+    if (!data || typeof data !== "object" || !Array.isArray(data.board)) return null;
+    return Object.assign(defaultState(), data);
   } catch (e) { return null; }
 }
 let saveTimer = null;
@@ -48,6 +50,7 @@ function save() {
   saveTimer = setTimeout(saveNow, 250);
 }
 function saveNow() {
+  if (!S) return;
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* немає сховища */ }
 }
 
@@ -259,7 +262,7 @@ function gainXp(n) {
 function unlockedChains() { return S.gens.map(g => GENS[g].chain); }
 function newOrder() {
   const busy = S.orders.map(o => o.ch);
-  const pool = Object.keys(CHARS).filter(c => !busy.includes(c));
+  const pool = Object.keys(CHARS).filter(c => !busy.includes(c) && (CHARS[c].from || 0) <= S.chapter);
   const ch = pick(pool);
   const chains = unlockedChains();
   const count = S.level < 3 ? 1 : (Math.random() < 0.55 ? 1 : 2);
@@ -866,6 +869,16 @@ function startGame() {
     Object.keys(S.collection).length || S.board.forEach(discover);
     save();
     playDialog(STORY[0].intro);
+  } else if (S.storyDone && S.chapter < STORY.length - 1) {
+    // з'явилися нові розділи — продовжуємо історію з місця, де вона закінчилась
+    S.storyDone = false; S.chapter++; S.task = 0;
+    save();
+    renderAll();
+    modal({
+      title: "Нові розділи! 💌",
+      html: `<div class="big-emoji">🏡</div><p>Історія дворика продовжується — на тебе чекають ${STORY.length - S.chapter} нових розділів!</p>`,
+      buttons: [{ label: "Читати ›", onClick: () => playDialog(STORY[S.chapter].intro, checkDaily) }]
+    });
   } else {
     checkDaily();
   }
