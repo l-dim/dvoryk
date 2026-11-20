@@ -89,6 +89,7 @@ window.EV = (() => {
   function onDeliver(o, card) {
     const e = st(); if (!e) return;
     e.pts += o.pts || 0;
+    window.QUEST && QUEST.track("snow", o.pts || 0);
     if (card && typeof flyIcon === "function") {
       const from = card.getBoundingClientRect(), to = $("evBtn").getBoundingClientRect();
       for (let k = 0; k < 4; k++) flyIcon("❄️", from, to, { delay: 300 + k * 80, size: 22, dur: 650, end: 0.6, lift: 50 });

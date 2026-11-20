@@ -64,34 +64,67 @@ window.QUEST = (() => {
   }
 
   /* ---------- завдання дня ---------- */
+  /* усі можливі завдання дня з урахуванням того, що зараз є в грі */
+  function dayCandidates() {
+    const lvl = S.level, c = [];
+    c.push({ k: "deliver", t: Math.min(7, 4 + Math.floor(lvl / 8)) });
+    c.push(Math.random() < 0.5 ? { k: "merge", t: Math.min(30, 15 + lvl) } : { k: "tap", t: Math.min(40, 20 + lvl) });
+    c.push({ k: "chest", t: lvl < 8 ? 1 : 2 });
+    if (lvl >= 5) c.push({ k: "high", t: 2 });
+    if (S.oven) c.push({ k: "cook", t: 1 });
+    const locks = S.board.filter(x => x && x.lock).length;
+    if (locks) c.push({ k: "lock", t: Math.min(2, locks) });
+    // пара однакових генераторів на дошці — можна злити
+    const seen = {};
+    if (S.board.some(x => { if (!x || !x.g || (x.gl || 1) >= GEN_MAX_LEVEL) return false; const key = x.g + (x.gl || 1); seen[key] = (seen[key] || 0) + 1; return seen[key] >= 2; }))
+      c.push({ k: "genmerge", t: 1 });
+    if (lvl >= 4) c.push({ k: "urgent", t: 1 });
+    const who = Object.keys(FRIENDS).filter(k => CHARS[k] && (CHARS[k].from || 0) <= S.chapter);
+    if (who.length) c.push({ k: "heart", who: pick(who), t: lvl < 6 ? 1 : 2 });
+    if (window.EV && EV.active()) c.push({ k: "snow", t: lvl < 8 ? 10 : 16 });
+    return c;
+  }
+  const TO = { halya: "бабусі Галі", stepan: "дідові Степану", olya: "Олі", marichka: "Марічці", andriy: "Андрієві",
+    liza: "Лізі", cat: "котику Пиріжку", ivan: "Іванові", taras: "Тарасові", iryna: "Ірині" };
+  const qText = q => q.k === "heart" ? `Віддай ${q.t > 1 ? q.t + " замовлення" : "замовлення"} ${TO[q.who] || CHARS[q.who].name}` : DAILY[q.k].text;
+  const qIcon = q => q.k === "heart" ? face(CHARS[q.who], "mini") : DAILY[q.k].icon;
   function newDay() {
     const old = S.dq || {};
-    const lvl = S.level;
-    const pool = [];
-    pool.push({ k: "deliver", t: Math.min(7, 4 + Math.floor(lvl / 8)) });
-    pool.push(Math.random() < 0.5 ? { k: "merge", t: Math.min(30, 15 + lvl) } : { k: "tap", t: Math.min(40, 20 + lvl) });
-    const extra = [{ k: "chest", t: lvl < 8 ? 1 : 2 }];
-    if (lvl >= 5) extra.push({ k: "high", t: 2 });
-    if (S.oven) extra.push({ k: "cook", t: 1 });
-    pool.push(pick(extra));
-    S.dq = { day: today(), list: pool.map(q => ({ k: q.k, t: q.t, n: 0 })), claimed: false,
+    const cand = dayCandidates();
+    const list = [cand[0]];                                   // віддати замовлення — завжди
+    const rest = cand.slice(1).sort(() => Math.random() - 0.5);
+    list.push(...rest.slice(0, 2));
+    S.dq = { day: today(), list: list.map(q => ({ k: q.k, t: q.t, n: 0, who: q.who })), claimed: false, swapped: false,
       streak: old.streak || 0, lastClaim: old.lastClaim || "" };
     // серія переривається, якщо вчора не забрала нагороду
     if (S.dq.lastClaim !== yesterday() && S.dq.lastClaim !== today()) S.dq.streak = 0;
     save();
   }
-  function track(k, n = 1) {
+  /* раз на день можна замінити одне завдання */
+  function swap(i) {
+    const d = S.dq;
+    if (d.swapped || d.claimed || !d.list[i] || d.list[i].n >= d.list[i].t) return;
+    const busy = d.list.map(q => q.k);
+    const opts = dayCandidates().filter(q => !busy.includes(q.k) && !(busy.includes("merge") && q.k === "tap") && !(busy.includes("tap") && q.k === "merge"));
+    if (!opts.length) { toast("Поки що немає іншого завдання на заміну 🙈"); return; }
+    const q = pick(opts);
+    d.list[i] = { k: q.k, t: q.t, n: 0, who: q.who };
+    d.swapped = true;
+    sfx.pop(); toast("🔄 Завдання замінено!");
+    save(); renderButton(); panel("day");
+  }
+  function track(k, n = 1, who) {
     if (!S || !S.dq) return;
     trackWeek(k, n);
     if (S.dq.day !== today()) newDay();
     let finished = null;
     S.dq.list.forEach(q => {
-      if (q.k !== k || q.n >= q.t) return;
+      if (q.k !== k || q.n >= q.t || (q.who && q.who !== who)) return;
       q.n = Math.min(q.t, q.n + n);
       if (q.n >= q.t) finished = q;
     });
     if (finished) {
-      toast("✅ Завдання дня: " + DAILY[finished.k].text.toLowerCase() + "!");
+      toast("✅ Завдання дня: " + qText(finished).toLowerCase() + "!");
       if (allDone()) setTimeout(() => toast("📋 Усі три завдання виконано — забери нагороду!"), 2400);
     }
     renderButton(); save();
@@ -126,6 +159,7 @@ window.QUEST = (() => {
   }
   function onDeliver(o) {
     const who = o.ch;
+    track("heart", 1, who);
     if (!FRIENDS[who]) return;
     if (hearts(who) >= FRIEND_STEPS[2]) return;
     S.fr[who] = hearts(who) + 1;
@@ -232,9 +266,9 @@ window.QUEST = (() => {
     b.classList.toggle("claimed", S.dq.claimed);
   }
   let panelTab = "day";
-  const qRows = (list) => list.map(q => `<div class="dq-row${q.n >= q.t ? " ok" : ""}"><span class="dq-ic">${DAILY[q.k].icon}</span>` +
-    `<span class="dq-mid"><b>${DAILY[q.k].text}</b><i class="dq-bar"><b style="width:${q.n / q.t * 100}%"></b></i></span>` +
-    `<span class="dq-n">${q.n >= q.t ? "✅" : q.n + "/" + q.t}</span></div>`).join("");
+  const qRows = (list, canSwap) => list.map((q, i) => `<div class="dq-row${q.n >= q.t ? " ok" : ""}"><span class="dq-ic">${qIcon(q)}</span>` +
+    `<span class="dq-mid"><b>${qText(q)}</b><i class="dq-bar"><b style="width:${q.n / q.t * 100}%"></b></i></span>` +
+    `<span class="dq-n">${q.n >= q.t ? "✅" : q.n + "/" + q.t}${canSwap && q.n < q.t ? `<button class="dq-swap" data-i="${i}" title="Замінити">🔄</button>` : ""}</span></div>`).join("");
   function panel(tab) {
     if (S.dq.day !== today()) newDay();
     if (!S.wq || S.wq.week !== weekKey()) newWeek();
@@ -246,7 +280,9 @@ window.QUEST = (() => {
     const dayReady = allDone() && !d.claimed, wkReady = weekDone() && !w.claimed;
     const btn = (ready, claimed, label, done, todo) => ready ? `<button class="btn dq-claim" data-c="1">${label}</button>`
       : `<button class="btn dq-claim" disabled>${claimed ? done : todo}</button>`;
-    const dayHtml = `<div class="dq-list">${qRows(d.list)}</div>` +
+    const canSwap = !d.swapped && !d.claimed;
+    const dayHtml = `<div class="dq-list">${qRows(d.list, canSwap)}</div>` +
+      (canSwap ? `<p class="dq-hint">🔄 Не подобається завдання? Одне можна замінити — раз на день.</p>` : "") +
       `<div class="dq-week"><span>Днів поспіль:</span><span class="dq-days">${week}</span></div>` +
       btn(dayReady, d.claimed, "Забрати нагороду 🎁", "Нагороду забрано ✓ Нові завдання завтра", "Виконай усі 3 — отримаєш 🎁") +
       `<div class="dq-map"><span>🗺️ <b>Таємниця старої скрині</b><br><small>${m.done ? "Скарб знайдено! Скриня — у дворику 🧰" : m.n ? "Шматочки карти: " + m.n + " з " + TREASURE.pieces : "Шматочки карти іноді трапляються в подарунках"}</small></span><span class="dq-pieces">${pieces}</span></div>`;
@@ -266,6 +302,7 @@ window.QUEST = (() => {
       ]
     });
     document.querySelectorAll(".dq-tab").forEach(b => b.onclick = () => { sfx.pop(); panel(b.dataset.t); });
+    document.querySelectorAll(".dq-swap").forEach(b => b.onclick = () => swap(+b.dataset.i));
     const c = document.querySelector(".dq-claim[data-c]");
     if (c) c.onclick = () => { $("modal").classList.remove("show"); panelTab === "day" ? claim() : claimWeek(); };
   }

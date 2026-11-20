@@ -51,6 +51,7 @@ window.MECH = (() => {
     S.board[a] = null;
     gainXp(5);
     window.QUEST && QUEST.track("merge");
+    window.QUEST && QUEST.track("genmerge");
     sfx.merge(4); sparkle(b, "✨", 8); popIdx.add(b); mergedIdx.add(b); burstAt(b);
     selected = b;
     setTimeout(() => modal({
