@@ -76,7 +76,9 @@ Object.keys(CHARS).forEach(k => CHARS[k].key = k);
 function face(ch, cls = "") {
   if (!PORTRAITS.includes(ch.key)) return ch.icon;
   const src = `portraits/${ch.key}.webp`;
-  return cls === "mini" ? `<span class="face mini"><img src="${src}" alt=""></span>` : `<img class="face ${cls}" src="${src}" alt="">`;
+  if (cls !== "mini") return `<img class="face ${cls}" src="${src}" alt="">`;
+  const [x, y, w] = PORTRAIT_FACE[ch.key] || [50, 22, 240];
+  return `<span class="face mini"><img src="${src}" alt="" style="width:${w}%;transform:translate(-${x}%,-${y}%)"></span>`;
 }
 function fmtName(t) { return t.replace(/\{name\}/g, S.name || "господинько"); }
 
