@@ -12,4 +12,4 @@
 
 `preview/` — та сама гра з об'ємними іконками [Fluent Emoji 3D](https://github.com/microsoft/fluentui-emoji) (© Microsoft, ліцензія MIT, див. `e3d/LICENSE-fluentui-emoji.txt`).
 Превʼю має власний сейв: при першому відкритті копіює прогрес з основної гри й далі основну гру не чіпає.
-Увімкнути 3D в основній грі: додати в `index.html` прапорець `window.DVORYK_3D = true` і підключити `js/emoji3d.js`.
+3D-вигляд увімкнено в основній грі (`window.DVORYK_3D = true` в `index.html`); щоб повернути звичайні емодзі — прибрати цей рядок.
