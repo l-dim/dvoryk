@@ -6,14 +6,17 @@
    ============================================================ */
 window.EV = (() => {
   const now = () => window.DVORYK_NOW || Date.now();
-  const inWindow = () => now() >= EVENT.start && now() < EVENT.end;
-  const st = () => (S.ev && S.ev.id === EVENT.id ? S.ev : null);
+  const year = () => new Date(now()).getFullYear();
+  const win = () => EVENT.window(year());
+  const curId = () => EVENT.key + "-" + year();
+  const inWindow = () => now() >= win().start && now() < win().end;
+  const st = () => (S.ev && S.ev.id === curId() ? S.ev : null);
   const active = () => !!st() && st().intro && !st().ended && inWindow();
   const ready = () => S && S.started && S.ordersDone >= 3;   // після навчання
   const busyUI = () => $("modal").classList.contains("show") || $("dialog").classList.contains("show");
 
   function daysLeft() {
-    const ms = EVENT.end - now();
+    const ms = win().end - now();
     const d = Math.floor(ms / 864e5), h = Math.floor(ms % 864e5 / 36e5);
     return d >= 1 ? d + " дн" : h >= 1 ? h + " год" : Math.max(1, Math.ceil(ms / 6e4)) + " хв";
   }
@@ -22,8 +25,10 @@ window.EV = (() => {
   /* ---------- старт і завершення ---------- */
   function tick() {
     if (!ready() || busyUI()) return;
+    // торішнє свято, яке не встигло завершитися (гру не відкривали) — спершу підсумуємо його
+    if (S.ev && !S.ev.ended && S.ev.intro && (S.ev.id !== curId() || !inWindow())) { finish(); return; }
     if (inWindow() && !st()) {
-      S.ev = { id: EVENT.id, pts: 0, got: 0, intro: false, ended: false };
+      S.ev = { id: curId(), pts: 0, got: 0, intro: false, ended: false };
     }
     const e = st();
     if (!e) return;
@@ -40,7 +45,7 @@ window.EV = (() => {
   }
 
   function finish() {
-    const e = st();
+    const e = S.ev;
     e.ended = true;
     let coins = 0, n = 0;
     S.board.forEach((it, i) => {

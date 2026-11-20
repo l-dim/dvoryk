@@ -324,3 +324,41 @@ body.farm .order { position: relative; }
 .ev-ms .ev-rw { flex: 1; }
 .ev-ms.got { opacity: .55; }
 .ev-ms.ready .ev-pts { color: #3f8a1c; }
+
+/* ---------- Генератори: заряд, сон, рівень ---------- */
+.tile .gen-bar { position: absolute; left: 14%; right: 14%; bottom: 5%; height: 6%; min-height: 4px; border-radius: 4px; background: rgba(120, 70, 20, .25); overflow: hidden; pointer-events: none; }
+.tile .gen-bar b { display: block; height: 100%; background: linear-gradient(90deg, #ffd65a, #6cc23a); border-radius: 4px; transition: width .3s; }
+.tile .gen-z { position: absolute; left: 0; right: 0; bottom: 4%; text-align: center; font: 900 9px/1 var(--font); color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, .7); pointer-events: none; }
+.tile.tired > .e3d, .tile.tired { filter: saturate(.45) brightness(.92); }
+.tile .gen-lv { position: absolute; right: 2px; top: 1px; min-width: 15px; height: 15px; padding: 0 3px; border-radius: 8px; background: linear-gradient(#ffd65a, #f2a516);
+  color: #6a3a00; font: 900 10px/15px var(--font); text-align: center; box-shadow: 0 1px 0 #a8640a; pointer-events: none; }
+
+/* ---------- Павутиння ---------- */
+.tile.lock { background: repeating-linear-gradient(45deg, rgba(200, 190, 170, .55) 0 6px, rgba(230, 222, 205, .55) 6px 12px) !important; border-radius: 10px; opacity: .95; }
+.tile.lock .e3d { opacity: .9; }
+.tile .lock-hp { position: absolute; right: 2px; bottom: 1px; font: 900 10px/1 var(--font); color: #5b3416; background: #fff3d0; border-radius: 6px; padding: 2px 3px; pointer-events: none; }
+
+/* ---------- Піч і страви ---------- */
+.tile.oven { background: radial-gradient(circle at 50% 35%, #ffd9a8, #e07b3e 70%, #a84a1e) !important; box-shadow: inset 0 0 0 2px #7a3210, inset 0 -4px 0 #7a3210 !important; }
+.tile.oven.ready { animation: ovenReady 1.2s ease-in-out infinite; }
+.tile .oven-t { position: absolute; left: 0; right: 0; bottom: 3%; text-align: center; font: 900 9px/1 var(--font); color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, .8); pointer-events: none; }
+.tile .oven-t .e3d { width: 1.1em; height: 1.1em; vertical-align: -2px; }
+@keyframes ovenReady { 50% { box-shadow: inset 0 0 0 2px #7a3210, 0 0 14px 4px rgba(255, 220, 120, .95) !important; transform: scale(1.06); } }
+.tile.dish { background: radial-gradient(circle at 50% 35%, #fffaf0, #ffe1b0) !important; box-shadow: inset 0 0 0 2px #f2a516 !important; }
+.rc-list { text-align: left; }
+.rc-row { display: flex; align-items: center; gap: 8px; padding: 8px 2px; border-top: 2px dashed var(--line); }
+.rc-out { font-size: 34px; font-family: var(--emoji); }
+.rc-out .e3d { width: 1.1em; height: 1.1em; }
+.rc-mid { flex: 1; display: flex; flex-direction: column; gap: 3px; font-size: 14px; }
+.rc-need { display: flex; align-items: center; gap: 3px; font-size: 12px; color: var(--ink-soft); font-weight: 700; }
+.rc-ing { width: 30px; height: 30px; display: grid; place-items: center; font-size: 20px; border-radius: 50%; background: #f3dca8; opacity: .55; position: relative; }
+.rc-ing.have { opacity: 1; box-shadow: 0 0 0 2px #6cc23a; }
+.rc-ing .e3d { width: 1em; height: 1em; }
+
+/* ---------- Термінові замовлення й страви ---------- */
+body.farm .order.urgent { border-color: #e2562e; box-shadow: 0 4px 0 #9c2f12, 0 8px 14px rgba(120, 30, 10, .28), inset 0 0 0 2px rgba(255, 250, 230, .9); }
+body.farm .order.urgent .o-who { background: linear-gradient(#ff8c63, #e2562e); }
+.o-timer { position: absolute; right: -6px; top: -11px; z-index: 4; transform: rotate(4deg); background: linear-gradient(#ff8c63, #e2562e); color: #fff;
+  font: 900 11px/1 var(--font); padding: 3px 7px; border-radius: 10px; box-shadow: 0 2px 0 #9c2f12; white-space: nowrap; text-shadow: 0 1px 0 rgba(120, 30, 10, .6); }
+body.farm .order.dish { border-color: #f2a516; }
+body.farm .order.dish .o-who { background: linear-gradient(#ffc94d, #e8962a); }

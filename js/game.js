@@ -62,16 +62,20 @@ function saveNow() {
 /* ---------------- Довідка по предметах ---------------- */
 function itemIcon(it) {
   if (!it) return "";
+  if (it.lock) return "🕸️";
+  if (it.st) return "🔥";
   if (it.g) return GENS[it.g].icon;
   return CHAINS[it.c].items[it.l][0];
 }
 function itemName(it) {
   if (!it) return "";
+  if (it.lock) return "Павутиння";
+  if (it.st) return "Піч";
   if (it.g) return GENS[it.g].name;
   return CHAINS[it.c].items[it.l][1];
 }
-function isMax(it) { return it && !it.g && it.l >= CHAINS[it.c].items.length - 1; }
-function itemValue(c, l) { return Math.round(4 * Math.pow(1.9, l)); }
+function isMax(it) { return it && !it.g && !it.lock && !it.st && (CHAINS[it.c].nomerge || it.l >= CHAINS[it.c].items.length - 1); }
+function itemValue(c, l) { return CHAINS[c] && CHAINS[c].value ? CHAINS[c].value : Math.round(4 * Math.pow(1.9, l)); }
 Object.keys(CHARS).forEach(k => CHARS[k].key = k);
 function face(ch, cls = "") {
   if (!PORTRAITS.includes(ch.key)) return ch.icon;
@@ -158,7 +162,7 @@ function placeItem(item, near = Math.floor(N / 2)) {
   return i;
 }
 function discover(it) {
-  if (!it || it.g) return;
+  if (!it || it.g || it.lock || it.st) return;
   const k = it.c + ":" + it.l;
   if (!S.collection[k]) {
     S.collection[k] = 1;
@@ -169,22 +173,27 @@ function discover(it) {
 /* ---------------- Генератор ---------------- */
 function produce(i) {
   const gen = GENS[S.board[i].g];
+  const gIt = S.board[i];
+  MECH.refresh(gIt);
+  if (MECH.resting(gIt)) { MECH.restModal(i); return; }
   if (emptyNear(i) < 0) { sfx.nope(); toast("Немає місця 🙈 Об'єднай або продай щось"); return; }
   if (!spendEnergy()) return;
+  const tired = MECH.useCharge(gIt);
   let item;
   const roll = Math.random();
   if (roll < 0.015) item = { c: "energy", l: 0 };
   else if (roll < 0.06) item = { c: "coin", l: 0 };
   else {
     // що вищий рівень гравця, то частіше генератор дає одразу кращі предмети
-    const r = Math.random(), up = Math.min(0.35, 0.15 + S.level * 0.01);
-    item = { c: gen.chain, l: r < 0.03 + S.level * 0.002 ? 2 : r < up ? 1 : 0 };
+    const r = Math.random(), tb = MECH.tierBonus(gIt), up = Math.min(0.35, 0.15 + S.level * 0.01) + tb;
+    item = { c: gen.chain, l: r < 0.03 + S.level * 0.002 + tb / 2 ? 2 : r < up ? 1 : 0 };
   }
   const at = placeItem(item, i);
   if (at >= 0) spawnFrom.set(at, i);
   sfx.pop();
   bounce(i);
   if (S.tut === 0) setTut(1);
+  if (tired) setTimeout(() => toast("💤 " + gen.name + " відпочиватиме " + GEN_REST_MIN[MECH.gl(gIt) - 1] + " хв"), 400);
   renderBoard(); renderTop(); renderOrders(); save();
   return at;
 }
@@ -205,6 +214,7 @@ function openChest(i) {
     const at = placeItem(item, i);
     if (at >= 0) spawnFrom.set(at, i);
   }
+  if (k >= 1) MECH.maybeGenCopy(k === 1 ? 0.12 : 0.25, i);
   sfx.open();
   sparkle(i, "✨", 8);
   renderBoard(); renderOrders(); save();
@@ -227,6 +237,8 @@ function handleDrop(a, b) {
   if (a === b) return;
   const A = S.board[a], B = S.board[b];
   if (!A) return;
+  if (A.lock || (B && B.lock)) { renderBoard(); return; }   // павутиння не рухається
+  if (MECH.canMergeGens(A, B)) { MECH.mergeGens(a, b); renderBoard(); renderOrders(); renderInfo(); save(); return; }
   if (!B) {
     S.board[b] = A; S.board[a] = null;
     if (selected === a) selected = b;
@@ -241,6 +253,7 @@ function handleDrop(a, b) {
     sparkle(b, "✨", 5);
     popIdx.add(b); mergedIdx.add(b); burstAt(b);
     selected = b;
+    MECH.crackAround(b);
     // невеликий бонус за злиття
     const bonus = Math.random();
     if (bonus < 0.015) placeItem({ c: "energy", l: 0 }, b);
@@ -262,6 +275,7 @@ function gainXp(n) {
   if (ups) {
     regen(); S.energy += ENERGY_BONUS.level;
     placeItem({ c: "chest", l: S.level % 5 === 0 ? 1 : 0 });
+    if (S.level % 5 === 0) MECH.maybeGenCopy(1);
     sfx.level();
     confetti();
     setTimeout(() => modal({
@@ -279,6 +293,8 @@ function newOrder() {
   // святкова подія іноді підкидає своє замовлення
   const evo = window.EV && EV.maybeOrder();
   if (evo) return evo;
+  const spo = MECH.specialOrder();
+  if (spo) return spo;
   const busy = S.orders.map(o => o.ch);
   const pool = Object.keys(CHARS).filter(c => !busy.includes(c) && (CHARS[c].from || 0) <= S.chapter);
   const ch = pick(pool);
@@ -299,7 +315,7 @@ function newOrder() {
   let coins = 0, xp = 0, top = 0;
   items.forEach(it => { coins += itemValue(it.c, it.l) * 2; xp += (it.l + 1) * 3; top = Math.max(top, it.l); });
   const stars = top >= 5 || items.length >= 2 && top >= 4 ? 2 : 1;
-  return { id: ++S.orderSeq, ch, items, coins, xp, stars, line: rnd(3) };
+  return MECH.maybeUrgent({ id: ++S.orderSeq, ch, items, coins, xp, stars, line: rnd(3) });
 }
 function fillOrders() {
   while (S.orders.length < 3) S.orders.push(newOrder());
@@ -530,7 +546,7 @@ function renderOrders() {
     const ch = CHARS[o.ch];
     const el = document.createElement("div");
     const pic = FARM && PORTRAITS.includes(ch.key);
-    el.className = "order" + (ready ? " ready" : "") + (pic ? " pic" : "") + (o.ev ? " ev" : "");
+    el.className = "order" + (ready ? " ready" : "") + (pic ? " pic" : "") + (o.ev ? " ev" : "") + (o.urgent ? " urgent" : "") + (o.dish ? " dish" : "");
     el.dataset.id = o.id;
     const itemsHtml = `<div class="o-items">${o.items.map((it, k) => `<span class="o-item${found[k] >= 0 ? " have" : ""}">${itemIcon(it)}</span>`).join("")}</div>`;
     el.innerHTML = (pic
@@ -539,7 +555,8 @@ function renderOrders() {
       : `<div class="o-who"><span class="o-ava">${face(ch, "mini")}</span><span class="o-name">${ch.name.split(" ").pop()}</span></div>` + itemsHtml) +
       (ready
         ? `<button class="o-btn">Віддати</button>`
-        : `<div class="o-rew">🪙${o.coins} · ${o.ev ? "❄️" + o.pts : "⭐".repeat(o.stars)}</div>`);
+        : `<div class="o-rew">🪙${o.coins} · ${o.ev ? "❄️" + o.pts : "⭐".repeat(o.stars)}</div>`) +
+      (o.until ? `<span class="o-timer" data-until="${o.until}">⏰ ${MECH.hhmm(o.until - Date.now())}</span>` : "");
     el.addEventListener("click", e => {
       if (ready && e.target.closest(".o-btn")) { deliver(o.id); return; }
       bubble(ch, ch.ask[o.line] + "  " + o.items.map(it => itemIcon(it) + " " + itemName(it)).join(", "), el);
@@ -559,15 +576,15 @@ function renderBoard() {
   for (let i = 0; i < N; i++) {
     const cell = board.children[i], it = S.board[i];
     cell.classList.toggle("sel", i === selected);
-    const key = it ? (it.g ? "g:" + it.g : it.c + ":" + it.l) : "";
-    if (cell.dataset.key === key && !popIdx.has(i) && !spawnFrom.has(i) && !mergedIdx.has(i)) { cell.firstChild && cell.firstChild.classList.toggle("needed", neededIdx.has(i)); continue; }
+    const key = it ? (MECH.tileKey(it) || it.c + ":" + it.l) : "";
+    if (cell.dataset.key === key && !popIdx.has(i) && !spawnFrom.has(i) && !mergedIdx.has(i)) { cell.firstChild && cell.firstChild.classList.toggle("needed", neededIdx.has(i)); MECH.decorate(cell.firstChild, it); continue; }
     cell.dataset.key = key;
     cell.innerHTML = "";
     if (!it) continue;
     const t = document.createElement("div");
     const from = spawnFrom.has(i) && FARM ? cellRect(spawnFrom.get(i)) : null, to = from && cellRect(i);
     const anim = from && to ? " spawn" : mergedIdx.has(i) && FARM ? " merged" : popIdx.has(i) ? " pop" : "";
-    t.className = "tile" + (it.g ? " gen" : "") + (it.c && CHAINS[it.c].open ? " chest" : "") +
+    t.className = "tile" + (it.g ? " gen" : "") + (it.c && CHAINS[it.c].open ? " chest" : "") + (it.c === "dish" ? " dish" : "") +
       (it.c && CHAINS[it.c].collect ? " collect" : "") + (isMax(it) && PRODUCT_CHAINS.includes(it.c) ? " max" : "") +
       anim + (neededIdx.has(i) ? " needed" : "");
     if (from && to) { t.style.setProperty("--fx", (from.left - to.left) + "px"); t.style.setProperty("--fy", (from.top - to.top) + "px"); }
@@ -576,6 +593,7 @@ function renderBoard() {
     t.textContent = itemIcon(it);
     if (it.g) { const b = document.createElement("span"); b.className = "gen-badge"; b.textContent = "⚡"; t.appendChild(b); }
     cell.appendChild(t);
+    MECH.decorate(t, it);
   }
   popIdx.clear(); spawnFrom.clear(); mergedIdx.clear();
 }
@@ -588,9 +606,20 @@ function renderInfo() {
     return;
   }
   let text = "", btn = "";
-  if (it.g) {
+  if (it.lock) {
+    text = `<b>Павутиння</b><small>Об'єднай щось поруч${it.lock > 1 ? " ще " + it.lock + " рази" : ""} — під ним сюрприз</small>`;
+  } else if (it.st) {
+    text = `<b>Піч 🔥</b><small>Тапни, щоб приготувати страву</small>`;
+  } else if (it.g) {
     const ch = CHAINS[GENS[it.g].chain];
-    text = `<b>${GENS[it.g].name}</b><small>Тапай, щоб отримати ${ch.items[0][0]} (−1 ⚡)</small>`;
+    MECH.refresh(it);
+    const lv = MECH.gl(it) > 1 ? ` <span class="lvl-tag">рів. ${MECH.gl(it)}</span>` : "";
+    text = MECH.resting(it)
+      ? `<b>${GENS[it.g].name}</b>${lv}<small>💤 Відпочиває ще ${Math.ceil((it.rest - Date.now()) / 60e3)} хв</small>`
+      : `<b>${GENS[it.g].name}</b>${lv}<small>Заряд ${it.ch}/${MECH.cap(it)} · тапай, щоб отримати ${ch.items[0][0]} (−1 ⚡)</small>`;
+  } else if (it.c === "dish") {
+    text = `<b>${itemName(it)}</b><small>Страву просять сусіди за ⭐⭐</small>`;
+    btn = `<button class="sell" id="sellBtn">Продати +${Math.round(itemValue(it.c, it.l) / 2)}🪙</button>`;
   } else if (CHAINS[it.c].open) {
     text = `<b>${itemName(it)}</b><small>Тапни ще раз, щоб відкрити!${isMax(it) ? "" : " Або об'єднай два однакові"}</small>`;
   } else if (CHAINS[it.c].collect) {
@@ -1023,6 +1052,7 @@ function onMove(e) {
   if (!drag) return;
   const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
   if (!drag.ghost && dx * dx + dy * dy < 64) return;
+  if (S.board[drag.i] && S.board[drag.i].lock) return;
   if (!drag.ghost) {
     const r = drag.tile.getBoundingClientRect();
     const g = drag.tile.cloneNode(true);
@@ -1040,7 +1070,7 @@ function onMove(e) {
   if (cell) {
     const t = S.board[+cell.dataset.i], A = S.board[drag.i];
     cell.classList.add("over");
-    cell.classList.toggle("can-merge", !!(t && A && !A.g && !t.g && t.c === A.c && t.l === A.l && +cell.dataset.i !== drag.i && !isMax(A)));
+    cell.classList.toggle("can-merge", +cell.dataset.i !== drag.i && (!!(t && A && !A.g && !t.g && !t.lock && !t.st && t.c === A.c && t.l === A.l && !isMax(A)) || MECH.canMergeGens(A, t)));
   }
   drag.over = cell;
 }
@@ -1059,6 +1089,8 @@ function onUp(e) {
 function tap(i) {
   const it = S.board[i];
   if (!it) return;
+  if (it.lock) { selected = i; renderBoard(); renderInfo(); MECH.lockModal(i); return; }
+  if (it.st) { selected = i; renderInfo(); MECH.ovenModal(i); return; }
   if (it.g) { selected = i; produce(i); renderInfo(); return; }
   const ch = CHAINS[it.c];
   if (ch.collect) { collect(i); return; }
@@ -1089,6 +1121,7 @@ function isStandalone() { return window.navigator.standalone === true || matchMe
 function startGame() {
   $("start").classList.remove("show");
   $("app").hidden = false;
+  MECH.migrate();
   fillOrders();
   renderAll();
   showTab("board");
@@ -1151,6 +1184,8 @@ function init() {
     const before = S.energy;
     renderTop();
     if (window.EV) { EV.renderButton(); if (Date.now() % 5000 < 1000) EV.tick(); }
+    MECH.tick();
+    if (Date.now() % 5000 < 1000) MECH.checkOven();
     if (!$("tab-shop").hidden) renderShop();
     if (S.energy !== before) save();
   }, 1000);
