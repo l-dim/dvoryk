@@ -67,7 +67,7 @@ const PORTRAITS = ["halya", "stepan", "olya", "marichka", "cat", "andriy", "liza
 /* Мальовані тварини для дворика: емодзі → items/<назва>.webp */
 const YARD_ANIMALS = { "🐕": "animal-dog", "🐔": "animal-hen", "🐓": "animal-rooster", "🐣": "animal-hatch",
   "🐥": "animal-chick", "🐐": "animal-goat", "🐦": "animal-bird", "🐝": "animal-bee" };
-const YARD_PICS = ["olya-bride", "olya-groom", "liza-bride", "taras-groom", "olya-full", "andriy-full", "halya-full", "stepan-full", "halya-bride", "stepan-groom", "liza-full", "taras-full"];
+const YARD_PICS = ["olya-bride", "olya-groom", "liza-bride", "taras-groom", "olya-full", "andriy-full", "halya-full", "stepan-full", "halya-bride", "stepan-groom", "liza-full", "taras-full", "liza-baby"];
 /* Зимове вбрання на повний зріст: portraits/<ключ>-winter.webp (для вдягнених сусідів узимку) */
 const PORTRAITS_WINTER = ["halya", "stepan", "olya", "marichka", "andriy", "liza", "cat", "ivan", "taras", "iryna"];
 const PORTRAITS_FULL = ["halya", "stepan", "olya", "marichka", "andriy", "liza", "ivan", "taras", "iryna"];
@@ -1083,7 +1083,7 @@ const STORY = [
         lines: [["olya", "Тут Тарасові фотоапарати… одинадцять штук. Перенесемо в сарай 😄"]] },
       { title: "Прибрати пил", cost: 9, remove: ["dust"], add: [],
         lines: [["iryna", "Дитяча кімната має бути найчистішою в хаті. Навіть Пиріжка помили! 🐱"], ["cat", "Мяу!!! (Пиріжок це не пробачить.)"]] },
-      { title: "Колиска від діда Степана", cost: 10, add: [{ e: "🛏️", x: 50, y: 62, s: 12 }],
+      { title: "Колиска від діда Степана", cost: 10, add: [{ e: "🛏️", paint: true, x: 50, y: 62, s: 12 }],
         lines: [["stepan", "Дубова колиска. Я в ній сам колись спав — а тепер поправив і пофарбував 🪵"]] },
       { title: "Вишита ковдрочка", cost: 10, add: [{ e: "🧶", x: 40, y: 72, s: 5 }, { e: "🎀", x: 58, y: 70, s: 5 }],
         lines: [["halya", "Вишила на ковдрочці калину й зірочки — на щастя й на здоров'я 🧵"]] },
@@ -1091,7 +1091,7 @@ const STORY = [
         lines: [["marichka", "Я віддаю свого ведмедика! Він уже дорослий, йому потрібна нова дитинка 🧸"]] },
       { title: "Пляшечки й пелюшки", cost: 10, add: [{ e: "🍼", x: 64, y: 82, s: 5 }, { e: "🧺", x: 74, y: 76, s: 6 }],
         lines: [["andriy", "А я зварив Лізі курячий бульйон на тиждень вперед. Молодим мамам треба сили 🍲"]] },
-      { title: "Сюрприз готовий", cost: 11, add: [{ e: "🎈", x: 22, y: 50, s: 7 }, { e: "💖", x: 50, y: 44, s: 6 }],
+      { title: "Сюрприз готовий", cost: 11, add: [{ e: "🎈", x: 22, y: 50, s: 7 }, { e: "💖", x: 50, y: 44, s: 6 }, { e: "👩", pic: "liza-baby", x: 30, y: 70, s: 10 }],
         lines: [["liza", "(заходить із малечею на руках) …Це все ви? Для нас? 🥹"],
                 ["taras", "Я не можу говорити. Я знову плачу. Просто сфотографуйте мене хтось 📸😭"]] }
     ],
@@ -1123,7 +1123,7 @@ const STORY = [
         lines: [["olya", "Я принесла ромашки. Бо від ромашок діти ростуть добрими 🌼"]] },
       { title: "Хрещені батьки", cost: 11, add: [{ e: "💖", x: 50, y: 54, s: 5 }],
         lines: [["liza", "{name}, ти будеш хрещеною мамою? 🥹"], ["taras", "Ми не уявляємо нікого іншого. Без тебе в нас не було б нічого з цього 💛"]] },
-      { title: "Ім'я для малечі", cost: 11, add: [{ e: "👩", pic: "liza-full", x: 40, y: 64, s: 10 }, { e: "👶", x: 50, y: 70, s: 7 }, { e: "👨", pic: "taras-full", x: 60, y: 64, s: 10 }],
+      { title: "Ім'я для малечі", cost: 11, add: [{ e: "👩", pic: "liza-baby", x: 44, y: 64, s: 10 }, { e: "👨", pic: "taras-full", x: 56, y: 64, s: 10 }],
         lines: [["liza", "Знайомтеся: Галинка 💛"],
                 ["halya", "…Галинка? Як я?.. 😭"],
                 ["taras", "Як найдобріша людина, яку ми знаємо. Бабусю Галю, ви тепер бабуся по-справжньому 💛"],
@@ -1158,7 +1158,8 @@ const VILLAGE_ART = ["vil-hive", "vil-mill", "vil-bridge", "vil-boat", "vil-well
 const DECO_ICONS = { "⛲": "deco-fountain", "⛱️": "deco-umbrella", "🕸️": "deco-web", "🕰️": "deco-clock", "🔥": "deco-fire",
   "💨": "deco-dust", "🎈": "deco-balloons", "🏆": "deco-trophy", "🎻": "deco-violin",
   "🪗": "deco-accordion", "🎆": "deco-firework", "🎇": "deco-sparkler", "🎉": "deco-popper", "🎊": "deco-confetti",
-  "🌙": "deco-moon", "🎶": "deco-notes", "🕯️": "deco-candle", "⛸️": "deco-skates", "🧑‍🌾": "deco-scarecrow" };
+  "🌙": "deco-moon", "🎶": "deco-notes", "🕯️": "deco-candle", "⛸️": "deco-skates", "🧑‍🌾": "deco-scarecrow",
+  "🎀": "deco-bow", "💖": "deco-heart", "💕": "deco-hearts", "🌟": "deco-star", "✨": "deco-sparkles", "💍": "deco-ring", "🍊": "deco-tangerine", "🍂": "deco-leaves", "🍁": "deco-maple", "🛏️": "deco-cradle", "🖼️": "deco-picture", "🪞": "deco-mirror", "👗": "deco-dress", "🥾": "deco-boots", "🍼": "deco-bottle", "🧵": "deco-thread", "🐑": "deco-lamb", "🔔": "deco-bell", "📸": "deco-camera", "🎲": "deco-dice", "🃏": "deco-cards", "🥳": "deco-party", "🕷️": "deco-spider", "🟫": "deco-soil", "👼": "deco-angel", "🪡": "deco-needle", "👶": "deco-baby" };
 /* Мальовані значки інтерфейсу: емодзі → items/<назва>.webp (аркуш sheet-ui) */
 const UI_ICONS = { "⭐": "ui-star", "⚙️": "ui-gear", "🏡": "ui-home", "🛍️": "ui-shop", "📖": "ui-book",
   "✅": "ui-check", "🔨": "ui-hammer", "🔒": "ui-lock", "📜": "ui-scroll", "❄️": "ui-snow", "♨️": "st-oven" };
