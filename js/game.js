@@ -173,6 +173,7 @@ function produce(i) {
     item = { c: gen.chain, l: r < 0.03 + S.level * 0.002 ? 2 : r < up ? 1 : 0 };
   }
   const at = placeItem(item, i);
+  if (at >= 0) spawnFrom.set(at, i);
   sfx.pop();
   bounce(i);
   if (S.tut === 0) setTut(1);
@@ -193,7 +194,8 @@ function openChest(i) {
     if (r < 0.08) item = { c: "energy", l: Math.min(2, rnd(k + 1)) };
     else if (r < 0.28) item = { c: "coin", l: Math.min(3, rnd(k + 2)) };
     else item = { c: pick(unlocked), l: rnd(maxT + 1) };
-    placeItem(item, i);
+    const at = placeItem(item, i);
+    if (at >= 0) spawnFrom.set(at, i);
   }
   sfx.open();
   sparkle(i, "✨", 8);
@@ -205,8 +207,9 @@ function collect(i) {
   const it = S.board[i], ch = CHAINS[it.c];
   const v = ch.values[it.l];
   S.board[i] = null;
-  if (ch.collect === "coins") { S.coins += v; sfx.coin(); floatAt(i, "+" + v + " 🪙"); }
-  else { regen(); S.energy += v; sfx.coin(); floatAt(i, "+" + v + " ⚡"); }
+  const src = cellRect(i);
+  if (ch.collect === "coins") { S.coins += v; sfx.coin(); floatAt(i, "+" + v + " 🪙"); flyMany(src, "🪙", "coins", Math.min(6, 2 + it.l * 2)); }
+  else { regen(); S.energy += v; sfx.coin(); floatAt(i, "+" + v + " ⚡"); flyMany(src, "⚡", "energy", Math.min(6, 2 + it.l * 2)); }
   if (selected === i) selected = -1;
   renderBoard(); renderTop(); renderInfo(); save();
 }
@@ -228,7 +231,7 @@ function handleDrop(a, b) {
     gainXp(1 + Math.floor(nl / 2));
     sfx.merge(nl);
     sparkle(b, "✨", 5);
-    popIdx.add(b);
+    popIdx.add(b); mergedIdx.add(b); burstAt(b);
     selected = b;
     // невеликий бонус за злиття
     const bonus = Math.random();
@@ -308,20 +311,24 @@ function deliver(id) {
   if (!o) return;
   const found = matchOrder(o);
   if (found.some(i => i < 0)) { sfx.nope(); return; }
-  found.forEach(i => { flyFrom(i); S.board[i] = null; if (selected === i) selected = -1; });
+  const card = document.querySelector(`.order[data-id="${id}"]`);
+  found.forEach((i, k) => { flyFrom(i, card, k * 70); S.board[i] = null; if (selected === i) selected = -1; });
+  if (card && FARM) {
+    const cr = card.getBoundingClientRect();
+    setTimeout(() => { flyMany(cr, "🪙", "coins", 4); if (o.stars) flyMany(cr, "⭐", "stars", o.stars + 1, 120); }, 380);
+  }
   S.coins += o.coins;
   S.stars += o.stars;
   S.ordersDone++;
   sfx.deliver();
-  const card = document.querySelector(`.order[data-id="${id}"]`);
   bubble(CHARS[o.ch], pick(CHARS[o.ch].thanks), card);
   S.orders = S.orders.filter(x => x.id !== id);
   if (S.ordersDone % 4 === 0) placeItem({ c: "chest", l: 0 });
   gainXp(o.xp);
   if (S.tut === 2) setTut(3);
   renderBoard(); renderTop(); renderInfo();
-  if (card) card.classList.add("leaving");
-  setTimeout(() => { fillOrders(); renderOrders(); save(); }, 450);
+  if (card) { card.classList.add("got"); setTimeout(() => card.classList.add("leaving"), FARM ? 420 : 0); }
+  setTimeout(() => { fillOrders(); renderOrders(); save(); }, FARM ? 850 : 450);
   renderNavBadge();
   save();
 }
@@ -478,6 +485,8 @@ function sellSelected() {
    ============================================================ */
 let selected = -1;
 const popIdx = new Set();
+const spawnFrom = new Map(); // клітинка → звідки прилетів предмет
+const mergedIdx = new Set();
 let neededIdx = new Set();
 
 function renderAll() { renderTop(); renderOrders(); renderBoard(); renderInfo(); renderInbox(); renderStory(); renderShop(); renderCollection(); renderNavBadge(); renderTut(); }
@@ -536,20 +545,23 @@ function renderBoard() {
     const cell = board.children[i], it = S.board[i];
     cell.classList.toggle("sel", i === selected);
     const key = it ? (it.g ? "g:" + it.g : it.c + ":" + it.l) : "";
-    if (cell.dataset.key === key && !popIdx.has(i)) { cell.firstChild && cell.firstChild.classList.toggle("needed", neededIdx.has(i)); continue; }
+    if (cell.dataset.key === key && !popIdx.has(i) && !spawnFrom.has(i) && !mergedIdx.has(i)) { cell.firstChild && cell.firstChild.classList.toggle("needed", neededIdx.has(i)); continue; }
     cell.dataset.key = key;
     cell.innerHTML = "";
     if (!it) continue;
     const t = document.createElement("div");
+    const from = spawnFrom.has(i) && FARM ? cellRect(spawnFrom.get(i)) : null, to = from && cellRect(i);
+    const anim = from && to ? " spawn" : mergedIdx.has(i) && FARM ? " merged" : popIdx.has(i) ? " pop" : "";
     t.className = "tile" + (it.g ? " gen" : "") + (it.c && CHAINS[it.c].open ? " chest" : "") +
       (it.c && CHAINS[it.c].collect ? " collect" : "") + (isMax(it) && PRODUCT_CHAINS.includes(it.c) ? " max" : "") +
-      (popIdx.has(i) ? " pop" : "") + (neededIdx.has(i) ? " needed" : "");
+      anim + (neededIdx.has(i) ? " needed" : "");
+    if (from && to) { t.style.setProperty("--fx", (from.left - to.left) + "px"); t.style.setProperty("--fy", (from.top - to.top) + "px"); }
     t.dataset.i = i;
     t.textContent = itemIcon(it);
     if (it.g) { const b = document.createElement("span"); b.className = "gen-badge"; b.textContent = "⚡"; t.appendChild(b); }
     cell.appendChild(t);
   }
-  popIdx.clear();
+  popIdx.clear(); spawnFrom.clear(); mergedIdx.clear();
 }
 
 function renderInfo() {
@@ -734,13 +746,54 @@ function sparkle(i, ch, n) {
     setTimeout(() => s.remove(), 700);
   }
 }
-function flyFrom(i) {
+const FARM = document.body.classList.contains("farm");
+function flyFrom(i, toEl, delay = 0) {
   const r = cellRect(i); if (!r) return;
+  if (FARM && toEl) { flyIcon(itemIcon(S.board[i]), r, toEl.getBoundingClientRect(), { delay, size: r.width * 0.8, end: 0.5, onEnd: () => toEl.classList.add("got") }); return; }
   const f = document.createElement("div");
   f.className = "fly"; f.textContent = itemIcon(S.board[i]);
   f.style.left = (r.left + r.width / 2) + "px"; f.style.top = (r.top + r.height / 2) + "px";
   document.body.appendChild(f);
   setTimeout(() => f.remove(), 700);
+}
+/* іконка летить дугою з одного місця в інше */
+function flyIcon(content, from, to, { delay = 0, size = 30, dur = 620, end = 0.6, lift = 70, onEnd } = {}) {
+  if (!from || !to) return;
+  const f = document.createElement("div");
+  f.className = "flyto"; f.textContent = content; f.style.fontSize = size + "px";
+  document.body.appendChild(f);
+  const x0 = from.left + from.width / 2 - size / 2, y0 = from.top + from.height / 2 - size / 2;
+  const x1 = to.left + to.width / 2 - size / 2, y1 = to.top + to.height / 2 - size / 2;
+  const mx = (x0 + x1) / 2 + (Math.random() - 0.5) * 40, my = Math.min(y0, y1) - lift;
+  const kf = [];
+  for (let k = 0; k <= 10; k++) {
+    const t = k / 10, u = 1 - t;
+    const x = u * u * x0 + 2 * u * t * mx + t * t * x1, y = u * u * y0 + 2 * u * t * my + t * t * y1;
+    const s = k === 0 ? 0.6 : k < 3 ? 1.15 : 1 - (1 - end) * t;
+    kf.push({ transform: `translate(${x}px, ${y}px) scale(${s})`, opacity: k === 0 ? 0 : 1 });
+  }
+  const a = f.animate(kf, { duration: dur, delay, easing: "cubic-bezier(.4, 0, .7, 1)", fill: "both" });
+  a.onfinish = () => { f.remove(); onEnd && onEnd(); };
+}
+/* кілька монеток / зірочок летять у лічильник угорі */
+function flyMany(from, content, counterId, n, delay0 = 0) {
+  if (!FARM || !from) return;
+  const target = $(counterId) && $(counterId).closest(".chip");
+  if (!target) return;
+  const to = target.getBoundingClientRect();
+  for (let k = 0; k < n; k++) {
+    flyIcon(content, from, to, { delay: delay0 + k * 70, size: 24, dur: 650, end: 0.7, lift: 40 + Math.random() * 50,
+      onEnd: () => { target.classList.remove("bump"); void target.offsetWidth; target.classList.add("bump"); if (k === n - 1) sfx.coin(); } });
+  }
+}
+function burstAt(i) {
+  if (!FARM) return;
+  const r = cellRect(i); if (!r) return;
+  const b = document.createElement("div");
+  b.className = "burst";
+  b.style.left = (r.left + r.width / 2) + "px"; b.style.top = (r.top + r.height / 2) + "px";
+  document.body.appendChild(b);
+  setTimeout(() => b.remove(), 460);
 }
 function bounce(i) {
   const c = $("board").children[i];

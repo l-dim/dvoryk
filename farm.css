@@ -1,0 +1,259 @@
+/* ============================================================
+   ФЕРМЕРСЬКИЙ СТИЛЬ (body.farm)
+   Соковита трава, дерев'яні рамки, пергамент, стрічки, пухкі кнопки.
+   Вмикається класом farm на body; без нього лишається старий вигляд.
+   ============================================================ */
+body.farm {
+  --ink: #5b3416;
+  --ink-soft: #8d6640;
+  --wood-l: #d0914f;
+  --wood: #ad6b30;
+  --wood-d: #7c461a;
+  --wood-dd: #55300f;
+  --parch: #fff5da;
+  --parch2: #f6e2b3;
+  --parch-edge: #dcb57c;
+  --grass: #7cc444;
+  --grass-d: #4f9a29;
+  --green: #6cc23a;
+  --green-d: #3f8a1c;
+  --gold: #ffc53d;
+  --line: #e2c48f;
+  --outline: 0 1px 0 rgba(70, 35, 8, .9), 0 -1px 0 rgba(70, 35, 8, .6), 1px 0 0 rgba(70, 35, 8, .6), -1px 0 0 rgba(70, 35, 8, .6), 0 2px 2px rgba(50, 25, 5, .5);
+  background-color: #6fbb3c;
+  background-image:
+    radial-gradient(90% 40% at 50% 0%, rgba(255, 255, 210, .45), transparent 70%),
+    radial-gradient(45% 30% at 15% 60%, rgba(160, 225, 100, .35), transparent 70%),
+    radial-gradient(40% 28% at 85% 85%, rgba(40, 110, 20, .25), transparent 70%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cg fill='none' stroke-linecap='round' stroke-width='2.2'%3E%3Cpath d='M14 34q1-9 6-13M17 35q-1-8-6-12M20 35q3-6 9-8' stroke='%2353a22d'/%3E%3Cpath d='M96 22q1-9 6-13M99 23q-1-8-6-12M102 23q3-6 9-8' stroke='%239ad65f'/%3E%3Cpath d='M60 92q1-9 6-13M63 93q-1-8-6-12M66 93q3-6 9-8' stroke='%2353a22d'/%3E%3Cpath d='M126 118q1-9 6-13M129 119q-1-8-6-12' stroke='%239ad65f'/%3E%3Cpath d='M28 132q1-8 5-11M31 133q-1-7-5-10' stroke='%2364b23a'/%3E%3C/g%3E%3Ccircle cx='118' cy='62' r='3' fill='%23fff'/%3E%3Ccircle cx='118' cy='62' r='1.3' fill='%23ffd23d'/%3E%3Ccircle cx='40' cy='70' r='2.5' fill='%23ffe36b'/%3E%3Ccircle cx='86' cy='138' r='2.6' fill='%23ffb3d1'/%3E%3C/svg%3E");
+  background-attachment: fixed;
+}
+
+/* ---------- текст-обвідка для заголовків на дереві ---------- */
+body.farm .m-title, body.farm .panel h2, body.farm .nav button, body.farm .chip, body.farm .btn, body.farm .o-btn,
+body.farm .t-btn, body.farm .s-btn, body.farm .sell, body.farm .toast, body.farm .start h1 { letter-spacing: .1px; }
+
+/* ---------- Кнопки: пухкі, глянцеві ---------- */
+body.farm .btn, body.farm .btn.tea, body.farm .o-btn, body.farm .t-btn {
+  color: #fff; text-shadow: 0 2px 0 rgba(30, 80, 5, .75), 0 0 2px rgba(30, 80, 5, .5);
+  background: linear-gradient(#a6ec66 0%, #74c83b 48%, #5bb02a 52%, #61b92e 100%);
+  border: 2px solid #3a7f17;
+  box-shadow: 0 4px 0 #2f6b12, 0 6px 10px rgba(30, 60, 10, .3), inset 0 2px 0 rgba(255, 255, 255, .55), inset 0 -3px 0 rgba(0, 0, 0, .12);
+}
+body.farm .btn { border-radius: 18px; font-size: 18px; font-weight: 900; }
+body.farm .btn:active, body.farm .o-btn:active, body.farm .t-btn:active, body.farm .s-btn:active, body.farm .sell:active {
+  transform: translateY(3px) scale(.98); box-shadow: 0 1px 0 #2f6b12, inset 0 2px 0 rgba(255, 255, 255, .4);
+}
+body.farm .btn.ghost {
+  color: var(--ink); text-shadow: none;
+  background: linear-gradient(#fffaf0, #f4e0b4); border: 2px solid var(--parch-edge);
+  box-shadow: 0 4px 0 #b88a4e, inset 0 2px 0 #fff;
+}
+body.farm .btn:disabled { filter: grayscale(.55); opacity: .7; }
+body.farm .s-btn, body.farm .sell {
+  color: #fff; text-shadow: 0 2px 0 rgba(130, 70, 0, .8);
+  background: linear-gradient(#ffe27a 0%, #ffc43a 50%, #f5a91d 52%, #f7b326 100%);
+  border: 2px solid #b8730c; box-shadow: 0 3px 0 #94590a, inset 0 2px 0 rgba(255, 255, 255, .6);
+}
+body.farm .o-btn { border-radius: 12px; font-size: 14px; }
+body.farm .t-btn { border-radius: 14px; }
+
+/* ---------- Верхня панель: дерев'яні таблички ---------- */
+body.farm .top { padding-top: 10px; }
+body.farm .chip, body.farm .gear {
+  color: #fff8e6; text-shadow: var(--outline); font-size: 16px;
+  background: linear-gradient(#9a5f2c, #7a4519 55%, #6a3a12);
+  border: 2px solid #4a2709; border-radius: 16px;
+  box-shadow: 0 3px 0 #3a1e06, inset 0 2px 0 rgba(255, 210, 150, .35), inset 0 -2px 0 rgba(0, 0, 0, .25);
+}
+body.farm .chip .ic { font-size: 20px; margin-left: -6px; filter: drop-shadow(0 2px 1px rgba(0, 0, 0, .35)); }
+body.farm .chip .ic .e3d { width: 1.25em; height: 1.25em; }
+body.farm .chip small { color: #ffe9b8; text-shadow: none; opacity: .9; }
+body.farm .gear .e3d { width: 1.05em; height: 1.05em; }
+body.farm .xp-ring { width: 44px; height: 44px; background: conic-gradient(#8ef04a calc(var(--p) * 1%), #4a2709 0);
+  box-shadow: 0 3px 0 #3a1e06, 0 0 0 2px #4a2709; }
+body.farm .xp-ring span { width: 34px; height: 34px; color: #6a3a00; font-size: 16px;
+  background: radial-gradient(circle at 40% 30%, #fff6b0, #ffd43d 55%, #f0a812); box-shadow: inset 0 -2px 0 rgba(150, 80, 0, .35); }
+body.farm .chip.bump { animation: chipBump .45s cubic-bezier(.3, 1.8, .5, 1); }
+body.farm .xp-ring.bump { animation: chipBump .45s cubic-bezier(.3, 1.8, .5, 1); }
+
+/* ---------- Пергамент у дерев'яній рамці ---------- */
+body.farm .order, body.farm .info, body.farm .panel, body.farm .inbox, body.farm .m-box, body.farm .d-box, body.farm .start-card {
+  background:
+    radial-gradient(120% 90% at 50% 40%, transparent 60%, rgba(190, 130, 60, .22) 100%),
+    linear-gradient(#fff9e6, var(--parch) 40%, var(--parch2));
+  border: 3px solid var(--wood);
+  box-shadow: 0 4px 0 var(--wood-d), 0 8px 14px rgba(30, 60, 10, .28), inset 0 0 0 2px rgba(255, 250, 230, .9), inset 0 0 0 4px rgba(214, 170, 105, .35);
+}
+
+/* ---------- Замовлення ---------- */
+body.farm .orders { gap: 8px; padding-top: 6px; }
+body.farm .order { border-radius: 16px; padding: 5px 5px 7px; min-height: 108px; }
+body.farm .order:nth-child(2) { transform: rotate(-.6deg); }
+body.farm .order:nth-child(3) { transform: rotate(.6deg); }
+body.farm .o-who { margin: -2px -2px 2px; background: linear-gradient(#b8783a, #95561f); border-radius: 11px 11px 6px 6px; padding: 2px 0; box-shadow: inset 0 1px 0 rgba(255, 220, 170, .4); }
+body.farm .o-name { color: #fff8e6; text-shadow: var(--outline); }
+body.farm .o-ava { font-size: 24px; margin: -6px 0 -4px; filter: drop-shadow(0 2px 1px rgba(0, 0, 0, .3)); }
+body.farm .o-item { background: radial-gradient(circle at 50% 35%, #fffef6, #f3dca8); border-radius: 50%; box-shadow: inset 0 -2px 0 rgba(170, 115, 60, .3), 0 0 0 2px #e3c38a; }
+body.farm .o-item.have::after { background: linear-gradient(#8fe052, #4fae22); box-shadow: 0 1px 0 #2f6b12; }
+body.farm .o-rew { color: var(--ink); }
+body.farm .order.ready { border-color: #4fae22; animation: readyBob 1.4s ease-in-out infinite;
+  box-shadow: 0 4px 0 #2f6b12, 0 0 0 3px rgba(150, 240, 90, .5), 0 0 18px rgba(170, 255, 100, .7), inset 0 0 0 2px rgba(255, 250, 230, .9); }
+body.farm .order.leaving { transform: scale(.5) translateY(-30px) rotate(-8deg); opacity: 0; transition: .4s cubic-bezier(.5, -.4, .7, .3); }
+body.farm .order.got { animation: gotHit .35s ease; }
+
+body.farm .tut { background: linear-gradient(#ff9d57, #f26d2d); border: 2px solid #b5440f; box-shadow: 0 3px 0 #8a330a; text-shadow: 0 1px 0 rgba(120, 40, 0, .8); border-radius: 14px; }
+
+/* ---------- Дошка: дерев'яна скринька з пергаментними клітинками ---------- */
+body.farm .board {
+  padding: 8px; gap: 3px; border-radius: 20px;
+  background:
+    linear-gradient(rgba(255, 220, 160, .25), transparent 30%, rgba(0, 0, 0, .12)),
+    repeating-linear-gradient(90deg, #b8753a 0 26px, #a9672f 26px 28px, #bf7c40 28px 50px, #9f5f2a 50px 52px);
+  border: 3px solid var(--wood-dd);
+  box-shadow: 0 6px 0 #4a2709, 0 14px 22px rgba(20, 50, 5, .4), inset 0 2px 0 rgba(255, 220, 160, .55), inset 0 -3px 0 rgba(0, 0, 0, .25);
+}
+body.farm .cell { border-radius: 10px; background: linear-gradient(#fff6dc, #f6e3b6);
+  box-shadow: inset 0 -3px 0 rgba(170, 115, 60, .25), inset 0 2px 0 rgba(255, 255, 255, .8); }
+body.farm .cell:nth-child(2n) { background: linear-gradient(#fbecc8, #f0d8a3); }
+body.farm .cell.over { background: linear-gradient(#fffbd0, #ffe98a); }
+body.farm .cell.can-merge { background: linear-gradient(#ecffd9, #c8f0a3); box-shadow: inset 0 0 0 3px #5bb52a, 0 0 12px rgba(140, 230, 80, .8); }
+body.farm .tile.gen { background: radial-gradient(circle at 50% 30%, #fffbe9, #ffd98f 70%, #f4b85a);
+  box-shadow: inset 0 0 0 2px #d58e35, inset 0 -4px 0 #d08a33, 0 2px 4px rgba(120, 60, 10, .35); animation: genBreath 2.8s ease-in-out infinite; }
+body.farm .gen-badge { filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .4)); }
+body.farm .cell.sel .tile { background: radial-gradient(circle at 50% 40%, #fffdf0, #ffe9a8);
+  box-shadow: inset 0 0 0 3px #ffb81c, 0 0 0 2px #fff3c0, 0 6px 12px rgba(200, 130, 20, .5); }
+body.farm .tile.max::before { box-shadow: inset 0 0 0 2px #ffc53d, 0 0 8px rgba(255, 200, 60, .8); }
+body.farm .tile.needed::after { background: linear-gradient(#8fe052, #4fae22); box-shadow: 0 1px 0 #2f6b12; }
+body.farm .tile.collect { animation: shine 2.2s ease-in-out infinite; }
+body.farm .tile.chest { animation: chestHop 2.6s ease-in-out infinite; }
+
+/* поява предмета: вилітає з генератора дугою */
+body.farm .tile.spawn { animation: spawnArc .5s cubic-bezier(.35, .1, .4, 1) both; z-index: 3; }
+/* злиття: сплющення + спалах */
+body.farm .tile.merged { animation: mergeSquash .45s cubic-bezier(.3, 1.6, .5, 1); z-index: 2; }
+.burst { position: fixed; z-index: 56; pointer-events: none; width: 10px; height: 10px; border-radius: 50%; transform: translate(-50%, -50%);
+  border: 4px solid #fff7b0; box-shadow: 0 0 14px 4px rgba(255, 230, 120, .9), inset 0 0 10px rgba(255, 255, 200, .9);
+  animation: burst .45s ease-out forwards; }
+.flyto { position: fixed; left: 0; top: 0; z-index: 59; pointer-events: none; font-family: var(--emoji); line-height: 1; will-change: transform;
+  filter: drop-shadow(0 4px 3px rgba(40, 20, 5, .35)); }
+.flyto .e3d { width: 1.2em; height: 1.2em; vertical-align: 0; }
+
+/* ---------- Інфо-рядок ---------- */
+body.farm .info { border-radius: 16px; }
+body.farm .info-hint { color: var(--ink-soft); font-weight: 700; }
+body.farm .lvl-tag { background: #f0d49a; color: var(--ink); }
+body.farm .inbox { border-radius: 16px; }
+body.farm .inbox span { background: linear-gradient(#ff7a5c, #e04a2a); box-shadow: 0 2px 0 #9c2a12; }
+
+/* ---------- Нижня навігація: дерев'яна дошка ---------- */
+body.farm .nav {
+  margin: 0 6px 4px; padding: 6px 6px 6px; border-radius: 20px;
+  background:
+    linear-gradient(rgba(255, 220, 160, .25), transparent 40%, rgba(0, 0, 0, .15)),
+    repeating-linear-gradient(90deg, #a9672f 0 60px, #9a5c27 60px 62px, #b06d33 62px 120px, #93561f 120px 122px);
+  border: 3px solid var(--wood-dd);
+  box-shadow: 0 4px 0 #3a1e06, 0 -2px 10px rgba(20, 50, 5, .25), inset 0 2px 0 rgba(255, 220, 160, .45);
+}
+body.farm .nav button { color: #fff1d2; text-shadow: var(--outline); border-radius: 14px; padding: 3px 0 4px; }
+body.farm .nav button span { filter: drop-shadow(0 2px 1px rgba(0, 0, 0, .35)); }
+body.farm .nav button.on { color: var(--ink); text-shadow: none;
+  background: linear-gradient(#fffbe8, #f6dfa9); box-shadow: 0 3px 0 #6a3a12, inset 0 2px 0 #fff, 0 0 0 2px #ffd36b; transform: translateY(-3px); }
+body.farm .nav button.on span { animation: navHop .5s cubic-bezier(.3, 1.8, .5, 1); transform: scale(1.15); }
+body.farm .nav .dot { background: linear-gradient(#ff7a5c, #e04a2a); border-color: #fff3d0; }
+
+/* ---------- Дворик ---------- */
+body.farm .scene { border: 4px solid var(--wood); border-radius: 22px;
+  box-shadow: 0 5px 0 var(--wood-d), 0 12px 20px rgba(20, 50, 5, .35), inset 0 0 0 2px rgba(255, 230, 180, .5); }
+body.farm .panel { border-radius: 20px; }
+body.farm .panel h2 { color: var(--ink); text-shadow: 0 2px 0 rgba(255, 255, 255, .8); }
+body.farm .ch-head h2 { font-size: 18px; }
+body.farm .link { color: #b4541c; }
+body.farm .bar { height: 14px; background: #e8cf9b; border-radius: 8px; box-shadow: inset 0 2px 3px rgba(120, 70, 20, .35); border: 2px solid #c79a5a; }
+body.farm .bar i { background: linear-gradient(#a6ec66, #5bb02a); box-shadow: inset 0 2px 0 rgba(255, 255, 255, .5); }
+body.farm .task { border-top: 2px dashed var(--line); }
+body.farm .t-cost { color: var(--ink-soft); }
+
+/* стрічка-заголовок у крамничці й колекції */
+body.farm #tab-shop .panel > h2, body.farm #tab-coll .panel > h2 {
+  position: relative; display: block; width: fit-content; margin: -4px auto 12px; padding: 6px 22px 8px;
+  color: #fff; text-shadow: 0 2px 0 rgba(120, 30, 10, .8); font-size: 20px;
+  background: linear-gradient(#ff8c63, #e2562e); border-radius: 6px; box-shadow: 0 3px 0 #9c2f12, inset 0 2px 0 rgba(255, 255, 255, .35);
+}
+body.farm #tab-shop .panel > h2 small, body.farm #tab-coll .panel > h2 small { color: #ffe6d6; }
+body.farm .shop-item { border-top: 2px dashed var(--line); }
+body.farm .s-ic { filter: drop-shadow(0 3px 2px rgba(90, 50, 20, .3)); }
+body.farm .coll-it { background: radial-gradient(circle at 50% 35%, #fffef6, #f3dca8); box-shadow: inset 0 -2px 0 rgba(170, 115, 60, .3), 0 0 0 2px #e3c38a; }
+
+/* ---------- Модалка: пергамент зі стрічкою ---------- */
+body.farm .modal { background: radial-gradient(circle at 50% 45%, rgba(40, 25, 5, .25), rgba(40, 25, 5, .6)); }
+body.farm .m-box { border-width: 4px; border-radius: 24px; padding: 30px 18px 18px; position: relative; overflow: visible;
+  animation: modalIn .45s cubic-bezier(.3, 1.5, .5, 1); }
+body.farm .m-title {
+  position: absolute; left: 50%; top: -22px; transform: translateX(-50%); margin: 0; white-space: nowrap; max-width: 96%;
+  overflow: hidden; text-overflow: ellipsis;
+  padding: 8px 26px 10px; color: #fff; font-size: 19px; text-shadow: 0 2px 0 rgba(30, 80, 5, .8);
+  background: linear-gradient(#9be15d, #5cb82d); border: 2px solid #3a7f17; border-radius: 10px;
+  box-shadow: 0 4px 0 #2f6b12, inset 0 2px 0 rgba(255, 255, 255, .45);
+}
+body.farm .m-body { color: var(--ink); font-weight: 600; }
+body.farm .big-emoji { position: relative; display: inline-block; z-index: 0; margin: 4px 0; }
+body.farm .big-emoji::before { content: ""; position: absolute; left: 50%; top: 50%; width: 170px; height: 170px; z-index: -1;
+  transform: translate(-50%, -50%); border-radius: 50%;
+  background: repeating-conic-gradient(rgba(255, 220, 90, .55) 0 10deg, transparent 10deg 24deg);
+  -webkit-mask: radial-gradient(circle, #000 25%, transparent 70%); mask: radial-gradient(circle, #000 25%, transparent 70%);
+  animation: rays 9s linear infinite; }
+body.farm .rewards { color: var(--ink); }
+body.farm .set-row { border-bottom: 2px dashed var(--line); }
+
+/* ---------- Діалог: великий персонаж і пергамент ---------- */
+body.farm .dialog { background: linear-gradient(transparent 30%, rgba(30, 20, 5, .45)); }
+body.farm .d-box { position: relative; border-radius: 22px; padding: 14px 14px 12px 112px; min-height: 112px; overflow: visible; margin-top: 60px;
+  animation: dlgIn .4s cubic-bezier(.3, 1.4, .5, 1); }
+body.farm .d-ava { position: absolute; left: -2px; bottom: 4px; font-size: 120px; animation: talk 2.2s ease-in-out infinite;
+  filter: drop-shadow(0 6px 4px rgba(40, 20, 5, .35)); transform-origin: 50% 100%; }
+body.farm .d-ava .e3d { width: 1.05em; height: 1.05em; }
+body.farm .d-name { display: inline-block; top: -30px; margin: 0 0 -24px -8px; padding: 4px 14px 6px; color: #fff; font-size: 15px;
+  text-shadow: 0 2px 0 rgba(120, 30, 10, .8); background: linear-gradient(#ff8c63, #e2562e); border-radius: 8px;
+  box-shadow: 0 3px 0 #9c2f12, inset 0 2px 0 rgba(255, 255, 255, .35); position: relative; }
+body.farm .d-text { color: var(--ink); }
+body.farm .d-next { color: var(--ink-soft); animation: pulse 1.4s ease-in-out infinite; }
+
+/* ---------- Сповіщення ---------- */
+body.farm .toast { background: linear-gradient(#9a5f2c, #6a3a12); border: 2px solid #4a2709; color: #fff8e6; text-shadow: var(--outline);
+  box-shadow: 0 3px 0 #3a1e06, 0 8px 14px rgba(0, 0, 0, .3); border-radius: 16px; }
+body.farm .bubble { background: linear-gradient(#fffdf2, #fff3d2); border: 3px solid var(--wood); box-shadow: 0 4px 0 var(--wood-d), 0 10px 18px rgba(30, 60, 10, .3); }
+body.farm .float { color: #fff; font-size: 18px; text-shadow: var(--outline); }
+
+/* ---------- Старт ---------- */
+body.farm .start { background: transparent; }
+body.farm .start-card { border-radius: 26px; padding: 22px 18px; border-width: 4px; }
+body.farm .start h1 { color: #fff; font-size: 34px; text-shadow: 0 3px 0 #3a7f17, 0 -1px 0 #3a7f17, 2px 0 0 #3a7f17, -2px 0 0 #3a7f17, 0 6px 6px rgba(20, 50, 5, .4); }
+body.farm .start-sub { color: var(--ink-soft); }
+body.farm #nameInput { background: #fffdf4; border: 2px solid var(--parch-edge); box-shadow: inset 0 2px 3px rgba(150, 100, 40, .25); }
+body.farm .install { background: rgba(255, 248, 225, .9); }
+
+/* ---------- Анімації ---------- */
+@keyframes spawnArc {
+  0% { transform: translate(var(--fx), var(--fy)) scale(.35); opacity: .3; }
+  50% { transform: translate(calc(var(--fx) * .45), calc(var(--fy) * .45 - 34px)) scale(.95); opacity: 1; }
+  80% { transform: translate(0, 0) scale(1.12, .86); }
+  100% { transform: none; }
+}
+@keyframes mergeSquash { 0% { transform: scale(.4); } 45% { transform: scale(1.28, .8); } 70% { transform: scale(.9, 1.12); } 100% { transform: scale(1); } }
+@keyframes burst { to { width: 90px; height: 90px; opacity: 0; border-width: 1px; } }
+@keyframes chipBump { 0% { transform: scale(1); } 40% { transform: scale(1.18); } 100% { transform: scale(1); } }
+@keyframes readyBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@keyframes gotHit { 50% { transform: scale(1.08); } }
+@keyframes genBreath { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+@keyframes shine { 0%, 100% { filter: drop-shadow(0 0 3px rgba(255, 210, 90, .7)); } 50% { filter: drop-shadow(0 0 9px rgba(255, 230, 120, 1)); transform: scale(1.06); } }
+@keyframes chestHop { 0%, 70%, 100% { transform: translateY(0) rotate(0); } 76% { transform: translateY(-5px) rotate(-5deg); } 82% { transform: translateY(0) rotate(4deg); } 88% { transform: translateY(-2px) rotate(-2deg); } }
+@keyframes navHop { 0% { transform: scale(.8); } 60% { transform: scale(1.3) translateY(-3px); } 100% { transform: scale(1.15); } }
+@keyframes modalIn { 0% { transform: scale(.4) translateY(30px); opacity: 0; } 100% { transform: none; opacity: 1; } }
+@keyframes dlgIn { 0% { transform: translateY(60px) scale(.9); opacity: 0; } 100% { transform: none; opacity: 1; } }
+@keyframes talk { 0%, 100% { transform: rotate(0) scaleY(1); } 25% { transform: rotate(-2deg) scaleY(1.02); } 75% { transform: rotate(2deg) scaleY(.99); } }
+@keyframes rays { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  body.farm .tile.gen, body.farm .tile.chest, body.farm .tile.collect, body.farm .order.ready, body.farm .d-ava, body.farm .big-emoji::before { animation: none; }
+}

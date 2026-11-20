@@ -59,8 +59,8 @@ function init(el) {
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "low-power" });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.05;
+  renderer.toneMapping = THREE.NeutralToneMapping;
+  renderer.toneMappingExposure = 1.0;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.domElement.className = "yard3d";
@@ -70,7 +70,8 @@ function init(el) {
   camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
   camera.position.set(0, 10.5, 18);
 
-  scene.add(new THREE.HemisphereLight(0xfff4e0, 0x8a6a4a, 1.6));
+  hemi = new THREE.HemisphereLight(0xfff4e0, 0x8a6a4a, 1.6);
+  scene.add(hemi);
   sun = new THREE.DirectionalLight(0xfff1d6, 2.2);
   sun.position.set(6, 12, 7);
   sun.castShadow = true;
@@ -287,12 +288,84 @@ async function scatter(on) {
   if (grassGroup !== g) return;
   for (let i = 0; i < 34; i++) {
     const a = rand() * Math.PI * 2, r = 1.2 + Math.sqrt(rand()) * (R - 1.6);
-    const o = srcs[i % kinds.length].clone(true);
+    const kind = i % kinds.length;
+    const o = kinds[kind].includes("flower") ? srcs[kind].clone(true) : paint(srcs[kind].clone(true), rand() < 0.5 ? 0x4e9e2b : 0x66b83a);
     normalize(o, 0.35 + rand() * 0.25);
     const h = new THREE.Group(); h.add(o);
     h.position.set(Math.cos(a) * r, 0, Math.sin(a) * r); h.rotation.y = rand() * 6.28;
     g.add(h);
   }
+  req(3);
+}
+
+/* ---------- огорожа, стежка з каменів і кущі ---------- */
+let decoGroup = null, hemi = null;
+function juicy(hex) {
+  // соковитіша трава: більше насиченості, трохи світліше
+  const c = new THREE.Color(hex), hsl = {};
+  c.getHSL(hsl);
+  return new THREE.Color().setHSL(hsl.h, Math.min(0.85, hsl.s * 1.25 + 0.12), Math.min(0.5, hsl.l * 0.78));
+}
+function paint(obj, color) {
+  obj.traverse(o => {
+    if (!o.isMesh) return;
+    const ms = Array.isArray(o.material) ? o.material : [o.material];
+    o.material = ms.map(m => { const n = m.clone(); n.map = null; n.color = new THREE.Color(color); return n; });
+    if (o.material.length === 1) o.material = o.material[0];
+  });
+  return obj;
+}
+async function decorate(ch, outdoor, winter) {
+  if (decoGroup) { scene.remove(decoGroup); decoGroup = null; }
+  if (!outdoor) return;
+  const g = new THREE.Group(); decoGroup = g; scene.add(g);
+  let seed = 11; const rand = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+
+  // стежка з плаского каміння від краю до центру
+  const stoneMat = new THREE.MeshStandardMaterial({ color: winter ? 0xd9dde3 : 0xe9e3d6, roughness: 1 });
+  for (let k = 0; k < 9; k++) {
+    const t = k / 8, z = R - 0.6 - t * (R * 0.95), x = Math.sin(t * 3.2) * 0.55;
+    for (let j = 0; j < 2; j++) {
+      const r = 0.22 + rand() * 0.12;
+      const st = new THREE.Mesh(new THREE.CylinderGeometry(r, r * 1.05, 0.06, 7), stoneMat);
+      st.position.set(x + (j ? 0.32 : -0.28) + (rand() - 0.5) * 0.12, 0.02, z + (rand() - 0.5) * 0.2);
+      st.rotation.y = rand() * 6.28; st.receiveShadow = true;
+      g.add(st);
+    }
+  }
+  try {
+    // біла огорожа по краю (спереду — відкрита хвіртка, щоб не заступала)
+    const fenceSrc = await loadModel("nature/fence_simple");
+    if (decoGroup !== g) return;
+    const fence = paint(fenceSrc.clone(true), 0xfbf6ec);
+    normalize(fence, 0.95);
+    const Rf = R - 0.22, step = 0.9 / Rf;
+    for (let a = 0; a < Math.PI * 2; a += step) {
+      const ang = a + step / 2;
+      const dz = Math.cos(ang); // 1 = до камери
+      if (dz > 0.72) continue;
+      const h = new THREE.Group(); h.add(fence.clone(true));
+      h.position.set(Math.sin(ang) * Rf, 0, Math.cos(ang) * Rf);
+      h.rotation.y = ang + Math.PI / 2;
+      g.add(h);
+    }
+    // пухкі кущі вздовж заднього краю
+    if (!winter) {
+      const bush = await loadModel("nature/plant_bushLarge");
+      const bush2 = await loadModel("nature/plant_bush");
+      if (decoGroup !== g) return;
+      for (let k = 0; k < 9; k++) {
+        const ang = Math.PI * (0.72 + k * 0.07) + (rand() - 0.5) * 0.05;
+        const o = (k % 2 ? bush2 : bush).clone(true);
+        normalize(o, 0.75 + rand() * 0.35);
+        const h = new THREE.Group(); h.add(o);
+        const rr = R - 0.75;
+        h.position.set(Math.sin(ang) * rr * (k % 2 ? 1 : 0.97), 0, Math.cos(ang) * rr);
+        h.rotation.y = rand() * 6.28;
+        g.add(h);
+      }
+    }
+  } catch (e) { /* без огорожі — не страшно */ }
   req(3);
 }
 
@@ -304,12 +377,15 @@ async function render(chIndex, ch, list, animate) {
     for (const [, it] of items) { scene.remove(it.obj); it.obj.traverse(o => billboards.delete(o)); }
     items.clear();
     chapterShown = chIndex;
-    islandTop.color.set(ch.ground);
-    island.userData.rim.material.color.set(new THREE.Color(ch.ground).multiplyScalar(0.85));
+    const winter = /Зимов/.test(ch.title);
+    hemi.color.set(winter ? 0xe8f0ff : 0xfff4e0); sun.color.set(winter ? 0xf4f8ff : 0xfff1d6);
+    islandTop.color.copy(winter ? new THREE.Color(0xeef4ff) : ch.indoor ? new THREE.Color(ch.ground).lerp(new THREE.Color(0xe8d2b0), 0.35) : juicy(ch.ground));
+    island.userData.rim.material.color.copy(islandTop.color).multiplyScalar(0.8);
     backWall.visible = indoorNow = !!ch.indoor;
     controls.reset && controls.reset();
     camera.position.set(0, 10.5, 18); controls.update();
-    scatter(!ch.indoor && !/Зимов/.test(ch.title));
+    scatter(!ch.indoor && !winter);
+    decorate(ch, !ch.indoor, winter);
   }
   const want = new Map(list.map(d => [d.key, d]));
   for (const [k, it] of items) if (!want.has(k)) { items.delete(k); vanish(it.obj); }
