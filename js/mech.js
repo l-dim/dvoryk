@@ -50,6 +50,7 @@ window.MECH = (() => {
     S.board[b] = { g: A.g, gl: nl, ch: GEN_CHARGE[nl - 1] };
     S.board[a] = null;
     gainXp(5);
+    window.QUEST && QUEST.track("merge");
     sfx.merge(4); sparkle(b, "✨", 8); popIdx.add(b); mergedIdx.add(b); burstAt(b);
     selected = b;
     setTimeout(() => modal({
@@ -132,6 +133,7 @@ window.MECH = (() => {
       const at = placeItem({ c: "dish", l }, i);
       if (at >= 0) popIdx.add(at);
       sfx.level(); sparkle(i, "✨", 8);
+      window.QUEST && QUEST.track("cook");
       toast("Готово: " + CHAINS.dish.items[l][0] + " " + CHAINS.dish.items[l][1] + "!");
       renderBoard(); renderOrders(); renderInfo(); save();
       return;

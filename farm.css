@@ -362,3 +362,47 @@ body.farm .order.urgent .o-who { background: linear-gradient(#ff8c63, #e2562e); 
   font: 900 11px/1 var(--font); padding: 3px 7px; border-radius: 10px; box-shadow: 0 2px 0 #9c2f12; white-space: nowrap; text-shadow: 0 1px 0 rgba(120, 30, 10, .6); }
 body.farm .order.dish { border-color: #f2a516; }
 body.farm .order.dish .o-who { background: linear-gradient(#ffc94d, #e8962a); }
+
+/* ---------- Завдання дня ---------- */
+.q-btn { flex: none; width: 56px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  border-radius: 16px; border: 3px solid var(--wood, #ad6b30); padding: 3px 4px 5px;
+  background: linear-gradient(#fff9e6, #f6e2b3); box-shadow: 0 4px 0 #7c461a; }
+.q-btn .q-ic { font-size: 24px; line-height: 1; font-family: var(--emoji); }
+.q-btn .q-ic .e3d { width: 1.1em; height: 1.1em; }
+.q-btn small { font: 900 11px/1 var(--font); color: #5b3416; }
+.q-btn.ready { border-color: #4fae22; animation: qReady 1.2s ease-in-out infinite; }
+.q-btn.ready::after { content: "!"; position: absolute; top: -8px; right: -6px; width: 18px; height: 18px; border-radius: 50%; background: linear-gradient(#ff8c63, #e2562e);
+  color: #fff; font: 900 12px/18px var(--font); text-align: center; box-shadow: 0 2px 0 #9c2f12; }
+.q-btn.claimed small { color: #3f8a1c; }
+@keyframes qReady { 50% { transform: translateY(-3px) scale(1.05); box-shadow: 0 4px 0 #2f6b12, 0 0 14px rgba(140, 230, 80, .9); } }
+.dq-list { text-align: left; }
+.dq-row { display: flex; align-items: center; gap: 10px; padding: 9px 2px; border-top: 2px dashed var(--line); }
+.dq-row.ok { opacity: .7; }
+.dq-ic { font-size: 26px; width: 34px; text-align: center; font-family: var(--emoji); }
+.dq-ic .e3d { width: 1.1em; height: 1.1em; }
+.dq-mid { flex: 1; display: flex; flex-direction: column; gap: 5px; font-size: 14px; }
+.dq-bar { display: block; height: 9px; border-radius: 6px; background: #e8cf9b; overflow: hidden; box-shadow: inset 0 1px 2px rgba(120, 70, 20, .3); }
+.dq-bar b { display: block; height: 100%; background: linear-gradient(#a6ec66, #5bb02a); border-radius: 6px; }
+.dq-n { font-weight: 900; min-width: 40px; text-align: right; }
+.dq-week, .dq-map { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 2px 2px; border-top: 2px dashed var(--line); text-align: left; font-weight: 700; font-size: 14px; }
+.dq-map small { color: var(--ink-soft); font-weight: 600; }
+.dq-days, .dq-pieces { display: flex; gap: 4px; }
+.dq-days i, .dq-pieces i { width: 18px; height: 18px; border-radius: 50%; background: #e8cf9b; display: grid; place-items: center; font-size: 11px; font-style: normal; }
+.dq-days i.on { background: linear-gradient(#ffd65a, #f2a516); }
+.dq-pieces i { border-radius: 4px; width: 16px; height: 20px; }
+.dq-pieces i.on { background: linear-gradient(#f5deb0, #d8a865); box-shadow: inset 0 0 0 1px #a8723a; }
+
+/* ---------- Сусіди й сердечка ---------- */
+.fr-list { display: flex; flex-direction: column; gap: 6px; }
+.fr-row { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 14px; background: rgba(255, 255, 255, .55); text-align: left; width: 100%; }
+.fr-ava { font-size: 30px; }
+.fr-ava .face.mini { width: 40px; height: 40px; }
+.fr-mid { flex: 1; display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+.fr-dots { display: flex; gap: 3px; }
+.fr-dots i { width: 12px; height: 12px; border-radius: 50%; background: #ead6ad; }
+.fr-dots i.st { box-shadow: 0 0 0 2px #f2c25a; }
+.fr-dots i.on { background: linear-gradient(#ffcf4a, #f2a516); }
+.fr-n { font-weight: 900; font-size: 15px; min-width: 36px; text-align: right; }
+.fr-n .e3d { width: 1.4em; height: 1.4em; }
+.fr-tag { font-size: 12px; font-weight: 800; color: #b07a10; white-space: nowrap; }
+.fr-sc { margin-top: 6px !important; }

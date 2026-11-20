@@ -190,6 +190,7 @@ function produce(i) {
   }
   const at = placeItem(item, i);
   if (at >= 0) spawnFrom.set(at, i);
+  window.QUEST && QUEST.track("tap");
   sfx.pop();
   bounce(i);
   if (S.tut === 0) setTut(1);
@@ -215,6 +216,8 @@ function openChest(i) {
     if (at >= 0) spawnFrom.set(at, i);
   }
   if (k >= 1) MECH.maybeGenCopy(k === 1 ? 0.12 : 0.25, i);
+  window.QUEST && QUEST.track("chest");
+  window.QUEST && QUEST.onChest(k, i);
   sfx.open();
   sparkle(i, "✨", 8);
   renderBoard(); renderOrders(); save();
@@ -254,6 +257,8 @@ function handleDrop(a, b) {
     popIdx.add(b); mergedIdx.add(b); burstAt(b);
     selected = b;
     MECH.crackAround(b);
+    window.QUEST && QUEST.track("merge");
+    if (nl >= 4) window.QUEST && QUEST.track("high");
     // невеликий бонус за злиття
     const bonus = Math.random();
     if (bonus < 0.015) placeItem({ c: "energy", l: 0 }, b);
@@ -348,6 +353,8 @@ function deliver(id) {
   S.stars += o.stars;
   S.ordersDone++;
   if (o.ev && window.EV) EV.onDeliver(o, card);
+  window.QUEST && QUEST.onDeliver(o);
+  window.QUEST && QUEST.track("deliver");
   sfx.deliver();
   bubble(CHARS[o.ch], pick(CHARS[o.ch].thanks), card);
   S.orders = S.orders.filter(x => x.id !== id);
@@ -698,6 +705,7 @@ function renderStory(animateLast) {
   ];
   if (window.Yard3D) {
     all.push(...yardPeople(ch, all));
+    if (window.QUEST) all.push(...QUEST.yardGifts(ch, all));
     // справжній 3D-дворик
     scene.classList.add("is3d");
     if (!scene.querySelector("canvas")) scene.innerHTML = "";
@@ -757,7 +765,8 @@ function renderShop() {
 function renderCollection() {
   const box = $("collList");
   let have = 0, total = 0;
-  box.innerHTML = "";
+  box.innerHTML = window.QUEST ? QUEST.friendsPanelHtml() : "";
+  box.querySelectorAll(".fr-row").forEach(b => b.onclick = () => QUEST.friendModal(b.dataset.who));
   PRODUCT_CHAINS.forEach(c => {
     const ch = CHAINS[c];
     const sec = document.createElement("div");
@@ -893,7 +902,7 @@ function toast(text) {
 let bubbleT = null;
 function bubble(ch, text, anchor) {
   const b = $("bubble");
-  b.innerHTML = `<span class="b-ava">${face(ch, "mini")}</span><span><b>${ch.name}</b><br>${fmtName(text)}</span>`;
+  b.innerHTML = `<span class="b-ava">${face(ch, "mini")}</span><span><b>${ch.name}</b> ${window.QUEST && S ? QUEST.heartsTag(ch.key) : ""}<br>${fmtName(text)}</span>`;
   b.classList.add("show");
   clearTimeout(bubbleT); bubbleT = setTimeout(() => b.classList.remove("show"), 2600);
 }
@@ -1122,6 +1131,7 @@ function startGame() {
   $("start").classList.remove("show");
   $("app").hidden = false;
   MECH.migrate();
+  if (window.QUEST) { QUEST.init(); QUEST.renderButton(); }
   fillOrders();
   renderAll();
   showTab("board");
@@ -1175,6 +1185,7 @@ function init() {
   $("settingsBtn").onclick = openSettings;
   $("inboxBtn").onclick = takeInbox;
   $("evBtn").onclick = () => window.EV && EV.panel();
+  $("qBtn").onclick = () => window.QUEST && QUEST.panel();
   $("teaBtn").onclick = () => { takeTea(); renderShop(); };
   $("energyChip").onclick = () => { showNoEnergyInfo(); };
   $("dialog").onclick = nextLine;
@@ -1185,6 +1196,7 @@ function init() {
     renderTop();
     if (window.EV) { EV.renderButton(); if (Date.now() % 5000 < 1000) EV.tick(); }
     MECH.tick();
+    if (window.QUEST) QUEST.tick();
     if (Date.now() % 5000 < 1000) MECH.checkOven();
     if (!$("tab-shop").hidden) renderShop();
     if (S.energy !== before) save();
