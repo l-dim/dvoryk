@@ -309,7 +309,7 @@ async function build(d) {
   const holder = new THREE.Group();
   holder.position.copy(place(d));
   const size = d.s * SIZE * (SCALE[d.e] || 1);
-  let spec = indoorNow && d.y < 34 ? null : MODELS[d.e];
+  let spec = (indoorNow && d.y < 34) || d.paint ? null : MODELS[d.e];
   if (typeof spec === "function") spec = spec(d);
   // мальовані тварини (аркуш sheet-animals)
   const animal = typeof YARD_ANIMALS !== "undefined" && YARD_ANIMALS[d.e];
@@ -409,11 +409,13 @@ function setWater(ch) {
   for (let k = 0; k <= N; k++) { const z = z0 + (z1 - z0) * k / N; pts.push(new THREE.Vector2(-Math.sqrt(Math.max(0, Rw * Rw - z * z)), -z)); }
   for (let k = N; k >= 0; k--) { const z = z0 + (z1 - z0) * k / N; pts.push(new THREE.Vector2(Math.sqrt(Math.max(0, Rw * Rw - z * z)), -z)); }
   const geo = new THREE.ShapeGeometry(new THREE.Shape(pts));
-  const mat = new THREE.MeshStandardMaterial({ color: 0x5fb6ea, roughness: 0.18, metalness: 0.05, emissive: 0x1f6fa8, emissiveIntensity: 0.18 });
+  const mat = ch.ice  // замерзлий ставок — світлий блакитний лід
+    ? new THREE.MeshStandardMaterial({ color: 0x9fd2f2, roughness: 0.05, metalness: 0.15, emissive: 0x5aa0d8, emissiveIntensity: 0.22 })
+    : new THREE.MeshStandardMaterial({ color: 0x5fb6ea, roughness: 0.18, metalness: 0.05, emissive: 0x1f6fa8, emissiveIntensity: 0.18 });
   waterMesh = new THREE.Mesh(geo, mat);
   waterMesh.rotation.x = -Math.PI / 2; waterMesh.position.y = 0.012; waterMesh.receiveShadow = true;
   // світлі береги
-  const edge = new THREE.MeshStandardMaterial({ color: 0xe8dcb8, roughness: 1 });
+  const edge = new THREE.MeshStandardMaterial({ color: ch.ice ? 0xffffff : 0xe8dcb8, roughness: 1 });
   [z0, z1].forEach(z => {
     const w = 2 * Math.sqrt(Math.max(0, Rw * Rw - z * z));
     const b = new THREE.Mesh(new THREE.BoxGeometry(w, 0.03, 0.14), edge);
@@ -498,12 +500,13 @@ async function render(chIndex, ch, list, animate) {
   if (!renderer) return;
   const newChapter = chIndex !== chapterShown;
   if (newChapter) {
-    for (const [, it] of items) { scene.remove(it.obj); it.obj.traverse(o => billboards.delete(o)); }
+    // предмети, які ще вантажаться (obj === null), просто забуваємо — їхні build() самі відкинуться
+    for (const [, it] of items) if (it.obj) { scene.remove(it.obj); it.obj.traverse(o => billboards.delete(o)); }
     items.clear();
     chapterShown = chIndex;
-    const winter = /Зимов/.test(ch.title);
+    const winter = !!ch.winter || /Зимов/.test(ch.title);
     hemi.color.set(winter ? 0xe8f0ff : 0xfff4e0); sun.color.set(winter ? 0xf4f8ff : 0xfff1d6);
-    islandTop.color.copy(winter ? new THREE.Color(0xeef4ff) : ch.indoor ? new THREE.Color(ch.ground).lerp(new THREE.Color(0xe8d2b0), 0.35) : juicy(ch.ground));
+    islandTop.color.copy(ch.indoor ? new THREE.Color(ch.ground).lerp(new THREE.Color(0xe8d2b0), 0.35) : winter ? new THREE.Color(0xeef4ff) : juicy(ch.ground));
     island.userData.rim.material.color.copy(islandTop.color).multiplyScalar(0.8);
     backWall.visible = indoorNow = !!ch.indoor;
     controls.reset && controls.reset();
@@ -513,7 +516,7 @@ async function render(chIndex, ch, list, animate) {
     decorate(ch, !ch.indoor, winter);
   }
   const want = new Map(list.map(d => [d.key, d]));
-  for (const [k, it] of items) if (!want.has(k)) { items.delete(k); vanish(it.obj); }
+  for (const [k, it] of items) if (!want.has(k)) { items.delete(k); if (it.obj) vanish(it.obj); }
   let delay = 0;
   for (const [k, d] of want) {
     if (items.has(k)) continue;
