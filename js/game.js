@@ -72,6 +72,12 @@ function itemName(it) {
 }
 function isMax(it) { return it && !it.g && it.l >= CHAINS[it.c].items.length - 1; }
 function itemValue(c, l) { return Math.round(4 * Math.pow(1.9, l)); }
+Object.keys(CHARS).forEach(k => CHARS[k].key = k);
+function face(ch, cls = "") {
+  if (!PORTRAITS.includes(ch.key)) return ch.icon;
+  const src = `portraits/${ch.key}.webp`;
+  return cls === "mini" ? `<span class="face mini"><img src="${src}" alt=""></span>` : `<img class="face ${cls}" src="${src}" alt="">`;
+}
 function fmtName(t) { return t.replace(/\{name\}/g, S.name || "господинько"); }
 
 /* ---------------- Звук (м'які тони WebAudio) ---------------- */
@@ -520,7 +526,7 @@ function renderOrders() {
     el.className = "order" + (ready ? " ready" : "");
     el.dataset.id = o.id;
     el.innerHTML =
-      `<div class="o-who"><span class="o-ava">${ch.icon}</span><span class="o-name">${ch.name.split(" ").pop()}</span></div>` +
+      `<div class="o-who"><span class="o-ava">${face(ch, "mini")}</span><span class="o-name">${ch.name.split(" ").pop()}</span></div>` +
       `<div class="o-items">${o.items.map((it, k) => `<span class="o-item${found[k] >= 0 ? " have" : ""}">${itemIcon(it)}</span>`).join("")}</div>` +
       (ready
         ? `<button class="o-btn">Віддати</button>`
@@ -822,7 +828,7 @@ function toast(text) {
 let bubbleT = null;
 function bubble(ch, text, anchor) {
   const b = $("bubble");
-  b.innerHTML = `<span class="b-ava">${ch.icon}</span><span><b>${ch.name}</b><br>${fmtName(text)}</span>`;
+  b.innerHTML = `<span class="b-ava">${face(ch, "mini")}</span><span><b>${ch.name}</b><br>${fmtName(text)}</span>`;
   b.classList.add("show");
   clearTimeout(bubbleT); bubbleT = setTimeout(() => b.classList.remove("show"), 2600);
 }
@@ -854,7 +860,9 @@ function nextLine() {
   if (!dlgQueue.length) { d.classList.remove("show"); const f = dlgDone; dlgDone = null; f && f(); return; }
   const [who, text] = dlgQueue.shift();
   const ch = CHARS[who];
-  d.querySelector(".d-ava").textContent = ch.icon;
+  const av = d.querySelector(".d-ava");
+  av.innerHTML = face(ch, "big");
+  av.classList.toggle("has-pic", PORTRAITS.includes(ch.key));
   d.querySelector(".d-name").textContent = ch.name;
   d.querySelector(".d-text").textContent = fmtName(text);
   d.classList.add("show");

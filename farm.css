@@ -257,3 +257,13 @@ body.farm .install { background: rgba(255, 248, 225, .9); }
 @media (prefers-reduced-motion: reduce) {
   body.farm .tile.gen, body.farm .tile.chest, body.farm .tile.collect, body.farm .order.ready, body.farm .d-ava, body.farm .big-emoji::before { animation: none; }
 }
+
+/* ---------- Мальовані портрети персонажів ---------- */
+.face { display: block; pointer-events: none; -webkit-user-drag: none; }
+.face.mini { position: relative; overflow: hidden; display: inline-block; vertical-align: middle; width: 1.4em; height: 1.4em; border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, #fff8e0, #f3d9a0); box-shadow: 0 0 0 2px #fff3d0, 0 2px 2px rgba(0, 0, 0, .3); }
+.face.mini img { position: absolute; left: 50%; top: -4%; width: 240%; transform: translateX(-50%); }
+.b-ava .face.mini { width: 48px; height: 48px; }
+body.farm .d-ava.has-pic { left: -12px; bottom: 0; animation: talk 2.6s ease-in-out infinite; }
+.face.big { height: 185px; width: auto; max-width: 168px; object-fit: contain; object-position: 50% 100%; }
+body.farm .dialog .d-box:has(.has-pic) { padding-left: 148px; margin-top: 90px; }
