@@ -222,7 +222,7 @@ function portraitTexture(who, fade) {
         res({ tex: t, aspect: c.width / c.height });
       };
       img.onerror = rej;
-      img.src = BASE + "portraits/" + who + (fade || who === "cat" || who.includes("-") ? "" : "-full") + ".webp";
+      img.src = BASE + (who.startsWith("animal-") ? "items/" + who : "portraits/" + who + (fade || who === "cat" || who.includes("-") ? "" : "-full")) + ".webp";
     }));
   }
   return picCache.get(k);
@@ -296,6 +296,15 @@ async function build(d) {
   const size = d.s * SIZE * (SCALE[d.e] || 1);
   let spec = indoorNow && d.y < 34 ? null : MODELS[d.e];
   if (typeof spec === "function") spec = spec(d);
+  // мальовані тварини (аркуш sheet-animals)
+  const animal = typeof YARD_ANIMALS !== "undefined" && YARD_ANIMALS[d.e];
+  if (animal) {
+    try {
+      const fig = await portraitFigure(animal, size * (AIR.has(d.e) ? 0.85 : 1.15), true);
+      if (AIR.has(d.e)) fig.traverse(o => { if (o.isMesh) o.castShadow = false; });
+      holder.add(fig); return holder;
+    } catch (e) { /* лишаємо 3D-іконку */ }
+  }
   if (d.pic && typeof YARD_PICS !== "undefined" && YARD_PICS.includes(d.pic)) {
     try { holder.add(await portraitFigure(d.pic, size * 2.35, true)); return holder; } catch (e) { /* лишаємо смайлик */ }
   }

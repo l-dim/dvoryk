@@ -64,6 +64,8 @@ const GENS = {
 const PORTRAITS = ["halya", "stepan", "olya", "marichka", "cat", "andriy", "liza", "ivan", "taras", "iryna"];
 /* Персонажі, для яких є малюнок на повний зріст: portraits/<ключ>-full.webp (стоять у 3D-дворику) */
 /* Додаткові мальовані фігурки для дворика (portraits/<назва>.webp), напр. весільні пари */
+/* Мальовані тварини для дворика: емодзі → items/<назва>.webp */
+const YARD_ANIMALS = {};
 const YARD_PICS = ["olya-bride", "olya-groom", "liza-bride", "taras-groom"];
 const PORTRAITS_FULL = ["halya", "stepan", "olya", "marichka", "andriy", "liza", "ivan", "taras", "iryna"];
 /* Де обличчя на портреті (у % від картинки) і масштаб для круглого аватара: [x, y, ширина%] */
