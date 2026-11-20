@@ -634,10 +634,12 @@ function yardPeople(ch, all) {
   for (const w of who) {
     const s = 10;
     // не ставати впритул і не заступати собою те, що стоїть позаду (фігура висока)
-    const free = slots.find(([x, y]) => taken.every(([tx, ty, ts]) =>
-      Math.hypot(tx - x, (ty - y) * 1.4) > (ts + s) * 0.85 && !(ts <= 12 && Math.abs(tx - x) < (ts + s) * 0.5 && ty < y && y - ty < 32)));
+    const free = slots.find(([x, y]) => taken.every(([tx, ty, ts, person]) =>
+      Math.hypot(tx - x, (ty - y) * 1.4) > (ts + s) * 0.85 &&
+      !(ts <= 12 && Math.abs(tx - x) < (ts + s) * 0.5 && ty < y && y - ty < 32) &&
+      !(person && Math.abs(tx - x) < 12 && Math.abs(ty - y) < 32)));
     if (!free) break;
-    taken.push([free[0], free[1], s]);
+    taken.push([free[0], free[1], s, true]); // сусіди не стають один за одним
     out.push({ key: "p-" + w, who: w, x: free[0], y: free[1], s });
   }
   return out;
