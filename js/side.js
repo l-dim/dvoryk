@@ -10,7 +10,7 @@
    PUA_MAP[символ] = { e: емодзі-замінник, img: мальована картинка або null }.
    ============================================================ */
 const SIDE_DUR = 48 * 3600e3, SIDE_GAP = 24 * 3600e3;
-const SIDE_ART = [];                    // мальовані: "side-jam-0", "side-gen-jam"…
+const SIDE_ART = ["side-jam-0", "side-jam-1", "side-jam-2", "side-jam-3", "side-jam-4", "side-shirt-0", "side-shirt-1", "side-shirt-2", "side-shirt-3", "side-shirt-4", "side-fair-0", "side-fair-1", "side-fair-2", "side-fair-3", "side-fair-4", "side-garden-0", "side-garden-1", "side-garden-2", "side-garden-3", "side-garden-4", "side-gen-jam", "side-gen-shirt", "side-gen-fair", "side-gen-garden"];                    // мальовані: "side-jam-0", "side-gen-jam"…
 const SIDE_KINDS = [
   { id: "jam", host: "halya", title: "Вишневе варення", gen: ["🪣", "Відро вишень"],
     items: [["🍒", "Вишенька"], ["🥣", "Миска вишень"], ["🫕", "Казанок варення"], ["🫙", "Банка варення"], ["🥧", "Вишневий пиріг"]],
