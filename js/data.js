@@ -510,7 +510,7 @@ const PAINTED_ITEMS = ["veg-0", "veg-1", "veg-2", "veg-3", "veg-4", "veg-5", "ve
 const DECO_ICONS = { "⛲": "deco-fountain", "⛱️": "deco-umbrella", "🕸️": "deco-web", "🕰️": "deco-clock", "🔥": "deco-fire",
   "💨": "deco-dust", "🎈": "deco-balloons", "🏆": "deco-trophy", "🎻": "deco-violin",
   "🪗": "deco-accordion", "🎆": "deco-firework", "🎇": "deco-sparkler", "🎉": "deco-popper", "🎊": "deco-confetti",
-  "🌙": "deco-moon", "🎶": "deco-notes", "🕯️": "deco-candle", "⛸️": "deco-skates" };
+  "🌙": "deco-moon", "🎶": "deco-notes", "🕯️": "deco-candle", "⛸️": "deco-skates", "🧑‍🌾": "deco-scarecrow" };
 /* Мальовані значки інтерфейсу: емодзі → items/<назва>.webp (аркуш sheet-ui) */
 const UI_ICONS = { "⭐": "ui-star", "⚙️": "ui-gear", "🏡": "ui-home", "🛍️": "ui-shop", "📖": "ui-book",
   "✅": "ui-check", "🔨": "ui-hammer", "🔒": "ui-lock", "📜": "ui-scroll" };
