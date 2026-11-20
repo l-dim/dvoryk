@@ -263,7 +263,7 @@ window.MECH = (() => {
     save();
   }
   function checkOven() {
-    if (S.oven || S.chapter < OVEN_FROM_CHAPTER || !S.started) return;
+    if (S.oven || S.chapter < OVEN_FROM_CHAPTER || !S.started || S.sideOn) return;
     S.oven = true;
     const at = placeItem({ st: "oven" });
     if (at >= 0) popIdx.add(at);

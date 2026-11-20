@@ -42,7 +42,8 @@ window.WD = (() => {
     const it = WARDROBE[who].item;
     return unlocked(it.c) ? it : { c: "bake", l: Math.min(it.l, 5) };
   }
-  const findOnBoard = it => S.board.findIndex(x => x && !x.g && !x.lock && !x.st && x.c === it.c && x.l === it.l);
+  const mainBoard = () => (S.sideOn ? S.main : S.board);
+  const findOnBoard = it => mainBoard().findIndex(x => x && !x.g && !x.lock && !x.st && x.c === it.c && x.l === it.l);
   function canGive(who) {
     const w = st(), g = WARDROBE[who];
     return !!w && season().phase === "prep" && !w.dressed[who] && (w.n[who] || 0) >= g.orders && findOnBoard(needItem(who)) >= 0 && S.coins >= g.coins;
@@ -62,7 +63,7 @@ window.WD = (() => {
     if (!canGive(who)) return;
     const w = st(), g = WARDROBE[who];
     const i = findOnBoard(needItem(who));
-    S.board[i] = null; if (selected === i) selected = -1;
+    mainBoard()[i] = null; if (!S.sideOn && selected === i) selected = -1;
     S.coins -= g.coins;
     w.dressed[who] = true;
     save(); renderAll(); if (window.QUEST) QUEST.renderButton();

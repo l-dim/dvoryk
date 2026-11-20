@@ -155,6 +155,8 @@ function emptyNear(from) {
   return best;
 }
 function placeItem(item, near = Math.floor(N / 2)) {
+  // на дошці пригоди — лише її предмети; подарунки й нагороди чекають у 📥
+  if (window.SIDE && SIDE.guardPlace(item)) { S.inbox.push(item); renderInbox(); return -1; }
   const i = emptyNear(near);
   if (i < 0) { S.inbox.push(item); renderInbox(); return -1; }
   S.board[i] = item;
@@ -554,6 +556,7 @@ function renderOrders() {
   const box = $("orders");
   neededIdx = new Set();
   box.innerHTML = "";
+  if (S.sideOn && S.side && window.SIDE) { SIDE.renderGoals(box); return; }
   S.orders.forEach(o => {
     const found = matchOrder(o);
     const ready = found.every(i => i >= 0);
@@ -661,6 +664,7 @@ function renderInbox() {
 }
 function takeInbox() {
   if (!S.inbox.length) return;
+  if (S.sideOn) { sfx.nope(); toast("Це для городу — повернись на город 🪴, щоб забрати"); return; }
   const i = emptyNear(Math.floor(N / 2));
   if (i < 0) { sfx.nope(); toast("Звільни місце на дошці 🙂"); return; }
   const it = S.inbox.shift();
@@ -846,7 +850,7 @@ const TUT = [
 function setTut(n) { S.tut = n; renderTut(); }
 function renderTut() {
   const h = $("tutHint");
-  if (S.tut < TUT.length) { h.textContent = TUT[S.tut]; h.hidden = false; }
+  if (S.tut < TUT.length && !S.sideOn) { h.textContent = TUT[S.tut]; h.hidden = false; }
   else h.hidden = true;
 }
 
@@ -1176,6 +1180,7 @@ function isStandalone() { return window.navigator.standalone === true || matchMe
 function startGame() {
   $("start").classList.remove("show");
   $("app").hidden = false;
+  if (window.SIDE) SIDE.onStart();
   MECH.migrate();
   if (window.QUEST) { QUEST.init(); QUEST.renderButton(); }
   fillOrders();
@@ -1232,6 +1237,7 @@ function init() {
   $("inboxBtn").onclick = takeInbox;
   $("evBtn").onclick = () => window.EV && EV.panel();
   $("qBtn").onclick = () => window.QUEST && QUEST.panel();
+  $("sideBtn").onclick = () => window.SIDE && SIDE.toggle();
   $("teaBtn").onclick = () => { takeTea(); renderShop(); };
   $("energyChip").onclick = () => { showNoEnergyInfo(); };
   $("dialog").onclick = nextLine;
@@ -1244,6 +1250,7 @@ function init() {
     MECH.tick();
     if (window.QUEST) QUEST.tick();
     if (window.WD) WD.tick();
+    if (window.SIDE) SIDE.tick();
     if (Date.now() % 5000 < 1000) MECH.checkOven();
     if (!$("tab-shop").hidden) renderShop();
     if (S.energy !== before) save();
