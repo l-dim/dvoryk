@@ -88,6 +88,7 @@ window.MECH = (() => {
     const it = S.board[i];
     if (!it || !("lock" in it)) return;
     S.board[i] = it.hide || lockReward();
+    window.QUEST && QUEST.track("lock");
     discover(S.board[i]);
     popIdx.add(i); burstAt(i); sparkle(i, "✨", 6);
     sfx.open();

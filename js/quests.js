@@ -18,6 +18,49 @@ window.QUEST = (() => {
     if (!S.frSeen) S.frSeen = {};
     if (!S.map) S.map = { n: 0, seen: false, done: false };
     if (!S.dq || S.dq.day !== today()) newDay();
+    if (!S.wq || S.wq.week !== weekKey()) newWeek();
+  }
+
+  /* ---------- завдання тижня ---------- */
+  function weekKey() {            // понеділок поточного тижня
+    const d = new Date(now()); d.setHours(12, 0, 0, 0);
+    d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+    return dayStr(d.getTime());
+  }
+  function daysToSunday() { return 7 - ((new Date(now()).getDay() + 6) % 7); }
+  function newWeek() {
+    const lvl = S.level, k = Math.min(1.6, 1 + lvl / 40);
+    const list = [{ k: "deliver", t: Math.round(30 * k) }, { k: "daily", t: 5 }];
+    list.push(Math.random() < 0.5 ? { k: "merge", t: Math.round(120 * k) } : { k: "tap", t: Math.round(160 * k) });
+    const extra = [{ k: "chest", t: Math.round(7 * k) }];
+    if (lvl >= 5) extra.push({ k: "high", t: Math.round(10 * k) });
+    if (S.oven) extra.push({ k: "cook", t: 4 }, { k: "dish", t: 3 });
+    if (lvl >= 4) extra.push({ k: "urgent", t: 2 });
+    if (S.board.some(x => x && x.lock)) extra.push({ k: "lock", t: Math.min(4, S.board.filter(x => x && x.lock).length) });
+    list.push(pick(extra));
+    S.wq = { week: weekKey(), list: list.map(q => ({ k: q.k, t: q.t, n: 0 })), claimed: false };
+    save();
+  }
+  const weekDone = () => S.wq.list.every(q => q.n >= q.t);
+  function trackWeek(k, n) {
+    if (!S.wq || S.wq.week !== weekKey()) newWeek();
+    let fin = false;
+    S.wq.list.forEach(q => { if (q.k === k && q.n < q.t) { q.n = Math.min(q.t, q.n + n); if (q.n >= q.t) fin = true; } });
+    if (fin && weekDone() && !S.wq.claimed) setTimeout(() => toast("🗓️ Усі завдання тижня виконано — забери велику нагороду!"), 2600);
+  }
+  function claimWeek() {
+    if (!weekDone() || S.wq.claimed) return;
+    S.wq.claimed = true;
+    const r = WEEKLY_REWARD;
+    placeItem({ c: "chest", l: r.chest }); S.coins += r.coins; S.stars += r.stars; regen(); S.energy += r.energy;
+    save(); renderAll(); renderButton();
+    confetti(); sfx.level();
+    modal({
+      title: "Тиждень виконано! 🗓️",
+      html: `<div class="big-emoji">💝</div><p>Ти впоралася з усіма завданнями тижня — ти неймовірна!</p>` +
+        `<p class="rewards">💝 &nbsp; +${r.coins} 🪙 &nbsp; +${r.stars} ⭐ &nbsp; +${r.energy} ⚡</p><p class="hint-s">Нові завдання тижня — з понеділка.</p>`,
+      buttons: [{ label: "Дякую! 💛" }]
+    });
   }
 
   /* ---------- завдання дня ---------- */
@@ -39,6 +82,7 @@ window.QUEST = (() => {
   }
   function track(k, n = 1) {
     if (!S || !S.dq) return;
+    trackWeek(k, n);
     if (S.dq.day !== today()) newDay();
     let finished = null;
     S.dq.list.forEach(q => {
@@ -58,6 +102,7 @@ window.QUEST = (() => {
     const d = S.dq;
     d.streak = d.lastClaim === yesterday() ? d.streak + 1 : 1;
     d.lastClaim = today(); d.claimed = true;
+    trackWeek("daily", 1);
     const big = d.streak >= 7;
     placeItem({ c: "chest", l: big ? 2 : 0 });
     regen(); S.energy += 10;
@@ -182,34 +227,54 @@ window.QUEST = (() => {
     const b = $("qBtn"); if (!b || !S || !S.dq) return;
     const done = S.dq.list.filter(q => q.n >= q.t).length;
     $("qProg").textContent = S.dq.claimed ? "✓" : done + "/3";
-    b.classList.toggle("ready", allDone() && !S.dq.claimed);
+    const wReady = S.wq && weekDone() && !S.wq.claimed;
+    b.classList.toggle("ready", (allDone() && !S.dq.claimed) || !!wReady);
     b.classList.toggle("claimed", S.dq.claimed);
   }
-  function panel() {
+  let panelTab = "day";
+  const qRows = (list) => list.map(q => `<div class="dq-row${q.n >= q.t ? " ok" : ""}"><span class="dq-ic">${DAILY[q.k].icon}</span>` +
+    `<span class="dq-mid"><b>${DAILY[q.k].text}</b><i class="dq-bar"><b style="width:${q.n / q.t * 100}%"></b></i></span>` +
+    `<span class="dq-n">${q.n >= q.t ? "✅" : q.n + "/" + q.t}</span></div>`).join("");
+  function panel(tab) {
     if (S.dq.day !== today()) newDay();
-    const d = S.dq;
-    const rows = d.list.map(q => `<div class="dq-row${q.n >= q.t ? " ok" : ""}"><span class="dq-ic">${DAILY[q.k].icon}</span>` +
-      `<span class="dq-mid"><b>${DAILY[q.k].text}</b><i class="dq-bar"><b style="width:${q.n / q.t * 100}%"></b></i></span>` +
-      `<span class="dq-n">${q.n >= q.t ? "✅" : q.n + "/" + q.t}</span></div>`).join("");
+    if (!S.wq || S.wq.week !== weekKey()) newWeek();
+    if (tab) panelTab = tab;
+    const d = S.dq, w = S.wq;
     const shown = d.claimed ? d.streak : d.lastClaim === yesterday() ? d.streak : 0;
     const week = Array.from({ length: 7 }, (_, i) => `<i class="${i < shown ? "on" : ""}">${i === 6 ? "💝" : ""}</i>`).join("");
     const m = S.map, pieces = Array.from({ length: TREASURE.pieces }, (_, i) => `<i class="${m.done || i < m.n ? "on" : ""}"></i>`).join("");
+    const dayReady = allDone() && !d.claimed, wkReady = weekDone() && !w.claimed;
+    const btn = (ready, claimed, label, done, todo) => ready ? `<button class="btn dq-claim" data-c="1">${label}</button>`
+      : `<button class="btn dq-claim" disabled>${claimed ? done : todo}</button>`;
+    const dayHtml = `<div class="dq-list">${qRows(d.list)}</div>` +
+      `<div class="dq-week"><span>Днів поспіль:</span><span class="dq-days">${week}</span></div>` +
+      btn(dayReady, d.claimed, "Забрати нагороду 🎁", "Нагороду забрано ✓ Нові завдання завтра", "Виконай усі 3 — отримаєш 🎁") +
+      `<div class="dq-map"><span>🗺️ <b>Таємниця старої скрині</b><br><small>${m.done ? "Скарб знайдено! Скриня — у дворику 🧰" : m.n ? "Шматочки карти: " + m.n + " з " + TREASURE.pieces : "Шматочки карти іноді трапляються в подарунках"}</small></span><span class="dq-pieces">${pieces}</span></div>`;
+    const left = daysToSunday();
+    const wkHtml = `<p class="dq-when">До кінця тижня: <b>${left === 1 ? "останній день!" : left + (left < 5 ? " дні" : " днів")}</b></p>` +
+      `<div class="dq-list">${qRows(w.list)}</div>` +
+      `<p class="dq-prize">Нагорода: 💝 · +${WEEKLY_REWARD.coins} 🪙 · +${WEEKLY_REWARD.stars} ⭐ · +${WEEKLY_REWARD.energy} ⚡</p>` +
+      btn(wkReady, w.claimed, "Забрати велику нагороду 💝", "Нагороду тижня забрано ✓ Нові — з понеділка", "Виконай усі 4 — отримаєш 💝");
     modal({
-      title: "Завдання дня 📋",
-      html: `<div class="dq-list">${rows}</div>` +
-        `<div class="dq-week"><span>Днів поспіль:</span><span class="dq-days">${week}</span></div>` +
-        `<div class="dq-map"><span>🗺️ <b>Таємниця старої скрині</b><br><small>${m.done ? "Скарб знайдено! Скриня — у дворику 🧰" : m.n ? "Шматочки карти: " + m.n + " з " + TREASURE.pieces : "Шматочки карти іноді трапляються в подарунках"}</small></span><span class="dq-pieces">${pieces}</span></div>`,
+      title: "Завдання 📋",
+      html: `<div class="dq-tabs"><button class="dq-tab${panelTab === "day" ? " on" : ""}" data-t="day">Сьогодні${dayReady ? " ❗" : ""}</button>` +
+        `<button class="dq-tab${panelTab === "week" ? " on" : ""}" data-t="week">Тиждень${wkReady ? " ❗" : ""}</button></div>` +
+        (panelTab === "day" ? dayHtml : wkHtml),
       buttons: [
-        allDone() && !d.claimed ? { label: "Забрати нагороду 🎁", onClick: claim } : { label: d.claimed ? "Нагороду забрано ✓ Нові завдання завтра" : "Виконай усі три — і отримаєш 🎁", disabled: true },
-        { label: "💛 Мої сусіди", cls: "ghost", onClick: () => { showTab("coll"); $("tab-coll").scrollTop = 0; } }
+        { label: "💛 Мої сусіди", cls: "ghost", onClick: () => { showTab("coll"); $("tab-coll").scrollTop = 0; } },
+        { label: "Закрити", cls: "ghost" }
       ]
     });
+    document.querySelectorAll(".dq-tab").forEach(b => b.onclick = () => { sfx.pop(); panel(b.dataset.t); });
+    const c = document.querySelector(".dq-claim[data-c]");
+    if (c) c.onclick = () => { $("modal").classList.remove("show"); panelTab === "day" ? claim() : claimWeek(); };
   }
 
   /* ---------- щосекунди ---------- */
   function tick() {
     if (!S || !S.started) return;
     if (S.dq && S.dq.day !== today()) { newDay(); renderButton(); }
+    if (S.wq && S.wq.week !== weekKey()) { newWeek(); renderButton(); }
     if (queue.length && !busyUI()) queue.shift()();
   }
 

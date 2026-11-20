@@ -355,6 +355,8 @@ function deliver(id) {
   if (o.ev && window.EV) EV.onDeliver(o, card);
   window.QUEST && QUEST.onDeliver(o);
   window.QUEST && QUEST.track("deliver");
+  if (o.dish) window.QUEST && QUEST.track("dish");
+  if (o.urgent) window.QUEST && QUEST.track("urgent");
   sfx.deliver();
   bubble(CHARS[o.ch], pick(CHARS[o.ch].thanks), card);
   S.orders = S.orders.filter(x => x.id !== id);

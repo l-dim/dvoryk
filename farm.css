@@ -417,3 +417,11 @@ body.farm .order.dish .o-who { background: linear-gradient(#ffc94d, #e8962a); }
 .loc-chip.on { color: var(--ink, #5b3416); text-shadow: none; background: linear-gradient(#fffbe8, #f6dfa9); box-shadow: 0 3px 0 #6a3a12, 0 0 0 2px #ffd36b; }
 .loc-note { margin-top: 10px; padding: 10px; border-radius: 14px; background: #fff3d0; font-weight: 800; text-align: center; }
 .loc-note .btn { margin-top: 8px; }
+
+/* ---------- Вкладки «Сьогодні / Тиждень» ---------- */
+.dq-tabs { display: flex; gap: 4px; padding: 4px; margin: 0 0 6px; border-radius: 14px; background: #e8cf9b; box-shadow: inset 0 2px 3px rgba(120, 70, 20, .3); }
+.dq-tab { flex: 1; padding: 8px 4px; border-radius: 11px; font: 900 14px/1 var(--font); color: #7c5a34; }
+.dq-tab.on { background: linear-gradient(#fffbe8, #f6dfa9); color: var(--ink, #5b3416); box-shadow: 0 2px 0 #b88a4e; }
+.dq-claim { margin: 10px 0 2px !important; font-size: 15px !important; padding: 11px 10px !important; }
+.dq-when { margin: 4px 0 2px; font-size: 14px; }
+.dq-prize { margin: 8px 0 0; font-size: 13px; font-weight: 800; color: var(--ink-soft); }
