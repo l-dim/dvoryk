@@ -222,7 +222,7 @@ function portraitTexture(who, fade) {
         res({ tex: t, aspect: c.width / c.height });
       };
       img.onerror = rej;
-      img.src = BASE + "portraits/" + who + (fade || who === "cat" ? "" : "-full") + ".webp";
+      img.src = BASE + "portraits/" + who + (fade || who === "cat" || who.includes("-") ? "" : "-full") + ".webp";
     }));
   }
   return picCache.get(k);
@@ -296,6 +296,9 @@ async function build(d) {
   const size = d.s * SIZE * (SCALE[d.e] || 1);
   let spec = indoorNow && d.y < 34 ? null : MODELS[d.e];
   if (typeof spec === "function") spec = spec(d);
+  if (d.pic && typeof YARD_PICS !== "undefined" && YARD_PICS.includes(d.pic)) {
+    try { holder.add(await portraitFigure(d.pic, size * 2.35, true)); return holder; } catch (e) { /* лишаємо смайлик */ }
+  }
   if (d.who || (d.e === "🐱" && typeof PORTRAITS !== "undefined" && PORTRAITS.includes("cat"))) {
     try { holder.add(await portraitFigure(d.who || "cat", d.who ? size * 2.35 : size * 1.6, true)); return holder; }
     catch (e) { if (d.who) return holder; }

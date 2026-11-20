@@ -626,7 +626,8 @@ function yardPeople(ch, all) {
   [ch.intro || [], ...ch.tasks.map(t => t.lines || [])].forEach(lines => lines.forEach(([who]) => {
     if (CHARS[who] && who !== "cat" && PORTRAITS_FULL.includes(who)) count[who] = (count[who] || 0) + 1;
   }));
-  if (all.some(d => d.e === "👰")) { delete count.liza; delete count.taras; }
+  // хто вже стоїть у дворику окремою фігуркою (наречені) — двічі не ставимо
+  all.forEach(d => { if (d.pic) delete count[d.pic.split("-")[0]]; });
   const who = Object.keys(count).sort((a, b) => count[b] - count[a]).slice(0, 3);
   const slots = [[27, 72], [73, 72], [36, 87], [64, 87], [17, 60], [83, 60], [40, 76], [60, 76], [12, 74], [88, 74], [24, 86], [76, 86], [50, 64], [8, 66], [92, 66], [30, 94], [70, 94], [50, 92]];
   const taken = all.filter(d => d.y >= 34 && !d.who).map(d => [d.x, d.y, d.s]);
