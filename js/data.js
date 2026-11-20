@@ -67,7 +67,7 @@ const PORTRAITS = ["halya", "stepan", "olya", "marichka", "cat", "andriy", "liza
 /* Мальовані тварини для дворика: емодзі → items/<назва>.webp */
 const YARD_ANIMALS = { "🐕": "animal-dog", "🐔": "animal-hen", "🐓": "animal-rooster", "🐣": "animal-hatch",
   "🐥": "animal-chick", "🐐": "animal-goat", "🐦": "animal-bird", "🐝": "animal-bee" };
-const YARD_PICS = ["olya-bride", "olya-groom", "liza-bride", "taras-groom"];
+const YARD_PICS = ["olya-bride", "olya-groom", "liza-bride", "taras-groom", "olya-full", "andriy-full"];
 const PORTRAITS_FULL = ["halya", "stepan", "olya", "marichka", "andriy", "liza", "ivan", "taras", "iryna"];
 /* Де обличчя на портреті (у % від картинки) і масштаб для круглого аватара: [x, y, ширина%] */
 const PORTRAIT_FACE = {
@@ -271,7 +271,7 @@ const STORY = [
         lines: [["ivan", "Привіз листи з трьох сіл — усі хочуть приїхати на свято! 📮"]] },
       { title: "Конкурс пирогів", cost: 5, add: [{ e: "🥧", x: 72, y: 76, s: 8 }, { e: "🏆", x: 80, y: 70, s: 7 }],
         lines: [["andriy", "Журі одноголосно: перше місце — {name}! 🏆"]] },
-      { title: "Танці до ранку", cost: 5, add: [{ e: "💃", x: 42, y: 80, s: 9 }, { e: "🕺", x: 54, y: 80, s: 9 }, { e: "🎻", x: 64, y: 86, s: 6 }],
+      { title: "Танці до ранку", cost: 5, add: [{ e: "💃", pic: "olya-full", x: 42, y: 80, s: 9 }, { e: "🕺", pic: "andriy-full", x: 54, y: 80, s: 9 }, { e: "🎻", x: 64, y: 86, s: 6 }],
         lines: [["stepan", "Галю, згадаймо молодість? 🕺"], ["halya", "Ой, Степане… ну хіба що один танець 💃"]] },
       { title: "Святковий феєрверк", cost: 6, add: [{ e: "🎆", x: 30, y: 12, s: 12 }, { e: "🎇", x: 70, y: 10, s: 12 }],
         lines: [["halya", "Найкраще свято за багато років. Я так тобою пишаюся, {name}! ❤️"],
