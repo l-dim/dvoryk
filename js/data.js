@@ -865,7 +865,7 @@ const LOCS = [
   { id: "mill", icon: "🌾", name: "Млин" }, { id: "river", icon: "🛶", name: "Річка" }, { id: "square", icon: "⛲", name: "Площа" }
 ];
 /* Мальовані споруди села (items/<назва>.webp, аркуш sheet-village). Поки їх немає — стоять замінники з поля e. */
-const VILLAGE_ART = [];
+const VILLAGE_ART = ["vil-hive", "vil-mill", "vil-bridge", "vil-boat", "vil-well", "vil-stage", "vil-stall", "vil-sign", "vil-willow"];
 /* Мальовані прикраси дворика: емодзі → items/<назва>.webp (аркуші sheet-deco1/2) */
 const DECO_ICONS = { "⛲": "deco-fountain", "⛱️": "deco-umbrella", "🕸️": "deco-web", "🕰️": "deco-clock", "🔥": "deco-fire",
   "💨": "deco-dust", "🎈": "deco-balloons", "🏆": "deco-trophy", "🎻": "deco-violin",
