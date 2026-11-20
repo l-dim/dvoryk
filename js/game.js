@@ -302,7 +302,10 @@ function newOrder() {
   const spo = MECH.specialOrder();
   if (spo) return spo;
   const busy = S.orders.map(o => o.ch);
-  const pool = Object.keys(CHARS).filter(c => !busy.includes(c) && (CHARS[c].from || 0) <= S.chapter);
+  const healthy = Object.keys(CHARS).filter(c => (CHARS[c].from || 0) <= S.chapter && !(window.WD && WD.isSick(c)));
+  let pool = healthy.filter(c => !busy.includes(c));
+  if (!pool.length) pool = healthy;          // мало здорових сусідів — хтось замовить двічі
+  if (!pool.length) return null;             // усі на лікарняному
   const ch = pick(pool);
   const chains = unlockedChains();
   const count = S.level < 3 ? 1 : (Math.random() < 0.55 ? 1 : 2);
@@ -324,7 +327,8 @@ function newOrder() {
   return MECH.maybeUrgent({ id: ++S.orderSeq, ch, items, coins, xp, stars, line: rnd(3) });
 }
 function fillOrders() {
-  while (S.orders.length < 3) S.orders.push(newOrder());
+  S.orders = S.orders.filter(o => o && CHARS[o.ch]);
+  while (S.orders.length < 3) { const o = newOrder(); if (!o) break; S.orders.push(o); }
 }
 function matchOrder(o) {
   const used = new Set(), found = [];
@@ -356,6 +360,7 @@ function deliver(id) {
   if (o.ev && window.EV) EV.onDeliver(o, card);
   window.QUEST && QUEST.onDeliver(o);
   window.QUEST && QUEST.track("deliver");
+  window.WD && WD.onDeliver(o);
   if (o.dish) window.QUEST && QUEST.track("dish");
   if (o.urgent) window.QUEST && QUEST.track("urgent");
   sfx.deliver();
@@ -668,7 +673,7 @@ function takeInbox() {
 function yardPeople(ch, all) {
   const count = {};
   [ch.intro || [], ...ch.tasks.map(t => t.lines || [])].forEach(lines => lines.forEach(([who]) => {
-    if (CHARS[who] && who !== "cat" && PORTRAITS_FULL.includes(who)) count[who] = (count[who] || 0) + 1;
+    if (CHARS[who] && who !== "cat" && PORTRAITS_FULL.includes(who) && !(window.WD && WD.isSick(who))) count[who] = (count[who] || 0) + 1;
   }));
   // хто вже стоїть у дворику окремою фігуркою (наречені) — двічі не ставимо
   all.forEach(d => { if (d.pic) delete count[d.pic.split("-")[0]]; });
@@ -1229,6 +1234,7 @@ function init() {
     if (window.EV) { EV.renderButton(); if (Date.now() % 5000 < 1000) EV.tick(); }
     MECH.tick();
     if (window.QUEST) QUEST.tick();
+    if (window.WD) WD.tick();
     if (Date.now() % 5000 < 1000) MECH.checkOven();
     if (!$("tab-shop").hidden) renderShop();
     if (S.energy !== before) save();

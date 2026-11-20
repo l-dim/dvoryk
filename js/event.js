@@ -75,7 +75,7 @@ window.EV = (() => {
     if (S.orders.some(o => o.ev)) return null;
     if (Math.random() > 0.75) return null;
     const busy = S.orders.map(o => o.ch);
-    const who = EVENT.who.filter(c => !busy.includes(c) && (CHARS[c].from || 0) <= S.chapter);
+    const who = EVENT.who.filter(c => !busy.includes(c) && (CHARS[c].from || 0) <= S.chapter && !(window.WD && WD.isSick(c)));
     const ch = who.length ? pick(who) : null;
     if (!ch) return null;
     const max = S.level < 8 ? 3 : 4;

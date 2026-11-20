@@ -155,6 +155,7 @@ window.QUEST = (() => {
   function heartsTag(who) {
     if (!FRIENDS[who]) return "";
     const h = hearts(who);
+    if (window.WD && WD.isSick(who)) return `<span class="fr-tag">🤒 на лікарняному</span>`;
     return `<span class="fr-tag">💛 ${h}/${FRIEND_STEPS[2]}</span>`;
   }
   function onDeliver(o) {
@@ -191,7 +192,7 @@ window.QUEST = (() => {
       const dots = Array.from({ length: max }, (_, i) => `<i class="${i < h ? "on" : ""}${FRIEND_STEPS.includes(i + 1) ? " st" : ""}"></i>`).join("");
       return `<button class="fr-row" data-who="${k}"><span class="fr-ava">${face(CHARS[k], "mini")}</span>` +
         `<span class="fr-mid"><b>${CHARS[k].name}</b><span class="fr-dots">${dots}</span></span>` +
-        `<span class="fr-n">${h >= max ? FRIENDS[k].gift : h + "/" + max}</span></button>`;
+        `<span class="fr-n">${window.WD && WD.isSick(k) ? "🤒" : h >= max ? FRIENDS[k].gift : h + "/" + max}</span></button>`;
     }).join("");
     return `<div class="coll-sec"><div class="coll-h">Сусіди 💛 <small>сердечка за кожне замовлення</small></div><div class="fr-list">${rows}</div></div>`;
   }
@@ -262,7 +263,7 @@ window.QUEST = (() => {
     const done = S.dq.list.filter(q => q.n >= q.t).length;
     $("qProg").textContent = S.dq.claimed ? "✓" : done + "/3";
     const wReady = S.wq && weekDone() && !S.wq.claimed;
-    b.classList.toggle("ready", (allDone() && !S.dq.claimed) || !!wReady);
+    b.classList.toggle("ready", (allDone() && !S.dq.claimed) || !!wReady || !!(window.WD && WD.readyAny()));
     b.classList.toggle("claimed", S.dq.claimed);
   }
   let panelTab = "day";
@@ -273,6 +274,8 @@ window.QUEST = (() => {
     if (S.dq.day !== today()) newDay();
     if (!S.wq || S.wq.week !== weekKey()) newWeek();
     if (tab) panelTab = tab;
+    const winterOn = !!(window.WD && WD.active());
+    if (panelTab === "winter" && !winterOn) panelTab = "day";
     const d = S.dq, w = S.wq;
     const shown = d.claimed ? d.streak : d.lastClaim === yesterday() ? d.streak : 0;
     const week = Array.from({ length: 7 }, (_, i) => `<i class="${i < shown ? "on" : ""}">${i === 6 ? "💝" : ""}</i>`).join("");
@@ -294,8 +297,9 @@ window.QUEST = (() => {
     modal({
       title: "Завдання 📋",
       html: `<div class="dq-tabs"><button class="dq-tab${panelTab === "day" ? " on" : ""}" data-t="day">Сьогодні${dayReady ? " ❗" : ""}</button>` +
-        `<button class="dq-tab${panelTab === "week" ? " on" : ""}" data-t="week">Тиждень${wkReady ? " ❗" : ""}</button></div>` +
-        (panelTab === "day" ? dayHtml : wkHtml),
+        `<button class="dq-tab${panelTab === "week" ? " on" : ""}" data-t="week">Тиждень${wkReady ? " ❗" : ""}</button>` +
+        (winterOn ? `<button class="dq-tab${panelTab === "winter" ? " on" : ""}" data-t="winter">Зима${WD.readyAny() ? " ❗" : ""}</button>` : "") + `</div>` +
+        (panelTab === "day" ? dayHtml : panelTab === "week" ? wkHtml : WD.html()),
       buttons: [
         { label: "💛 Мої сусіди", cls: "ghost", onClick: () => { showTab("coll"); $("tab-coll").scrollTop = 0; } },
         { label: "Закрити", cls: "ghost" }
@@ -303,6 +307,7 @@ window.QUEST = (() => {
     });
     document.querySelectorAll(".dq-tab").forEach(b => b.onclick = () => { sfx.pop(); panel(b.dataset.t); });
     document.querySelectorAll(".dq-swap").forEach(b => b.onclick = () => swap(+b.dataset.i));
+    if (panelTab === "winter") WD.bind();
     const c = document.querySelector(".dq-claim[data-c]");
     if (c) c.onclick = () => { $("modal").classList.remove("show"); panelTab === "day" ? claim() : claimWeek(); };
   }

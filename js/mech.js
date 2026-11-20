@@ -176,7 +176,7 @@ window.MECH = (() => {
     if (hasOven && !S.orders.some(o => o.dish) && Math.random() < 0.22) {
       const opts = RECIPES.filter(recipeOpen);
       const busy = S.orders.map(o => o.ch);
-      const who = ["andriy", "halya", "stepan"].filter(c => !busy.includes(c) && (CHARS[c].from || 0) <= S.chapter);
+      const who = ["andriy", "halya", "stepan"].filter(c => !busy.includes(c) && (CHARS[c].from || 0) <= S.chapter && !(window.WD && WD.isSick(c)));
       if (opts.length && who.length) {
         const r = pick(opts);
         return { id: ++S.orderSeq, ch: pick(who), items: [{ c: "dish", l: r.l }], coins: 90, xp: 25, stars: 2, dish: true, line: rnd(3) };
