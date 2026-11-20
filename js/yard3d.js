@@ -297,7 +297,7 @@ async function build(d) {
   let spec = indoorNow && d.y < 34 ? null : MODELS[d.e];
   if (typeof spec === "function") spec = spec(d);
   if (d.who || (d.e === "🐱" && typeof PORTRAITS !== "undefined" && PORTRAITS.includes("cat"))) {
-    try { holder.add(await portraitFigure(d.who || "cat", d.who ? size * 2.1 : size * 1.6, true)); return holder; }
+    try { holder.add(await portraitFigure(d.who || "cat", d.who ? size * 2.35 : size * 1.6, true)); return holder; }
     catch (e) { if (d.who) return holder; }
   }
   if (d.e === "☁️") holder.add(cloud(size * 1.6));

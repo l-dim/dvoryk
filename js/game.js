@@ -628,12 +628,14 @@ function yardPeople(ch, all) {
   }));
   if (all.some(d => d.e === "👰")) { delete count.liza; delete count.taras; }
   const who = Object.keys(count).sort((a, b) => count[b] - count[a]).slice(0, 3);
-  const slots = [[27, 72], [73, 72], [36, 87], [64, 87], [17, 60], [83, 60], [50, 64], [24, 86], [76, 86]];
-  const taken = all.filter(d => d.y >= 34).map(d => [d.x, d.y, d.s]);
+  const slots = [[27, 72], [73, 72], [36, 87], [64, 87], [17, 60], [83, 60], [40, 76], [60, 76], [12, 74], [88, 74], [24, 86], [76, 86], [50, 64], [8, 66], [92, 66], [30, 94], [70, 94], [50, 92]];
+  const taken = all.filter(d => d.y >= 34 && !d.who).map(d => [d.x, d.y, d.s]);
   const out = [];
   for (const w of who) {
     const s = 10;
-    const free = slots.find(([x, y]) => taken.every(([tx, ty, ts]) => Math.hypot(tx - x, (ty - y) * 1.4) > (ts + s) * 0.55));
+    // не ставати впритул і не заступати собою те, що стоїть позаду (фігура висока)
+    const free = slots.find(([x, y]) => taken.every(([tx, ty, ts]) =>
+      Math.hypot(tx - x, (ty - y) * 1.4) > (ts + s) * 0.85 && !(ts <= 12 && Math.abs(tx - x) < (ts + s) * 0.5 && ty < y && y - ty < 32)));
     if (!free) break;
     taken.push([free[0], free[1], s]);
     out.push({ key: "p-" + w, who: w, x: free[0], y: free[1], s });
