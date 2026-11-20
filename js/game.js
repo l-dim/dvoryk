@@ -686,17 +686,39 @@ function yardPeople(ch, all) {
   }
   return out;
 }
+/* ---------- Місцини: який розділ показувати ---------- */
+let viewCh = null;                       // індекс розділу, який переглядаємо (null — поточний)
+const curIdx = () => Math.min(S.chapter, STORY.length - 1);
+const locOf = i => STORY[i].loc || "yard";
+function lastIdxOf(loc) { let r = -1; for (let i = 0; i <= curIdx(); i++) if (locOf(i) === loc) r = i; return r; }
+function renderLocBar() {
+  const bar = $("locBar");
+  const open = LOCS.filter(l => lastIdxOf(l.id) >= 0);
+  bar.hidden = open.length < 2;
+  if (bar.hidden) return;
+  const shown = viewCh === null ? curIdx() : viewCh;
+  bar.innerHTML = open.map(l => `<button class="loc-chip${locOf(shown) === l.id ? " on" : ""}" data-loc="${l.id}"><span>${l.icon}</span>${l.name}</button>`).join("");
+  bar.querySelectorAll(".loc-chip").forEach(b => b.onclick = () => {
+    const i = b.dataset.loc === locOf(curIdx()) ? null : lastIdxOf(b.dataset.loc);
+    if (i === viewCh) return;
+    viewCh = i; sfx.pop(); renderStory();
+  });
+}
 function renderStory(animateLast) {
-  const ch = curChapter();
+  if (viewCh !== null && (viewCh >= curIdx() || animateLast)) viewCh = null;
+  const idx = viewCh === null ? curIdx() : viewCh;
+  const ch = STORY[idx];
+  const doneN = idx < curIdx() ? ch.tasks.length : S.task;
+  renderLocBar();
   const scene = $("scene");
   scene.style.setProperty("--sky1", ch.sky[0]);
   scene.style.setProperty("--sky2", ch.sky[1]);
   scene.style.setProperty("--ground", ch.ground);
   const removed = new Set();
   const added = [];
-  ch.tasks.slice(0, S.task).forEach((t, k) => {
+  ch.tasks.slice(0, doneN).forEach((t, k) => {
     (t.remove || []).forEach(r => removed.add(r));
-    (t.add || []).forEach((a, j) => added.push(Object.assign({ fresh: animateLast && k === S.task - 1, key: "t" + k + "-" + j }, a)));
+    (t.add || []).forEach((a, j) => added.push(Object.assign({ fresh: animateLast && k === doneN - 1, key: "t" + k + "-" + j }, a)));
   });
   const all = [
     ...ch.base.map((d, j) => Object.assign({ key: "b" + j }, d)),
@@ -705,20 +727,20 @@ function renderStory(animateLast) {
   ];
   if (window.Yard3D) {
     all.push(...yardPeople(ch, all));
-    if (window.QUEST) all.push(...QUEST.yardGifts(ch, all));
+    if (window.QUEST && !ch.loc) all.push(...QUEST.yardGifts(ch, all));
     // справжній 3D-дворик
     scene.classList.add("is3d");
     if (!scene.querySelector("canvas")) scene.innerHTML = "";
     Yard3D.mount(scene);
-    Yard3D.render(Math.min(S.chapter, STORY.length - 1), ch, all, !!animateLast);
+    Yard3D.render(idx, ch, all, !!animateLast);
     Yard3D.setActive(!$("tab-story").hidden);
   } else {
     const deco = d => `<span class="deco${d.fresh ? " fresh" : ""}" style="left:${d.x}%;top:${d.y}%;font-size:${d.s}cqw">${d.e}</span>`;
     scene.innerHTML = `<div class="ground"></div>` + all.map(deco).join("");
   }
 
-  $("chapterTitle").textContent = `Розділ ${S.chapter + 1}. ${ch.title}`;
-  const done = Math.min(S.task, ch.tasks.length);
+  $("chapterTitle").textContent = `Розділ ${idx + 1}. ${ch.title}`;
+  const done = Math.min(doneN, ch.tasks.length);
   $("chapterBar").style.width = (done / ch.tasks.length * 100) + "%";
   $("chapterProg").textContent = done + "/" + ch.tasks.length;
 
@@ -726,7 +748,7 @@ function renderStory(animateLast) {
   list.innerHTML = "";
   ch.tasks.forEach((t, k) => {
     const row = document.createElement("div");
-    const state = k < S.task ? "done" : k === S.task ? "now" : "locked";
+    const state = k < doneN ? "done" : k === doneN ? "now" : "locked";
     row.className = "task " + state;
     row.innerHTML = `<span class="t-ic">${state === "done" ? "✅" : state === "now" ? "🔨" : "🔒"}</span>` +
       `<span class="t-title">${t.title}</span>` +
@@ -736,7 +758,14 @@ function renderStory(animateLast) {
     if (btn) btn.onclick = doTask;
     list.appendChild(row);
   });
-  $("storyEnd").hidden = !S.storyDone;
+  if (idx < curIdx()) {
+    const note = document.createElement("div");
+    note.className = "loc-note";
+    note.innerHTML = `Цю місцину вже відновлено 💛 <button class="btn small">↩ До поточного розділу</button>`;
+    note.querySelector("button").onclick = () => { viewCh = null; renderStory(); };
+    list.appendChild(note);
+  }
+  $("storyEnd").hidden = !S.storyDone || idx < curIdx();
   $("replayIntro").onclick = () => playDialog(ch.intro);
 }
 
@@ -1116,7 +1145,7 @@ function showTab(name) {
   document.querySelectorAll(".tab").forEach(t => t.hidden = t.id !== "tab-" + name);
   document.querySelectorAll(".nav button").forEach(b => b.classList.toggle("on", b.dataset.tab === name));
   if (window.Yard3D) Yard3D.setActive(name === "story");
-  if (name === "story") renderStory();
+  if (name === "story") { viewCh = null; renderStory(); }
   if (name === "shop") renderShop();
   if (name === "coll") renderCollection();
 }

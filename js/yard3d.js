@@ -327,6 +327,9 @@ async function build(d) {
     try { holder.add(await portraitFigure(d.who || "cat", d.who ? size * 2.35 : size * 1.6, true)); return holder; }
     catch (e) { if (d.who) return holder; }
   }
+  if (d.art && typeof VILLAGE_ART !== "undefined" && VILLAGE_ART.includes(d.art)) {
+    try { holder.add(standee(d, size * 1.35, await urlTexture("items/" + d.art + ".webp"))); return holder; } catch (e) { /* лишаємо замінник */ }
+  }
   if (d.e === "☁️") holder.add(cloud(size * 1.6));
   else if (spec) {
     const path = typeof spec === "string" ? spec : spec.m;
@@ -386,13 +389,40 @@ async function scatter(on) {
     normalize(o, 0.35 + rand() * 0.25);
     const h = new THREE.Group(); h.add(o);
     h.position.set(Math.cos(a) * r, 0, Math.sin(a) * r); h.rotation.y = rand() * 6.28;
+    if (inWater(h.position.z)) continue;
     g.add(h);
   }
   req(3);
 }
 
 /* ---------- огорожа, стежка з каменів і кущі ---------- */
-let decoGroup = null, hemi = null;
+let decoGroup = null, hemi = null, waterMesh = null, waterBand = null;
+/* річка/ставок поперек острівця: ch.river = { y, h } у координатах 2D-сцени (%) */
+const zOf = y => ((Math.max(26, y) - 26) / 66) * 2 * R - R;
+function setWater(ch) {
+  if (waterMesh) { (waterMesh.userData.edges || []).forEach(e => scene.remove(e)); scene.remove(waterMesh); waterMesh = null; }
+  waterBand = null;
+  if (!ch.river) return;
+  const z0 = zOf(ch.river.y - ch.river.h / 2), z1 = zOf(ch.river.y + ch.river.h / 2), Rw = R - 0.12;
+  waterBand = [z0 - 0.15, z1 + 0.15];
+  const pts = [], N = 24;
+  for (let k = 0; k <= N; k++) { const z = z0 + (z1 - z0) * k / N; pts.push(new THREE.Vector2(-Math.sqrt(Math.max(0, Rw * Rw - z * z)), -z)); }
+  for (let k = N; k >= 0; k--) { const z = z0 + (z1 - z0) * k / N; pts.push(new THREE.Vector2(Math.sqrt(Math.max(0, Rw * Rw - z * z)), -z)); }
+  const geo = new THREE.ShapeGeometry(new THREE.Shape(pts));
+  const mat = new THREE.MeshStandardMaterial({ color: 0x5fb6ea, roughness: 0.18, metalness: 0.05, emissive: 0x1f6fa8, emissiveIntensity: 0.18 });
+  waterMesh = new THREE.Mesh(geo, mat);
+  waterMesh.rotation.x = -Math.PI / 2; waterMesh.position.y = 0.012; waterMesh.receiveShadow = true;
+  // світлі береги
+  const edge = new THREE.MeshStandardMaterial({ color: 0xe8dcb8, roughness: 1 });
+  [z0, z1].forEach(z => {
+    const w = 2 * Math.sqrt(Math.max(0, Rw * Rw - z * z));
+    const b = new THREE.Mesh(new THREE.BoxGeometry(w, 0.03, 0.14), edge);
+    b.position.set(0, 0.006, z);
+    scene.add(b); (waterMesh.userData.edges = waterMesh.userData.edges || []).push(b);
+  });
+  scene.add(waterMesh);
+}
+const inWater = z => waterBand && z > waterBand[0] && z < waterBand[1];
 function juicy(hex) {
   // соковитіша трава: більше насиченості, трохи світліше
   const c = new THREE.Color(hex), hsl = {};
@@ -418,6 +448,7 @@ async function decorate(ch, outdoor, winter) {
   const stoneMat = new THREE.MeshStandardMaterial({ color: winter ? 0xd9dde3 : 0xe9e3d6, roughness: 1 });
   for (let k = 0; k < 9; k++) {
     const t = k / 8, z = R - 0.6 - t * (R * 0.95), x = Math.sin(t * 3.2) * 0.55;
+    if (inWater(z)) continue;
     for (let j = 0; j < 2; j++) {
       const r = 0.22 + rand() * 0.12;
       const st = new THREE.Mesh(new THREE.CylinderGeometry(r, r * 1.05, 0.06, 7), stoneMat);
@@ -477,6 +508,7 @@ async function render(chIndex, ch, list, animate) {
     backWall.visible = indoorNow = !!ch.indoor;
     controls.reset && controls.reset();
     camera.position.set(0, 10.5, 18); controls.update();
+    setWater(ch);
     scatter(!ch.indoor && !winter);
     decorate(ch, !ch.indoor, winter);
   }
