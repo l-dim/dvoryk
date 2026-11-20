@@ -61,7 +61,7 @@ const GENS = {
 /* Персонажі. from — з якого розділу (0 = перший) персонаж починає робити замовлення */
 /* Мальовані портрети: ключі персонажів, для яких є файл portraits/<ключ>.webp.
    Для решти показується смайлик. */
-const PORTRAITS = ["halya"];
+const PORTRAITS = ["halya", "stepan"];
 
 const CHARS = {
   halya:   { icon: "👵", name: "Бабуся Галя",

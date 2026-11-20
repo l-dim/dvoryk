@@ -265,5 +265,5 @@ body.farm .install { background: rgba(255, 248, 225, .9); }
 .face.mini img { position: absolute; left: 50%; top: -4%; width: 240%; transform: translateX(-50%); }
 .b-ava .face.mini { width: 48px; height: 48px; }
 body.farm .d-ava.has-pic { left: -12px; bottom: 0; animation: talk 2.6s ease-in-out infinite; }
-.face.big { height: 185px; width: auto; max-width: 168px; object-fit: contain; object-position: 50% 100%; }
-body.farm .dialog .d-box:has(.has-pic) { padding-left: 148px; margin-top: 90px; }
+.face.big { height: 185px; width: auto; max-width: 150px; object-fit: contain; object-position: 50% 100%; }
+body.farm .dialog .d-box:has(.has-pic) { padding-left: 146px; margin-top: 90px; }
