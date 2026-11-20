@@ -508,7 +508,9 @@ const PAINTED_ITEMS = ["veg-0", "veg-1", "veg-2", "veg-3", "veg-4", "veg-5", "ve
   "dairy-0", "dairy-1", "dairy-2", "dairy-3", "dairy-4", "dairy-5", "dairy-6", "coin-0", "coin-1", "coin-2", "coin-3", "energy-0", "energy-1", "energy-2", "chest-0", "chest-1", "chest-2", "gen-veg", "gen-bake", "gen-fruit", "gen-flower", "gen-tea", "gen-sweet", "gen-dairy"];
 /* Мальовані прикраси дворика: емодзі → items/<назва>.webp (аркуші sheet-deco1/2) */
 const DECO_ICONS = { "⛲": "deco-fountain", "⛱️": "deco-umbrella", "🕸️": "deco-web", "🕰️": "deco-clock", "🔥": "deco-fire",
-  "💨": "deco-dust", "🎈": "deco-balloons", "🏆": "deco-trophy", "🎻": "deco-violin" };
+  "💨": "deco-dust", "🎈": "deco-balloons", "🏆": "deco-trophy", "🎻": "deco-violin",
+  "🪗": "deco-accordion", "🎆": "deco-firework", "🎇": "deco-sparkler", "🎉": "deco-popper", "🎊": "deco-confetti",
+  "🌙": "deco-moon", "🎶": "deco-notes", "🕯️": "deco-candle", "⛸️": "deco-skates" };
 /* Мальовані значки інтерфейсу: емодзі → items/<назва>.webp (аркуш sheet-ui) */
 const UI_ICONS = { "⭐": "ui-star", "⚙️": "ui-gear", "🏡": "ui-home", "🛍️": "ui-shop", "📖": "ui-book",
   "✅": "ui-check", "🔨": "ui-hammer", "🔒": "ui-lock", "📜": "ui-scroll" };
