@@ -61,11 +61,11 @@ const GENS = {
 /* Персонажі. from — з якого розділу (0 = перший) персонаж починає робити замовлення */
 /* Мальовані портрети: ключі персонажів, для яких є файл portraits/<ключ>.webp.
    Для решти показується смайлик. */
-const PORTRAITS = ["halya", "stepan", "olya", "marichka", "cat", "andriy", "liza", "ivan"];
+const PORTRAITS = ["halya", "stepan", "olya", "marichka", "cat", "andriy", "liza", "ivan", "taras"];
 /* Де обличчя на портреті (у % від картинки) і масштаб для круглого аватара: [x, y, ширина%] */
 const PORTRAIT_FACE = {
   halya: [52, 26, 240], stepan: [46, 26, 230], olya: [53, 21, 250], marichka: [42, 22, 240], cat: [64, 22, 175],
-  andriy: [47, 29, 220], liza: [54, 23, 250], ivan: [45, 24, 240]
+  andriy: [47, 29, 220], liza: [54, 23, 250], ivan: [45, 24, 240], taras: [48, 18, 250]
 };
 
 const CHARS = {
