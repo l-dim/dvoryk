@@ -575,14 +575,24 @@ function renderStory(animateLast) {
   const added = [];
   ch.tasks.slice(0, S.task).forEach((t, k) => {
     (t.remove || []).forEach(r => removed.add(r));
-    (t.add || []).forEach(a => added.push(Object.assign({ fresh: animateLast && k === S.task - 1 }, a)));
+    (t.add || []).forEach((a, j) => added.push(Object.assign({ fresh: animateLast && k === S.task - 1, key: "t" + k + "-" + j }, a)));
   });
-  const deco = d => `<span class="deco${d.fresh ? " fresh" : ""}" style="left:${d.x}%;top:${d.y}%;font-size:${d.s}cqw">${d.e}</span>`;
-  scene.innerHTML =
-    `<div class="ground"></div>` +
-    ch.base.map(deco).join("") +
-    ch.clutter.filter(c => !removed.has(c.id)).map(deco).join("") +
-    added.map(deco).join("");
+  const all = [
+    ...ch.base.map((d, j) => Object.assign({ key: "b" + j }, d)),
+    ...ch.clutter.map((d, j) => Object.assign({ key: "c" + j }, d)).filter(c => !removed.has(c.id)),
+    ...added
+  ];
+  if (window.Yard3D) {
+    // справжній 3D-дворик
+    scene.classList.add("is3d");
+    if (!scene.querySelector("canvas")) scene.innerHTML = "";
+    Yard3D.mount(scene);
+    Yard3D.render(Math.min(S.chapter, STORY.length - 1), ch, all, !!animateLast);
+    Yard3D.setActive(!$("tab-story").hidden);
+  } else {
+    const deco = d => `<span class="deco${d.fresh ? " fresh" : ""}" style="left:${d.x}%;top:${d.y}%;font-size:${d.s}cqw">${d.e}</span>`;
+    scene.innerHTML = `<div class="ground"></div>` + all.map(deco).join("");
+  }
 
   $("chapterTitle").textContent = `Розділ ${S.chapter + 1}. ${ch.title}`;
   const done = Math.min(S.task, ch.tasks.length);
@@ -850,6 +860,7 @@ function tap(i) {
 function showTab(name) {
   document.querySelectorAll(".tab").forEach(t => t.hidden = t.id !== "tab-" + name);
   document.querySelectorAll(".nav button").forEach(b => b.classList.toggle("on", b.dataset.tab === name));
+  if (window.Yard3D) Yard3D.setActive(name === "story");
   if (name === "story") renderStory();
   if (name === "shop") renderShop();
   if (name === "coll") renderCollection();
@@ -948,3 +959,4 @@ function showNoEnergyInfo() {
 }
 
 document.addEventListener("DOMContentLoaded", init);
+window.addEventListener("yard3d-ready", () => { if (S && S.started) renderStory(); });

@@ -8,8 +8,9 @@
 - `js/game.js` — логіка гри
 - після змін у грі збільшити `VERSION` у `sw.js`
 
-## 3D-превʼю
+## Графіка й ліцензії
 
-`preview/` — та сама гра з об'ємними іконками [Fluent Emoji 3D](https://github.com/microsoft/fluentui-emoji) (© Microsoft, ліцензія MIT, див. `e3d/LICENSE-fluentui-emoji.txt`).
-Превʼю має власний сейв: при першому відкритті копіює прогрес з основної гри й далі основну гру не чіпає.
-3D-вигляд увімкнено в основній грі (`window.DVORYK_3D = true` в `index.html`); щоб повернути звичайні емодзі — прибрати цей рядок.
+- 3D-іконки: [Fluent Emoji 3D](https://github.com/microsoft/fluentui-emoji) © Microsoft, MIT (`e3d/LICENSE-fluentui-emoji.txt`).
+- 3D-дворик: [Three.js](https://threejs.org) r170, MIT (`vendor/LICENSE-three.txt`); моделі [Kenney](https://kenney.nl) — Nature, Food, Furniture, Holiday, City Suburban, Survival kits, CC0 (`models/*/License.txt`).
+- `js/yard3d.js` — 3D-сцена; таблиця `MODELS` зіставляє емодзі з `js/data.js` з моделями. Для чого моделі немає — ставиться «фігурка» з 3D-іконки.
+- Якщо WebGL недоступний, «Дворик» показується як раніше, у 2D.
