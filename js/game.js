@@ -28,7 +28,7 @@ function defaultState() {
     gens: ["veg", "bake"],
     chapter: 0, task: 0, storyDone: false,
     inbox: [], collection: {},
-    sound: true, infinite: false,
+    sound: true, infinite: false, energyBuys: { day: "", n: 0 },
     lastDaily: "", streak: 0, teaAt: 0, tut: 0,
     created: Date.now()
   };
@@ -44,7 +44,9 @@ function load() {
     if (!raw) return null;
     const data = JSON.parse(raw);
     if (!data || typeof data !== "object" || !Array.isArray(data.board)) return null;
-    return Object.assign(defaultState(), data);
+    const st = Object.assign(defaultState(), data);
+    st.infinite = false; // режим «без обмежень» прибрано — енергія тепер справжня
+    return st;
   } catch (e) { return null; }
 }
 let saveTimer = null;
@@ -118,7 +120,6 @@ function regen() {
   }
 }
 function spendEnergy() {
-  if (S.infinite) return true;
   regen();
   if (S.energy < 1) { showNoEnergy(); return false; }
   if (S.energy >= ENERGY_MAX) S.energyAt = Date.now();
@@ -164,8 +165,8 @@ function produce(i) {
   if (!spendEnergy()) return;
   let item;
   const roll = Math.random();
-  if (roll < 0.04) item = { c: "energy", l: 0 };
-  else if (roll < 0.08) item = { c: "coin", l: 0 };
+  if (roll < 0.015) item = { c: "energy", l: 0 };
+  else if (roll < 0.06) item = { c: "coin", l: 0 };
   else {
     // що вищий рівень гравця, то частіше генератор дає одразу кращі предмети
     const r = Math.random(), up = Math.min(0.35, 0.15 + S.level * 0.01);
@@ -189,8 +190,8 @@ function openChest(i) {
   for (let n = 0; n < count; n++) {
     const r = Math.random();
     let item;
-    if (r < 0.2) item = { c: "energy", l: Math.min(2, rnd(k + 1)) };
-    else if (r < 0.38) item = { c: "coin", l: Math.min(3, rnd(k + 2)) };
+    if (r < 0.08) item = { c: "energy", l: Math.min(2, rnd(k + 1)) };
+    else if (r < 0.28) item = { c: "coin", l: Math.min(3, rnd(k + 2)) };
     else item = { c: pick(unlocked), l: rnd(maxT + 1) };
     placeItem(item, i);
   }
@@ -231,8 +232,8 @@ function handleDrop(a, b) {
     selected = b;
     // невеликий бонус за злиття
     const bonus = Math.random();
-    if (bonus < 0.05) placeItem({ c: "energy", l: 0 }, b);
-    else if (bonus < 0.08 && nl >= 3) placeItem({ c: "coin", l: 0 }, b);
+    if (bonus < 0.015) placeItem({ c: "energy", l: 0 }, b);
+    else if (bonus < 0.05 && nl >= 3) placeItem({ c: "coin", l: 0 }, b);
     if (S.tut === 1) setTut(2);
   } else {
     S.board[b] = A; S.board[a] = B;
@@ -248,13 +249,13 @@ function gainXp(n) {
   let ups = 0;
   while (S.xp >= xpNeed(S.level)) { S.xp -= xpNeed(S.level); S.level++; ups++; }
   if (ups) {
-    regen(); S.energy += 40;
+    regen(); S.energy += ENERGY_BONUS.level;
     placeItem({ c: "chest", l: S.level % 5 === 0 ? 1 : 0 });
     sfx.level();
     confetti();
     setTimeout(() => modal({
       title: "Рівень " + S.level + "! 🎉",
-      html: `<div class="big-emoji">🌟</div><p>Ти молодчинка! Тримай подарунки:</p><p class="rewards">+40 ⚡ &nbsp; ${S.level % 5 === 0 ? "📦" : "🎁"}</p>`,
+      html: `<div class="big-emoji">🌟</div><p>Ти молодчинка! Тримай подарунки:</p><p class="rewards">+${ENERGY_BONUS.level} ⚡ &nbsp; ${S.level % 5 === 0 ? "📦" : "🎁"}</p>`,
       buttons: [{ label: "Дякую! 💛" }]
     }), 350);
   }
@@ -347,7 +348,7 @@ function doTask() {
     const parts = [];
     if (r.gen && !S.gens.includes(r.gen)) { S.gens.push(r.gen); placeItem({ g: r.gen }); parts.push(GENS[r.gen].icon + " " + GENS[r.gen].name); }
     if (r.chest !== undefined) { placeItem({ c: "chest", l: r.chest }); parts.push(CHAINS.chest.items[r.chest][0]); }
-    regen(); S.energy += 50; parts.push("+50 ⚡");
+    regen(); S.energy += ENERGY_BONUS.chapter; parts.push("+" + ENERGY_BONUS.chapter + " ⚡");
     S.chapter++; S.task = 0;
     if (S.chapter >= STORY.length) { S.storyDone = true; S.chapter = STORY.length - 1; S.task = STORY[S.chapter].tasks.length; }
     save();
@@ -374,12 +375,12 @@ function checkDaily() {
   S.streak = S.lastDaily === ys ? S.streak + 1 : 1;
   S.lastDaily = t;
   const big = S.streak % 3 === 0;
-  regen(); S.energy += 50;
+  regen(); S.energy += ENERGY_BONUS.daily;
   placeItem({ c: "chest", l: big ? 1 : 0 });
   save();
   modal({
     title: "Щоденний подарунок 🎁",
-    html: `<div class="big-emoji">${big ? "📦" : "🎁"}</div><p>День ${S.streak} поспіль! ${big ? "Кожен третій день — велика посилка!" : ""}</p><p class="rewards">+50 ⚡ &nbsp; ${big ? "📦" : "🎁"}</p>`,
+    html: `<div class="big-emoji">${big ? "📦" : "🎁"}</div><p>День ${S.streak} поспіль! ${big ? "Кожен третій день — велика посилка!" : ""}</p><p class="rewards">+${ENERGY_BONUS.daily} ⚡ &nbsp; ${big ? "📦" : "🎁"}</p>`,
     buttons: [{ label: "Забрати 💛", onClick: () => { renderAll(); } }]
   });
 }
@@ -391,27 +392,56 @@ function takeTea() {
   sfx.coin();
   toast("☕ Смачного! +" + TEA_BREAK_ENERGY + " ⚡");
 }
+function hm(ms) {
+  const m = Math.ceil(ms / 60000);
+  if (m < 60) return m + " хв";
+  return Math.floor(m / 60) + " год" + (m % 60 ? " " + (m % 60) + " хв" : "");
+}
+function energyFullIn() {
+  regen();
+  if (S.energy >= ENERGY_MAX) return 0;
+  return (ENERGY_MAX - S.energy - 1) * ENERGY_REGEN_MS + Math.max(0, ENERGY_REGEN_MS - (Date.now() - S.energyAt));
+}
+function energyBuysToday() {
+  if (!S.energyBuys || S.energyBuys.day !== todayStr()) S.energyBuys = { day: todayStr(), n: 0 };
+  return S.energyBuys.n;
+}
+function energyPrice() {
+  const n = energyBuysToday();
+  return n < ENERGY_SHOP.prices.length ? ENERGY_SHOP.prices[n] : 0;
+}
+function energyButtons(withWait) {
+  const btns = [];
+  if (teaReady()) btns.push({ label: "☕ Перерва на чай: +" + TEA_BREAK_ENERGY + " ⚡", onClick: takeTea });
+  else btns.push({ label: "☕ Чай буде за " + hm(TEA_BREAK_MS - (Date.now() - S.teaAt)), disabled: true });
+  const p = energyPrice();
+  if (p) btns.push({ label: "Купити " + ENERGY_SHOP.amount + " ⚡ за " + p + " 🪙", cls: "ghost", disabled: S.coins < p, onClick: () => buy("energy") });
+  if (withWait) btns.push({ label: "Зачекаю 💤", cls: "ghost" });
+  return btns;
+}
+let noEnergyTick = null;
 function showNoEnergy() {
   sfx.nope();
   regen();
-  const secs = Math.ceil((ENERGY_REGEN_MS - (Date.now() - S.energyAt)) / 1000);
-  const teaLeft = Math.max(0, TEA_BREAK_MS - (Date.now() - S.teaAt));
+  const next = () => mmss(Math.max(0, ENERGY_REGEN_MS - (Date.now() - S.energyAt)));
   modal({
     title: "Енергія скінчилась 😴",
-    html: `<div class="big-emoji">🫖</div><p>Наступна ⚡ буде за ${secs} с.<br>Або зроби перерву:</p>`,
-    buttons: [
-      teaReady()
-        ? { label: "☕ Перерва на чай: +" + TEA_BREAK_ENERGY + " ⚡", onClick: takeTea }
-        : { label: "☕ Чай буде за " + mmss(teaLeft), disabled: true },
-      { label: "Купити 50 ⚡ за 120 🪙", cls: "ghost", disabled: S.coins < 120, onClick: () => buy("energy") },
-      { label: "Зачекаю", cls: "ghost" }
-    ]
+    html: `<div class="big-emoji">🫖</div>
+      <p>Город відпочиває. Наступна ⚡ буде за <b id="neNext">${next()}</b>,<br>повна шкала (${ENERGY_MAX} ⚡) — за <b id="neFull">${hm(energyFullIn())}</b>.</p>
+      <p class="hint-s">Поки чекаєш — об'єднуй те, що вже є на дошці, і виконуй замовлення.${energyPrice() ? "" : "<br>Енергію на сьогодні вже купувала — завтра крамничка знову відкриється."}</p>`,
+    buttons: energyButtons(true)
   });
+  clearInterval(noEnergyTick);
+  noEnergyTick = setInterval(() => {
+    const a = document.getElementById("neNext"), b = document.getElementById("neFull");
+    if (!a || !$("modal").classList.contains("show")) { clearInterval(noEnergyTick); return; }
+    a.textContent = next(); b.textContent = hm(energyFullIn());
+  }, 1000);
 }
 
 /* ---------------- Крамничка (тільки ігрові монетки) ---------------- */
 const SHOP = [
-  { id: "energy", icon: "⚡", title: "50 енергії", price: 120 },
+  { id: "energy", icon: "⚡", title: ENERGY_SHOP.amount + " енергії", price: 0 },
   { id: "chest0", icon: "🎁", title: "Подарунок", price: 150 },
   { id: "chest1", icon: "📦", title: "Посилка", price: 400 },
   { id: "star",   icon: "⭐", title: "Зірочка для ремонту", price: 500 },
@@ -419,9 +449,11 @@ const SHOP = [
 ];
 function buy(id) {
   const s = SHOP.find(x => x.id === id);
-  if (S.coins < s.price) { sfx.nope(); toast("Не вистачає монеток 🪙"); return; }
-  S.coins -= s.price;
-  if (id === "energy") { regen(); S.energy += 50; }
+  const price = id === "energy" ? energyPrice() : s.price;
+  if (!price) { sfx.nope(); toast("Енергію на сьогодні вже купила — завтра знову можна 🌙"); return; }
+  if (S.coins < price) { sfx.nope(); toast("Не вистачає монеток 🪙"); return; }
+  S.coins -= price;
+  if (id === "energy") { regen(); S.energy += ENERGY_SHOP.amount; S.energyBuys.n++; }
   else if (id === "star") S.stars += 1;
   else placeItem({ c: "chest", l: +id.slice(-1) });
   sfx.coin();
@@ -456,9 +488,9 @@ function renderTop() {
   regen();
   $("lvl").textContent = S.level;
   $("xpRing").style.setProperty("--p", Math.min(100, S.xp / xpNeed(S.level) * 100));
-  $("energy").textContent = S.infinite ? "∞" : S.energy;
+  $("energy").textContent = S.energy;
   const t = $("energyTimer");
-  if (!S.infinite && S.energy < ENERGY_MAX) {
+  if (S.energy < ENERGY_MAX) {
     t.textContent = mmss(ENERGY_REGEN_MS - (Date.now() - S.energyAt));
     t.hidden = false;
   } else t.hidden = true;
@@ -623,13 +655,20 @@ function renderShop() {
   SHOP.forEach(s => {
     const row = document.createElement("div");
     row.className = "shop-item";
-    row.innerHTML = `<span class="s-ic">${s.icon}</span><span class="s-title">${s.title}</span><button class="s-btn${S.coins >= s.price ? "" : " dim"}">${s.price} 🪙</button>`;
+    let price = s.price, title = s.title, lbl;
+    if (s.id === "energy") {
+      price = energyPrice();
+      const left = ENERGY_SHOP.prices.length - energyBuysToday();
+      title += `<small class="s-sub">${left ? "сьогодні ще " + left + " з " + ENERGY_SHOP.prices.length : "завтра знову"}</small>`;
+    }
+    lbl = price ? price + " 🪙" : "🌙";
+    row.innerHTML = `<span class="s-ic">${s.icon}</span><span class="s-title">${title}</span><button class="s-btn${price && S.coins >= price ? "" : " dim"}">${lbl}</button>`;
     row.querySelector("button").onclick = () => buy(s.id);
     box.appendChild(row);
   });
   const tb = $("teaBtn");
   if (teaReady()) { tb.textContent = "☕ Перерва на чай: +" + TEA_BREAK_ENERGY + " ⚡ безкоштовно"; tb.classList.remove("dim"); }
-  else { tb.textContent = "☕ Наступна перерва за " + mmss(TEA_BREAK_MS - (Date.now() - S.teaAt)); tb.classList.add("dim"); }
+  else { tb.textContent = "☕ Наступна перерва на чай за " + hm(TEA_BREAK_MS - (Date.now() - S.teaAt)); tb.classList.add("dim"); }
 }
 
 function renderCollection() {
@@ -776,13 +815,11 @@ function openSettings() {
     html: `
       <label class="set-row">Ім'я <input id="setName" value="${(S.name || "").replace(/"/g, "&quot;")}" maxlength="20"></label>
       <label class="set-row">🔊 Звук <input type="checkbox" id="setSound" ${S.sound ? "checked" : ""}></label>
-      <label class="set-row">∞ Енергія без обмежень <input type="checkbox" id="setInf" ${S.infinite ? "checked" : ""}></label>
       <p class="hint-s">Тут немає жодних справжніх покупок — тільки ігрові монетки 💛</p>
       <button class="btn ghost small" id="setReset">Почати гру спочатку</button>`,
     buttons: [{ label: "Зберегти", onClick: () => {
       S.name = $("setName").value.trim();
       S.sound = $("setSound").checked;
-      S.infinite = $("setInf").checked;
       renderAll(); save();
     } }]
   });
@@ -928,7 +965,7 @@ function init() {
   $("settingsBtn").onclick = openSettings;
   $("inboxBtn").onclick = takeInbox;
   $("teaBtn").onclick = () => { takeTea(); renderShop(); };
-  $("energyChip").onclick = () => { if (!S.infinite && S.energy < ENERGY_MAX) showNoEnergyInfo(); };
+  $("energyChip").onclick = () => { showNoEnergyInfo(); };
   $("dialog").onclick = nextLine;
 
   setInterval(() => {
@@ -949,12 +986,12 @@ function init() {
   if (!window.DVORYK_NO_SW && "serviceWorker" in navigator && location.protocol !== "file:") navigator.serviceWorker.register("sw.js").catch(() => {});
 }
 function showNoEnergyInfo() {
-  regen();
-  const full = (ENERGY_MAX - S.energy - 1) * ENERGY_REGEN_MS + (ENERGY_REGEN_MS - (Date.now() - S.energyAt));
+  const full = energyFullIn();
   modal({
     title: "Енергія ⚡",
-    html: `<p>+1 ⚡ кожні ${ENERGY_REGEN_MS / 1000} секунд.<br>Повна шкала через ${mmss(Math.max(0, full))}.</p><p class="hint-s">Ще енергію дають ⚡🔋☀️ на дошці, нові рівні, подарунки й перерва на чай.</p>`,
-    buttons: teaReady() ? [{ label: "☕ Перерва на чай: +" + TEA_BREAK_ENERGY + " ⚡", onClick: takeTea }, { label: "Закрити", cls: "ghost" }] : [{ label: "Зрозуміло" }]
+    html: `<p>+1 ⚡ кожні ${ENERGY_REGEN_MS / 60000} хвилини, до ${ENERGY_MAX} ⚡.<br>${full ? "Повна шкала за <b>" + hm(full) + "</b>." : "Шкала повна — саме час садити! 🌱"}</p>
+      <p class="hint-s">Ще трохи енергії дають ⚡🔋☀️ на дошці, нові рівні, щоденний подарунок і перерва на чай (раз на ${TEA_BREAK_MS / 3600000} год).</p>`,
+    buttons: [...energyButtons(false), { label: "Зрозуміло", cls: "ghost" }]
   });
 }
 

@@ -176,6 +176,7 @@ main { flex: 1; min-height: 0; position: relative; }
 .shop-item { display: flex; align-items: center; gap: 12px; padding: 10px 2px; border-top: 1.5px dashed var(--line); }
 .s-ic { font-family: var(--emoji); font-size: 32px; width: 44px; text-align: center; }
 .s-title { flex: 1; font-weight: 700; }
+.s-sub { display: block; font-size: .75em; font-weight: 600; opacity: .6; }
 .s-btn { background: var(--gold); color: #fff; font-weight: 900; padding: 9px 12px; border-radius: 12px; box-shadow: 0 3px 0 #d79a26; white-space: nowrap; }
 .hint-s { font-size: 13px; color: var(--ink-soft); line-height: 1.4; margin: 4px 0 8px; }
 

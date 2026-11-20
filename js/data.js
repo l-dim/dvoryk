@@ -6,10 +6,12 @@
    ============================================================ */
 
 const COLS = 7, ROWS = 8;
-const ENERGY_MAX = 100;
-const ENERGY_REGEN_MS = 20 * 1000;      // +1⚡ кожні 20 секунд
-const TEA_BREAK_MS = 15 * 60 * 1000;    // безкоштовна перерва на чай раз на 15 хв
-const TEA_BREAK_ENERGY = 30;
+const ENERGY_MAX = 60;
+const ENERGY_REGEN_MS = 2 * 60 * 1000;  // +1⚡ кожні 2 хвилини (повна шкала ≈ 2 год)
+const TEA_BREAK_MS = 4 * 60 * 60 * 1000; // безкоштовна перерва на чай раз на 4 год
+const TEA_BREAK_ENERGY = 15;
+const ENERGY_BONUS = { level: 15, chapter: 20, daily: 25 };
+const ENERGY_SHOP = { amount: 20, prices: [150, 300, 600] }; // за день можна купити 3 рази, щоразу дорожче
 
 /* Ланцюжки: два однакові предмети → наступний у списку */
 const CHAINS = {
@@ -38,7 +40,7 @@ const CHAINS = {
   /* Спеціальні: тапни, щоб забрати / відкрити. Їх теж можна об'єднувати. */
   coin: { name: "Монетки", collect: "coins", values: [5, 15, 40, 100], items: [
     ["🪙", "Монетка"], ["💰", "Мішечок монет"], ["👛", "Гаманець"], ["💎", "Скарб"] ] },
-  energy: { name: "Енергія", collect: "energy", values: [5, 15, 40], items: [
+  energy: { name: "Енергія", collect: "energy", values: [3, 8, 20], items: [
     ["⚡", "Іскорка"], ["🔋", "Батарейка"], ["☀️", "Сонечко"] ] },
   chest: { name: "Подарунки", open: true, sizes: [3, 5, 8], items: [
     ["🎁", "Подарунок"], ["📦", "Посилка"], ["💝", "Скриня-сюрприз"] ] }
