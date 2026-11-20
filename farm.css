@@ -425,3 +425,31 @@ body.farm .order.dish .o-who { background: linear-gradient(#ffc94d, #e8962a); }
 .dq-claim { margin: 10px 0 2px !important; font-size: 15px !important; padding: 11px 10px !important; }
 .dq-when { margin: 4px 0 2px; font-size: 14px; }
 .dq-prize { margin: 8px 0 0; font-size: 13px; font-weight: 800; color: var(--ink-soft); }
+
+/* ---------- Компактний низ і більша дошка ---------- */
+/* інфо-рядок фіксованої висоти — щоб дошка не стрибала, коли вибираєш предмет */
+.info-row { height: 54px; margin-top: 5px; }
+.info { height: 100%; min-height: 0; overflow: hidden; padding: 4px 8px; gap: 7px; }
+.info-ic { font-size: 26px; flex: none; }
+.info-txt { font-size: 14px; line-height: 1.15; }
+.info-txt b, .info-txt small { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.info-txt small { margin-top: 3px; font-size: 11.5px; }
+.info-hint { font-size: 12.5px; line-height: 1.25; }
+.lvl-tag { font-size: 10.5px; padding: 1px 5px; vertical-align: 1px; }
+body.farm .sell { flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  padding: 4px 9px 5px; font-size: 14px; line-height: 1; border-radius: 12px; min-width: 58px; }
+body.farm .sell small { font-size: 9.5px; font-weight: 800; opacity: .9; }
+.q-btn, .ev-btn { height: 100%; width: 54px; padding: 2px 3px 4px; }
+.q-btn .q-ic { font-size: 21px; }
+.ev-btn .ev-ic { font-size: 22px; }
+.inbox { height: 100%; }
+/* замовлення трохи нижчі */
+body.farm .order { min-height: 0; padding: 4px 4px 6px; }
+body.farm .order.pic .o-body { min-height: 60px; margin-bottom: 2px; }
+body.farm .o-pic { width: 50px; }
+body.farm .order.pic .o-item { width: 32px; height: 32px; font-size: 22px; }
+body.farm .orders { padding: 4px 0 4px; gap: 7px; }
+/* дошка: тонша рамка, менші проміжки */
+body.farm .board { padding: 5px; gap: 3px; border-width: 3px; }
+#tab-board { padding-bottom: 4px; }
+body.farm .sell { white-space: nowrap; }

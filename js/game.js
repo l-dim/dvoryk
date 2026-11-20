@@ -628,7 +628,7 @@ function renderInfo() {
       : `<b>${GENS[it.g].name}</b>${lv}<small>Заряд ${it.ch}/${MECH.cap(it)} · тапай, щоб отримати ${ch.items[0][0]} (−1 ⚡)</small>`;
   } else if (it.c === "dish") {
     text = `<b>${itemName(it)}</b><small>Страву просять сусіди за ⭐⭐</small>`;
-    btn = `<button class="sell" id="sellBtn">Продати +${Math.round(itemValue(it.c, it.l) / 2)}🪙</button>`;
+    btn = `<button class="sell" id="sellBtn"><small>продати</small><span>+${Math.round(itemValue(it.c, it.l) / 2)}🪙</span></button>`;
   } else if (CHAINS[it.c].open) {
     text = `<b>${itemName(it)}</b><small>Тапни ще раз, щоб відкрити!${isMax(it) ? "" : " Або об'єднай два однакові"}</small>`;
   } else if (CHAINS[it.c].collect) {
@@ -636,13 +636,13 @@ function renderInfo() {
   } else {
     const ch = CHAINS[it.c];
     const next = isMax(it) ? "Найвищий рівень! 🏆" : `Два таких → ${ch.items[it.l + 1][0]} ${ch.items[it.l + 1][1]}`;
-    text = `<b>${itemName(it)}</b> <span class="lvl-tag">рів. ${it.l + 1}</span><small>${next}</small>`;
-    btn = `<button class="sell" id="sellBtn">Продати +${Math.max(1, Math.round(itemValue(it.c, it.l) / 2))}🪙</button>`;
+    text = `<b>${itemName(it)} <span class="lvl-tag">рів. ${it.l + 1}</span></b><small>${next}</small>`;
+    btn = `<button class="sell" id="sellBtn"><small>продати</small><span>+${Math.max(1, Math.round(itemValue(it.c, it.l) / 2))}🪙</span></button>`;
   }
   box.innerHTML = `<span class="info-ic">${itemIcon(it)}</span><span class="info-txt">${text}</span>${btn}`;
   const sb = $("sellBtn");
   if (sb) sb.onclick = () => {
-    if (it.l >= 3 && !sb.dataset.sure) { sb.dataset.sure = 1; sb.textContent = "Точно продати?"; return; }
+    if (it.l >= 3 && !sb.dataset.sure) { sb.dataset.sure = 1; sb.innerHTML = "<small>точно?</small>Так"; return; }
     sellSelected();
   };
 }
