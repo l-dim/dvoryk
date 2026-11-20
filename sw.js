@@ -1,6 +1,6 @@
 /* Офлайн-режим: спершу пробуємо мережу (щоб одразу отримувати оновлення гри),
    а без інтернету віддаємо збережену копію. */
-const VERSION = "dvoryk-v3";
+const VERSION = "dvoryk-v4";
 const FILES = ["./", "index.html", "style.css", "js/data.js", "js/game.js", "manifest.webmanifest",
   "icons/icon-180.png", "icons/icon-192.png", "icons/icon-512.png"];
 

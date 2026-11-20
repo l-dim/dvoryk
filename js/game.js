@@ -874,9 +874,11 @@ function startGame() {
     S.storyDone = false; S.chapter++; S.task = 0;
     save();
     renderAll();
+    const n = STORY.length - S.chapter;
+    const what = n === 1 ? "новий розділ" : n < 5 ? "нові розділи" : "нових розділів";
     modal({
-      title: "Нові розділи! 💌",
-      html: `<div class="big-emoji">🏡</div><p>Історія дворика продовжується — на тебе чекають ${STORY.length - S.chapter} нових розділів!</p>`,
+      title: n === 1 ? "Новий розділ! 💌" : "Нові розділи! 💌",
+      html: `<div class="big-emoji">🏡</div><p>Історія дворика продовжується — на тебе ${n === 1 ? "чекає" : "чекають"} ${n} ${what}: «${STORY[S.chapter].title}»${n > 1 ? " і далі" : ""}!</p>`,
       buttons: [{ label: "Читати ›", onClick: () => playDialog(STORY[S.chapter].intro, checkDaily) }]
     });
   } else {
