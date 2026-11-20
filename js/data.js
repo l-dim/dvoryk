@@ -499,7 +499,8 @@ const STORY = [
 /* ---------- Мальовані предмети ----------
    Ключі «ланцюжок-рівень» (напр. "veg-3") і «gen-<генератор>» (напр. "gen-veg"), для яких є items/<ключ>.webp.
    Такий предмет показується мальованим усюди замість 3D-іконки. */
-const PAINTED_ITEMS = ["veg-0", "veg-1", "veg-2", "veg-3", "veg-4", "veg-5", "veg-6", "veg-7"];
+const PAINTED_ITEMS = ["veg-0", "veg-1", "veg-2", "veg-3", "veg-4", "veg-5", "veg-6", "veg-7",
+  "bake-0", "bake-1", "bake-2", "bake-3", "bake-4", "bake-5", "bake-6", "bake-7", "bake-8", "fruit-0", "fruit-1", "fruit-2", "fruit-3", "fruit-4", "fruit-5", "fruit-6", "fruit-7"];
 window.PAINTED = (() => {
   const k = s => [...s].filter(c => c !== "\uFE0F").map(c => c.codePointAt(0).toString(16)).join("-");
   const map = {};
