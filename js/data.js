@@ -67,7 +67,7 @@ const PORTRAITS = ["halya", "stepan", "olya", "marichka", "cat", "andriy", "liza
 /* Мальовані тварини для дворика: емодзі → items/<назва>.webp */
 const YARD_ANIMALS = { "🐕": "animal-dog", "🐔": "animal-hen", "🐓": "animal-rooster", "🐣": "animal-hatch",
   "🐥": "animal-chick", "🐐": "animal-goat", "🐦": "animal-bird", "🐝": "animal-bee" };
-const YARD_PICS = ["olya-bride", "olya-groom", "liza-bride", "taras-groom", "olya-full", "andriy-full", "halya-full", "stepan-full"];
+const YARD_PICS = ["olya-bride", "olya-groom", "liza-bride", "taras-groom", "olya-full", "andriy-full", "halya-full", "stepan-full", "halya-bride", "stepan-groom"];
 const PORTRAITS_FULL = ["halya", "stepan", "olya", "marichka", "andriy", "liza", "ivan", "taras", "iryna"];
 /* Де обличчя на портреті (у % від картинки) і масштаб для круглого аватара: [x, y, ширина%] */
 const PORTRAIT_FACE = {
@@ -680,7 +680,7 @@ const STORY = [
         add: [{ e: "🍽️", x: 24, y: 82, s: 9 }, { e: "🍽️", x: 76, y: 82, s: 9 }, { e: "🍞", x: 50, y: 84, s: 10 }, { e: "🥂", x: 34, y: 86, s: 5 }],
         lines: [["andriy", "Коровай вийшов такий високий, що я його через двері ледве проніс! 🍞"]] },
       { title: "Перший танець", cost: 8,
-        add: [{ e: "👰", pic: "halya-full", x: 44, y: 64, s: 11 }, { e: "🤵", pic: "stepan-full", x: 56, y: 64, s: 11 }, { e: "💖", x: 50, y: 50, s: 6 }],
+        add: [{ e: "👰", pic: "halya-bride", x: 44, y: 64, s: 11 }, { e: "🤵", pic: "stepan-groom", x: 56, y: 64, s: 11 }, { e: "💖", x: 50, y: 50, s: 6 }],
         lines: [["stepan", "Галю. Сорок років я ходив повз твою хвіртку. Найкращі сорок років — і ще стільки ж попереду 💛"],
                 ["halya", "Старий ти дурнику… Чого ж ти раніше не спитав? 🥹"],
                 ["stepan", "Боявся гарбуза 🎃"]] },
