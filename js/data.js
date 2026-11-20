@@ -69,7 +69,7 @@ const YARD_ANIMALS = { "🐕": "animal-dog", "🐔": "animal-hen", "🐓": "anim
   "🐥": "animal-chick", "🐐": "animal-goat", "🐦": "animal-bird", "🐝": "animal-bee" };
 const YARD_PICS = ["olya-bride", "olya-groom", "liza-bride", "taras-groom", "olya-full", "andriy-full", "halya-full", "stepan-full", "halya-bride", "stepan-groom"];
 /* Зимове вбрання на повний зріст: portraits/<ключ>-winter.webp (для вдягнених сусідів узимку) */
-const PORTRAITS_WINTER = [];
+const PORTRAITS_WINTER = ["halya", "stepan", "olya", "marichka", "andriy", "liza", "cat", "ivan", "taras", "iryna"];
 const PORTRAITS_FULL = ["halya", "stepan", "olya", "marichka", "andriy", "liza", "ivan", "taras", "iryna"];
 /* Де обличчя на портреті (у % від картинки) і масштаб для круглого аватара: [x, y, ширина%] */
 const PORTRAIT_FACE = {
