@@ -495,3 +495,18 @@ const STORY = [
     reward: { chest: 2 }
   }
 ];
+
+/* ---------- Мальовані предмети ----------
+   Ключі «ланцюжок-рівень» (напр. "veg-3") і «gen-<генератор>» (напр. "gen-veg"), для яких є items/<ключ>.webp.
+   Такий предмет показується мальованим усюди замість 3D-іконки. */
+const PAINTED_ITEMS = ["veg-0", "veg-1", "veg-2", "veg-3", "veg-4", "veg-5", "veg-6", "veg-7"];
+window.PAINTED = (() => {
+  const k = s => [...s].filter(c => c !== "\uFE0F").map(c => c.codePointAt(0).toString(16)).join("-");
+  const map = {};
+  PAINTED_ITEMS.forEach(id => {
+    const [a, b] = id.split("-");
+    const emoji = a === "gen" ? GENS[b] && GENS[b].icon : CHAINS[a] && CHAINS[a].items[+b] && CHAINS[a].items[+b][0];
+    if (emoji) map[k(emoji)] = "items/" + id + ".webp";
+  });
+  return map;
+})();

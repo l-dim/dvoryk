@@ -22,11 +22,12 @@ const EMOJI3D = new Set(["1f0cf", "1f305", "1f319", "1f31f", "1f328", "1f331", "
     let last = 0, m, frag = null;
     while ((m = RE.exec(t))) {
       const k = key(m[0]);
-      if (!EMOJI3D.has(k)) continue;
+      const painted = window.PAINTED && window.PAINTED[k];
+      if (!painted && !EMOJI3D.has(k)) continue;
       frag = frag || document.createDocumentFragment();
       if (m.index > last) frag.appendChild(document.createTextNode(t.slice(last, m.index)));
       const img = document.createElement("img");
-      img.className = "e3d"; img.src = BASE + k + ".webp"; img.alt = m[0]; img.draggable = false;
+      img.className = painted ? "e3d pnt" : "e3d"; img.src = painted || BASE + k + ".webp"; img.alt = m[0]; img.draggable = false;
       frag.appendChild(img);
       last = m.index + m[0].length;
     }

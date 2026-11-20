@@ -281,3 +281,8 @@ body.farm .order.pic .o-item { width: 36px; height: 36px; font-size: 25px; }
 body.farm .order.pic .o-items .o-item:nth-child(2) { margin-top: 0; }
 body.farm .order.pic.ready .o-pic img { animation: picHop 1.4s ease-in-out infinite; transform-origin: 50% 100%; }
 @keyframes picHop { 0%, 100% { transform: none; } 50% { transform: translateY(-2px) rotate(-2deg); } }
+
+/* ---------- Мальовані предмети (замість 3D-іконок) ---------- */
+.e3d.pnt { object-fit: contain; }
+body.td .tile .e3d.pnt { width: 1.45em; height: 1.45em; }
+body.td .tile.gen .e3d.pnt { width: 1.6em; height: 1.6em; }

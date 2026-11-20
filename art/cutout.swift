@@ -1,5 +1,5 @@
 // Вирізає персонажа з фону (Apple Vision), обрізає порожні краї й зменшує.
-// Використання: swift art/cutout.swift <вхідна.png> <вихідна.png> [макс_висота=560]
+// Використання: cutout <вхідна> <вихідна.png> [макс_висота=560] [x y w h — клітинка, від верхнього лівого кута]
 import Foundation
 import Vision
 import CoreImage
@@ -12,7 +12,13 @@ guard args.count >= 3 else { print("usage: cutout <in> <out> [maxH]"); exit(1) }
 let inURL = URL(fileURLWithPath: args[1]), outURL = URL(fileURLWithPath: args[2])
 let maxH = args.count > 3 ? CGFloat(Double(args[3]) ?? 560) : 560
 
-guard let src = CIImage(contentsOf: inURL, options: [.applyOrientationProperty: true]) else { print("cannot read \(inURL.path)"); exit(1) }
+guard var src = CIImage(contentsOf: inURL, options: [.applyOrientationProperty: true]) else { print("cannot read \(inURL.path)"); exit(1) }
+if args.count >= 8, let cx = Double(args[4]), let cy = Double(args[5]), let cw = Double(args[6]), let chh = Double(args[7]) {
+  // CoreImage рахує y знизу — перевертаємо
+  let H = src.extent.height
+  src = src.cropped(to: CGRect(x: cx, y: H - cy - chh, width: cw, height: chh))
+  src = src.transformed(by: CGAffineTransform(translationX: -cx, y: -(H - cy - chh)))
+}
 let handler = VNImageRequestHandler(ciImage: src)
 let req = VNGenerateForegroundInstanceMaskRequest()
 try handler.perform([req])
