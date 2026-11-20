@@ -3,7 +3,8 @@
    ЗАТИШНИЙ ДВОРИК — рушій гри
    ============================================================ */
 
-const SAVE_KEY = "dvoryk_save_v1";
+// Превʼю-сторінка може мати власний сейв (щоб не чіпати основну гру)
+const SAVE_KEY = window.DVORYK_SAVE_KEY || "dvoryk_save_v1";
 const $ = id => document.getElementById(id);
 const rnd = n => Math.floor(Math.random() * n);
 const pick = arr => arr[rnd(arr.length)];
@@ -37,7 +38,9 @@ function idx(r, c) { return r * COLS + c; }
 let S = null;
 function load() {
   try {
-    const raw = localStorage.getItem(SAVE_KEY);
+    let raw = localStorage.getItem(SAVE_KEY);
+    // превʼю вперше відкривається з копією прогресу з основної гри
+    if (!raw && window.DVORYK_COPY_FROM) raw = localStorage.getItem(window.DVORYK_COPY_FROM);
     if (!raw) return null;
     const data = JSON.parse(raw);
     if (!data || typeof data !== "object" || !Array.isArray(data.board)) return null;
@@ -932,7 +935,7 @@ function init() {
   window.addEventListener("pagehide", saveNow);
 
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
-  if ("serviceWorker" in navigator && location.protocol !== "file:") navigator.serviceWorker.register("sw.js").catch(() => {});
+  if (!window.DVORYK_NO_SW && "serviceWorker" in navigator && location.protocol !== "file:") navigator.serviceWorker.register("sw.js").catch(() => {});
 }
 function showNoEnergyInfo() {
   regen();

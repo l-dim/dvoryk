@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#fff4e6">
+<meta name="color-scheme" content="light">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Дворик">
+<title>Затишний дворик 3D — превʼю</title>
+<link rel="apple-touch-icon" href="../icons/icon-180.png">
+<link rel="icon" type="image/png" href="../icons/icon-192.png">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<!-- ===== Стартовий екран ===== -->
+<div id="start" class="start">
+  <div class="start-card">
+    <div class="start-art">🏡<span>🌷</span><span>🐱</span></div>
+    <h1>Затишний дворик</h1>
+    <p class="start-sub">Город, випічка, квіти й добрі сусіди.<br>Об'єднуй, готуй, прикрашай 💛</p>
+    <label class="name-lbl" for="nameInput">Як тебе звати?</label>
+    <input id="nameInput" maxlength="20" placeholder="Твоє ім'я" autocomplete="off">
+    <button id="startBtn" class="btn big">Почати 🌷</button>
+    <p id="installHint" class="install" hidden>
+      Щоб гра відкривалась як застосунок: натисни <b>«Поділитися»</b> <span class="share-ic">⬆︎</span> внизу Safari → <b>«На початковий екран»</b>
+    </p>
+  </div>
+</div>
+
+<!-- ===== Гра ===== -->
+<div id="app" hidden>
+  <header class="top">
+    <div class="lvl-wrap"><div class="xp-ring" id="xpRing"><span id="lvl">1</span></div></div>
+    <button class="chip" id="energyChip"><span class="ic">⚡</span><span id="energy">100</span><small id="energyTimer" hidden></small></button>
+    <div class="chip"><span class="ic">🪙</span><span id="coins">0</span></div>
+    <div class="chip"><span class="ic">⭐</span><span id="stars">0</span></div>
+    <button class="gear" id="settingsBtn" aria-label="Налаштування">⚙️</button>
+  </header>
+
+  <main>
+    <!-- Дошка -->
+    <section class="tab" id="tab-board">
+      <div class="orders" id="orders"></div>
+      <div class="tut" id="tutHint" hidden></div>
+      <div class="board-wrap">
+        <div class="board" id="board"></div>
+      </div>
+      <div class="info-row">
+        <button class="inbox" id="inboxBtn" hidden><b>📥</b><span>0</span></button>
+        <div class="info" id="info"></div>
+      </div>
+    </section>
+
+    <!-- Дворик / сюжет -->
+    <section class="tab" id="tab-story" hidden>
+      <div class="scene" id="scene"></div>
+      <div class="panel">
+        <div class="ch-head">
+          <h2 id="chapterTitle"></h2>
+          <button class="link" id="replayIntro">📜 історія</button>
+        </div>
+        <div class="bar"><i id="chapterBar"></i></div>
+        <div class="ch-prog"><span id="chapterProg"></span> завдань · ⭐ заробляй, виконуючи замовлення</div>
+        <div id="tasks"></div>
+        <p id="storyEnd" class="story-end" hidden>💌 Нові розділи історії скоро! А поки — сусіди чекають на твої смаколики.</p>
+      </div>
+    </section>
+
+    <!-- Крамничка -->
+    <section class="tab" id="tab-shop" hidden>
+      <div class="panel">
+        <h2>Крамничка 🛍️</h2>
+        <p class="hint-s">Тут усе тільки за ігрові монетки 🪙 — справжніх грошей гра не бере ніколи.</p>
+        <button class="btn tea" id="teaBtn">☕</button>
+        <div id="shopList"></div>
+      </div>
+    </section>
+
+    <!-- Колекція -->
+    <section class="tab" id="tab-coll" hidden>
+      <div class="panel">
+        <h2>Колекція 📖 <small id="collProg"></small></h2>
+        <div id="collList"></div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="nav">
+    <button data-tab="board" class="on"><span>🧺</span>Город</button>
+    <button data-tab="story"><span>🏡</span>Дворик<i class="dot" id="navStoryDot" hidden></i></button>
+    <button data-tab="shop"><span>🛍️</span>Крамничка</button>
+    <button data-tab="coll"><span>📖</span>Колекція</button>
+  </nav>
+</div>
+
+<!-- ===== Накладки ===== -->
+<div id="dialog" class="dialog">
+  <div class="d-box">
+    <span class="d-ava"></span>
+    <div class="d-body"><b class="d-name"></b><p class="d-text"></p><span class="d-next">тапни, щоб продовжити ›</span></div>
+  </div>
+</div>
+<div id="modal" class="modal">
+  <div class="m-box">
+    <h3 class="m-title"></h3>
+    <div class="m-body"></div>
+    <div class="m-btns"></div>
+  </div>
+</div>
+<div id="toast" class="toast"></div>
+<div id="bubble" class="bubble"></div>
+<div id="confetti" class="confetti"></div>
+
+<script>
+  /* Превʼю 3D: окремий сейв (копія прогресу з основної гри), без офлайн-кешу */
+  window.DVORYK_3D = true;
+  window.DVORYK_E3D_BASE = "../";
+  window.DVORYK_SAVE_KEY = "dvoryk_preview_v1";
+  window.DVORYK_COPY_FROM = "dvoryk_save_v1";
+  window.DVORYK_NO_SW = true;
+</script>
+<script src="../js/emoji3d.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/game.js"></script>
+</body>
+</html>
