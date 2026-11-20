@@ -63,7 +63,7 @@ function saveNow() {
 function itemIcon(it) {
   if (!it) return "";
   if (it.lock) return "🕸️";
-  if (it.st) return "🔥";
+  if (it.st) return "♨️";
   if (it.g) return GENS[it.g].icon;
   return CHAINS[it.c].items[it.l][0];
 }
