@@ -265,13 +265,28 @@ function iconTexture(e) {
   }
   return texCache.get(k);
 }
-function standee(d, size) {
-  const tex = iconTexture(d.e);
+/* мальована картинка (items/…) з правильними пропорціями */
+const urlTexCache = new Map();
+function urlTexture(path) {
+  if (!urlTexCache.has(path)) {
+    urlTexCache.set(path, new Promise((res, rej) => {
+      new THREE.TextureLoader().load(BASE + path, t => {
+        t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
+        res({ tex: t, aspect: t.image.width / t.image.height });
+      }, undefined, rej);
+    }));
+  }
+  return urlTexCache.get(path);
+}
+function standee(d, size, pic) {
+  const tex = pic ? pic.tex : iconTexture(d.e);
   const flat = FLAT.has(d.e);
   const onWall = indoorNow && d.y < 34;
-  const geo = new THREE.PlaneGeometry(size, size);
-  if (!flat) geo.translate(0, size / 2, 0);
-  const mat = new THREE.MeshBasicMaterial({ map: tex, alphaTest: 0.45, side: THREE.DoubleSide, toneMapped: false });
+  // найбільший бік = size; мальовані картинки зберігають свої пропорції
+  const a = pic ? pic.aspect : 1, gw = a >= 1 ? size : size * a, gh = a >= 1 ? size / a : size;
+  const geo = new THREE.PlaneGeometry(gw, gh);
+  if (!flat) geo.translate(0, gh / 2, 0);
+  const mat = new THREE.MeshBasicMaterial({ map: tex, alphaTest: pic ? 0.3 : 0.45, side: THREE.DoubleSide, toneMapped: false });
   const mesh = new THREE.Mesh(geo, mat);
   mesh.castShadow = !flat && !AIR.has(d.e);
   mesh.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: tex, alphaTest: 0.45 });
@@ -324,7 +339,13 @@ async function build(d) {
       obj.rotation.y = holder.position.x * -0.06;
       holder.add(obj);
     } catch (e) { holder.add(standee(d, size)); }
-  } else holder.add(standee(d, size * (AIR.has(d.e) ? 0.9 : 1)));
+  } else {
+    // якщо цей предмет уже намальований (дошка, прикраси) — беремо мальовану картинку
+    const painted = window.PAINTED && window.PAINTED[key(d.e)];
+    let pic = null;
+    if (painted) { try { pic = await urlTexture(painted); } catch (e) {} }
+    holder.add(standee(d, size * (AIR.has(d.e) ? 0.9 : 1) * (pic ? 1.1 : 1), pic));
+  }
   return holder;
 }
 
