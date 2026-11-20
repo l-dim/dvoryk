@@ -324,7 +324,7 @@ async function build(d) {
     try { holder.add(await portraitFigure(d.pic, size * 2.35, true)); return holder; } catch (e) { /* лишаємо смайлик */ }
   }
   if (d.who || (d.e === "🐱" && typeof PORTRAITS !== "undefined" && PORTRAITS.includes("cat"))) {
-    try { holder.add(await portraitFigure(d.who || "cat", d.who ? size * 2.35 : size * 1.6, true)); return holder; }
+    try { holder.add(await portraitFigure(d.who || d.catPic || "cat", d.who ? size * 2.35 : size * 1.6, true)); return holder; }
     catch (e) { if (d.who) return holder; }
   }
   if (d.art && typeof VILLAGE_ART !== "undefined" && VILLAGE_ART.includes(d.art)) {

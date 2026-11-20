@@ -670,6 +670,12 @@ function takeInbox() {
 }
 
 /* Хто з сусідів стоїть у дворику: ті, хто найбільше говорить у розділі (до трьох) */
+/* Зимове вбрання: сусід отримав теплу річ і зараз зима (зимовий розділ або справжні морози) */
+function winterLook(who, ch) {
+  if (!PORTRAITS_WINTER.includes(who) || !window.WD || !WD.isDressed(who)) return false;
+  const s = WD.season();
+  return !!(ch.winter || /Зимов/.test(ch.title) || (s && s.phase === "winter"));
+}
 function yardPeople(ch, all) {
   const count = {};
   [ch.intro || [], ...ch.tasks.map(t => t.lines || [])].forEach(lines => lines.forEach(([who]) => {
@@ -690,7 +696,8 @@ function yardPeople(ch, all) {
       !(person && Math.abs(tx - x) < 12 && Math.abs(ty - y) < 32)));
     if (!free) break;
     taken.push([free[0], free[1], s, true]); // сусіди не стають один за одним
-    out.push({ key: "p-" + w, who: w, x: free[0], y: free[1], s });
+    const wl = winterLook(w, ch);
+    out.push({ key: "p-" + w + (wl ? "-w" : ""), who: wl ? w + "-winter" : w, x: free[0], y: free[1], s });
   }
   return out;
 }
@@ -734,6 +741,8 @@ function renderStory(animateLast) {
     ...added
   ];
   if (window.Yard3D) {
+    // котик у светрику, якщо йому видали светрик і зараз зима
+    if (winterLook("cat", ch)) all.forEach(d => { if (d.e === "🐱") { d.catPic = "cat-winter"; d.key += "-w"; } });
     all.push(...yardPeople(ch, all));
     if (window.QUEST && !ch.loc) all.push(...QUEST.yardGifts(ch, all));
     // справжній 3D-дворик
