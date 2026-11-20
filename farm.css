@@ -293,3 +293,34 @@ body.td .tile.gen .e3d.pnt { width: 1.6em; height: 1.6em; }
 .backup-code { display: block; width: 100%; height: 96px; margin: 8px 0 4px; padding: 8px 10px; border-radius: 12px; border: 2px solid var(--line);
   background: #fffdf4; color: var(--ink); font: 12px/1.3 ui-monospace, Menlo, monospace; word-break: break-all; resize: none;
   -webkit-user-select: text; user-select: text; }
+
+/* ---------- Святкова подія (Свято Миколая) ---------- */
+.ev-btn { flex: none; width: 62px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  border-radius: 16px; border: 3px solid #5b8fd1; padding: 3px 4px 5px;
+  background: radial-gradient(circle at 50% 30%, #ffffff, #dcecff 60%, #b9d6fa);
+  box-shadow: 0 4px 0 #3d6aa6, 0 0 12px rgba(150, 200, 255, .8); animation: evGlow 2.4s ease-in-out infinite; }
+.ev-btn .ev-ic { font-size: 26px; line-height: 1; font-family: var(--emoji); }
+.ev-btn .ev-ic .e3d { width: 1.1em; height: 1.1em; }
+.ev-btn small { font: 800 10px/1 var(--font); color: #2d5590; }
+.ev-bar { display: block; width: 100%; height: 6px; border-radius: 4px; background: #c7dcf5; overflow: hidden; }
+.ev-bar b { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #7fc3ff, #3d8ef0); border-radius: 4px; transition: width .6s; }
+.ev-btn.done .ev-bar b { background: linear-gradient(90deg, #ffd65a, #f5a623); }
+.ev-btn::after { content: "❄"; position: absolute; top: -8px; right: -6px; font-size: 15px; color: #fff; text-shadow: 0 0 3px #3d8ef0, 0 1px 0 #3d6aa6; }
+@keyframes evGlow { 50% { box-shadow: 0 4px 0 #3d6aa6, 0 0 20px rgba(150, 200, 255, 1); } }
+
+body.farm .order.ev { border-color: #5b8fd1;
+  background: radial-gradient(120% 90% at 50% 40%, transparent 60%, rgba(120, 170, 230, .25) 100%), linear-gradient(#f6fbff, #e3f0ff 60%, #d3e6fd);
+  box-shadow: 0 4px 0 #3d6aa6, 0 8px 14px rgba(30, 60, 110, .28), inset 0 0 0 2px rgba(255, 255, 255, .9); }
+body.farm .order.ev .o-who { background: linear-gradient(#6fa6e6, #3f78c4); }
+body.farm .order.ev::before { content: "❄"; position: absolute; top: 22px; right: 5px; z-index: 3; font-size: 14px; color: #fff; text-shadow: 0 0 3px #3d8ef0; }
+body.farm .order { position: relative; }
+.tile.gen[data-gen="mykolai"] { background: radial-gradient(circle at 50% 30%, #ffffff, #d6e9ff 70%, #a9cbf5) !important; box-shadow: inset 0 0 0 2px #5b8fd1, inset 0 -4px 0 #5b8fd1 !important; }
+
+.ev-sum { margin: 8px 0; font-size: 15px; }
+.ev-sum small { color: var(--ink-soft); }
+.ev-list { text-align: left; margin-top: 6px; }
+.ev-ms { display: flex; align-items: center; gap: 8px; padding: 7px 4px; border-top: 2px dashed var(--line); font-weight: 700; }
+.ev-ms .ev-pts { width: 62px; color: #2d5590; font-weight: 900; }
+.ev-ms .ev-rw { flex: 1; }
+.ev-ms.got { opacity: .55; }
+.ev-ms.ready .ev-pts { color: #3f8a1c; }

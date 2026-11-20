@@ -276,6 +276,9 @@ function gainXp(n) {
 /* ---------------- Замовлення ---------------- */
 function unlockedChains() { return S.gens.map(g => GENS[g].chain); }
 function newOrder() {
+  // святкова подія іноді підкидає своє замовлення
+  const evo = window.EV && EV.maybeOrder();
+  if (evo) return evo;
   const busy = S.orders.map(o => o.ch);
   const pool = Object.keys(CHARS).filter(c => !busy.includes(c) && (CHARS[c].from || 0) <= S.chapter);
   const ch = pick(pool);
@@ -328,6 +331,7 @@ function deliver(id) {
   S.coins += o.coins;
   S.stars += o.stars;
   S.ordersDone++;
+  if (o.ev && window.EV) EV.onDeliver(o, card);
   sfx.deliver();
   bubble(CHARS[o.ch], pick(CHARS[o.ch].thanks), card);
   S.orders = S.orders.filter(x => x.id !== id);
@@ -526,7 +530,7 @@ function renderOrders() {
     const ch = CHARS[o.ch];
     const el = document.createElement("div");
     const pic = FARM && PORTRAITS.includes(ch.key);
-    el.className = "order" + (ready ? " ready" : "") + (pic ? " pic" : "");
+    el.className = "order" + (ready ? " ready" : "") + (pic ? " pic" : "") + (o.ev ? " ev" : "");
     el.dataset.id = o.id;
     const itemsHtml = `<div class="o-items">${o.items.map((it, k) => `<span class="o-item${found[k] >= 0 ? " have" : ""}">${itemIcon(it)}</span>`).join("")}</div>`;
     el.innerHTML = (pic
@@ -535,7 +539,7 @@ function renderOrders() {
       : `<div class="o-who"><span class="o-ava">${face(ch, "mini")}</span><span class="o-name">${ch.name.split(" ").pop()}</span></div>` + itemsHtml) +
       (ready
         ? `<button class="o-btn">Віддати</button>`
-        : `<div class="o-rew">🪙${o.coins} · ${"⭐".repeat(o.stars)}</div>`);
+        : `<div class="o-rew">🪙${o.coins} · ${o.ev ? "❄️" + o.pts : "⭐".repeat(o.stars)}</div>`);
     el.addEventListener("click", e => {
       if (ready && e.target.closest(".o-btn")) { deliver(o.id); return; }
       bubble(ch, ch.ask[o.line] + "  " + o.items.map(it => itemIcon(it) + " " + itemName(it)).join(", "), el);
@@ -568,6 +572,7 @@ function renderBoard() {
       anim + (neededIdx.has(i) ? " needed" : "");
     if (from && to) { t.style.setProperty("--fx", (from.left - to.left) + "px"); t.style.setProperty("--fy", (from.top - to.top) + "px"); }
     t.dataset.i = i;
+    if (it.g) t.dataset.gen = it.g;
     t.textContent = itemIcon(it);
     if (it.g) { const b = document.createElement("span"); b.className = "gen-badge"; b.textContent = "⚡"; t.appendChild(b); }
     cell.appendChild(t);
@@ -1136,6 +1141,7 @@ function init() {
   document.querySelectorAll(".nav button").forEach(b => b.onclick = () => { audio(); showTab(b.dataset.tab); });
   $("settingsBtn").onclick = openSettings;
   $("inboxBtn").onclick = takeInbox;
+  $("evBtn").onclick = () => window.EV && EV.panel();
   $("teaBtn").onclick = () => { takeTea(); renderShop(); };
   $("energyChip").onclick = () => { showNoEnergyInfo(); };
   $("dialog").onclick = nextLine;
@@ -1144,6 +1150,7 @@ function init() {
     if (!S || !S.started) return;
     const before = S.energy;
     renderTop();
+    if (window.EV) { EV.renderButton(); if (Date.now() % 5000 < 1000) EV.tick(); }
     if (!$("tab-shop").hidden) renderShop();
     if (S.energy !== before) save();
   }, 1000);
