@@ -179,7 +179,7 @@ window.MECH = (() => {
       const who = ["andriy", "halya", "stepan"].filter(c => !busy.includes(c) && (CHARS[c].from || 0) <= S.chapter);
       if (opts.length && who.length) {
         const r = pick(opts);
-        return { id: ++S.orderSeq, ch: pick(who), items: [{ c: "dish", l: r.l }], coins: 140, xp: 25, stars: 2, dish: true, line: rnd(3) };
+        return { id: ++S.orderSeq, ch: pick(who), items: [{ c: "dish", l: r.l }], coins: 90, xp: 25, stars: 2, dish: true, line: rnd(3) };
       }
     }
     return null;
@@ -187,7 +187,7 @@ window.MECH = (() => {
   function maybeUrgent(o) {
     if (S.level < 4 || o.ev || o.dish || S.orders.some(x => x.until) || Math.random() >= 0.15) return o;
     o.until = now() + (2 + rnd(3)) * 3600e3;
-    o.coins *= 2; o.stars += 1; o.urgent = true;
+    o.coins = Math.round(o.coins * 1.6); o.stars += 1; o.urgent = true;
     return o;
   }
   function expireOrders() {

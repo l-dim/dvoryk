@@ -75,6 +75,7 @@ function itemName(it) {
   return CHAINS[it.c].items[it.l][1];
 }
 function isMax(it) { return it && !it.g && !it.lock && !it.st && (CHAINS[it.c].nomerge || it.l >= CHAINS[it.c].items.length - 1); }
+function sellPrice(it) { return Math.max(1, Math.round(itemValue(it.c, it.l) / 3)); }
 function itemValue(c, l) { return CHAINS[c] && CHAINS[c].value ? CHAINS[c].value : Math.round(4 * Math.pow(1.9, l)); }
 Object.keys(CHARS).forEach(k => CHARS[k].key = k);
 function face(ch, cls = "") {
@@ -181,8 +182,8 @@ function produce(i) {
   const tired = MECH.useCharge(gIt);
   let item;
   const roll = Math.random();
-  if (roll < 0.015) item = { c: "energy", l: 0 };
-  else if (roll < 0.06) item = { c: "coin", l: 0 };
+  if (roll < 0.01) item = { c: "energy", l: 0 };
+  else if (roll < 0.04) item = { c: "coin", l: 0 };
   else {
     // що вищий рівень гравця, то частіше генератор дає одразу кращі предмети
     const r = Math.random(), tb = MECH.tierBonus(gIt), up = Math.min(0.35, 0.15 + S.level * 0.01) + tb;
@@ -209,8 +210,8 @@ function openChest(i) {
   for (let n = 0; n < count; n++) {
     const r = Math.random();
     let item;
-    if (r < 0.08) item = { c: "energy", l: Math.min(2, rnd(k + 1)) };
-    else if (r < 0.28) item = { c: "coin", l: Math.min(3, rnd(k + 2)) };
+    if (r < 0.05) item = { c: "energy", l: Math.min(2, rnd(k + 1)) };
+    else if (r < 0.18) item = { c: "coin", l: Math.min(3, rnd(k + 2)) };
     else item = { c: pick(unlocked), l: rnd(maxT + 1) };
     const at = placeItem(item, i);
     if (at >= 0) spawnFrom.set(at, i);
@@ -261,8 +262,8 @@ function handleDrop(a, b) {
     if (nl >= 4) window.QUEST && QUEST.track("high");
     // невеликий бонус за злиття
     const bonus = Math.random();
-    if (bonus < 0.015) placeItem({ c: "energy", l: 0 }, b);
-    else if (bonus < 0.05 && nl >= 3) placeItem({ c: "coin", l: 0 }, b);
+    if (bonus < 0.008) placeItem({ c: "energy", l: 0 }, b);
+    else if (bonus < 0.025 && nl >= 3) placeItem({ c: "coin", l: 0 }, b);
     if (S.tut === 1) setTut(2);
   } else {
     S.board[b] = A; S.board[a] = B;
@@ -272,7 +273,7 @@ function handleDrop(a, b) {
 }
 
 /* ---------------- Досвід і рівні ---------------- */
-function xpNeed(l) { return 30 + 20 * (l - 1); }
+function xpNeed(l) { return 35 + 24 * (l - 1); }
 function gainXp(n) {
   S.xp += n;
   let ups = 0;
@@ -318,7 +319,7 @@ function newOrder() {
   // для перших замовлень — дуже прості речі
   if (S.ordersDone < 3) { items.length = 1; items[0].l = 1; items[0].c = pick(["veg", "bake"]); }
   let coins = 0, xp = 0, top = 0;
-  items.forEach(it => { coins += itemValue(it.c, it.l) * 2; xp += (it.l + 1) * 3; top = Math.max(top, it.l); });
+  items.forEach(it => { coins += Math.round(itemValue(it.c, it.l) * 1.3); xp += (it.l + 1) * 3; top = Math.max(top, it.l); });
   const stars = top >= 5 || items.length >= 2 && top >= 4 ? 2 : 1;
   return MECH.maybeUrgent({ id: ++S.orderSeq, ch, items, coins, xp, stars, line: rnd(3) });
 }
@@ -486,10 +487,10 @@ function showNoEnergy() {
 /* ---------------- Крамничка (тільки ігрові монетки) ---------------- */
 const SHOP = [
   { id: "energy", icon: "⚡", title: ENERGY_SHOP.amount + " енергії", price: 0 },
-  { id: "chest0", icon: "🎁", title: "Подарунок", price: 150 },
-  { id: "chest1", icon: "📦", title: "Посилка", price: 400 },
-  { id: "star",   icon: "⭐", title: "Зірочка для ремонту", price: 500 },
-  { id: "chest2", icon: "💝", title: "Скриня-сюрприз", price: 900 }
+  { id: "chest0", icon: "🎁", title: "Подарунок", price: 250 },
+  { id: "chest1", icon: "📦", title: "Посилка", price: 650 },
+  { id: "star",   icon: "⭐", title: "Зірочка для ремонту", price: 700 },
+  { id: "chest2", icon: "💝", title: "Скриня-сюрприз", price: 1400 }
 ];
 function buy(id) {
   const s = SHOP.find(x => x.id === id);
@@ -509,7 +510,7 @@ function buy(id) {
 function sellSelected() {
   const it = S.board[selected];
   if (!it || it.g) return;
-  const price = Math.max(1, Math.round(itemValue(it.c, it.l) / 2));
+  const price = sellPrice(it);
   floatAt(selected, "+" + price + " 🪙");
   S.board[selected] = null; selected = -1;
   S.coins += price;
@@ -628,7 +629,7 @@ function renderInfo() {
       : `<b>${GENS[it.g].name}</b>${lv}<small>Заряд ${it.ch}/${MECH.cap(it)} · тапай, щоб отримати ${ch.items[0][0]} (−1 ⚡)</small>`;
   } else if (it.c === "dish") {
     text = `<b>${itemName(it)}</b><small>Страву просять сусіди за ⭐⭐</small>`;
-    btn = `<button class="sell" id="sellBtn"><small>продати</small><span>+${Math.round(itemValue(it.c, it.l) / 2)}🪙</span></button>`;
+    btn = `<button class="sell" id="sellBtn"><small>продати</small><span>+${sellPrice(it)}🪙</span></button>`;
   } else if (CHAINS[it.c].open) {
     text = `<b>${itemName(it)}</b><small>Тапни ще раз, щоб відкрити!${isMax(it) ? "" : " Або об'єднай два однакові"}</small>`;
   } else if (CHAINS[it.c].collect) {
@@ -637,7 +638,7 @@ function renderInfo() {
     const ch = CHAINS[it.c];
     const next = isMax(it) ? "Найвищий рівень! 🏆" : `Два таких → ${ch.items[it.l + 1][0]} ${ch.items[it.l + 1][1]}`;
     text = `<b>${itemName(it)} <span class="lvl-tag">рів. ${it.l + 1}</span></b><small>${next}</small>`;
-    btn = `<button class="sell" id="sellBtn"><small>продати</small><span>+${Math.max(1, Math.round(itemValue(it.c, it.l) / 2))}🪙</span></button>`;
+    btn = `<button class="sell" id="sellBtn"><small>продати</small><span>+${sellPrice(it)}🪙</span></button>`;
   }
   box.innerHTML = `<span class="info-ic">${itemIcon(it)}</span><span class="info-txt">${text}</span>${btn}`;
   const sb = $("sellBtn");

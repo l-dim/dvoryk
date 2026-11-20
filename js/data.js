@@ -6,12 +6,12 @@
    ============================================================ */
 
 const COLS = 7, ROWS = 8;
-const ENERGY_MAX = 60;
-const ENERGY_REGEN_MS = 2 * 60 * 1000;  // +1⚡ кожні 2 хвилини (повна шкала ≈ 2 год)
-const TEA_BREAK_MS = 4 * 60 * 60 * 1000; // безкоштовна перерва на чай раз на 4 год
-const TEA_BREAK_ENERGY = 15;
-const ENERGY_BONUS = { level: 15, chapter: 20, daily: 25 };
-const ENERGY_SHOP = { amount: 20, prices: [150, 300, 600] }; // за день можна купити 3 рази, щоразу дорожче
+const ENERGY_MAX = 50;
+const ENERGY_REGEN_MS = 3 * 60 * 1000;  // +1⚡ кожні 3 хвилини (повна шкала ≈ 2,5 год)
+const TEA_BREAK_MS = 6 * 60 * 60 * 1000; // безкоштовна перерва на чай раз на 6 год
+const TEA_BREAK_ENERGY = 10;
+const ENERGY_BONUS = { level: 10, chapter: 15, daily: 15 };
+const ENERGY_SHOP = { amount: 15, prices: [200, 400, 800] }; // за день можна купити 3 рази, щоразу дорожче
 
 /* Ланцюжки: два однакові предмети → наступний у списку */
 const CHAINS = {
@@ -38,9 +38,9 @@ const CHAINS = {
     ["🧀", "Сир"], ["🍮", "Пудинг"], ["🫕", "Фондю"] ] },
 
   /* Спеціальні: тапни, щоб забрати / відкрити. Їх теж можна об'єднувати. */
-  coin: { name: "Монетки", collect: "coins", values: [5, 15, 40, 100], items: [
+  coin: { name: "Монетки", collect: "coins", values: [3, 10, 25, 60], items: [
     ["🪙", "Монетка"], ["💰", "Мішечок монет"], ["👛", "Гаманець"], ["💎", "Скарб"] ] },
-  energy: { name: "Енергія", collect: "energy", values: [3, 8, 20], items: [
+  energy: { name: "Енергія", collect: "energy", values: [2, 5, 12], items: [
     ["⚡", "Іскорка"], ["🔋", "Батарейка"], ["☀️", "Сонечко"] ] },
   chest: { name: "Подарунки", open: true, sizes: [3, 5, 8], items: [
     ["🎁", "Подарунок"], ["📦", "Посилка"], ["💝", "Скриня-сюрприз"] ] }
@@ -892,11 +892,11 @@ const EVENT = {
   window: y => ({ start: new Date(y, 10, 20).getTime(), end: new Date(y, 11, 7).getTime() }),
   chain: "mykolai", gen: "mykolai", who: ["iryna", "marichka"],
   milestones: [
-    { pts: 10,  reward: { energy: 20 } },
+    { pts: 10,  reward: { energy: 10 } },
     { pts: 25,  reward: { chest: 0 } },
-    { pts: 45,  reward: { coins: 300 } },
+    { pts: 45,  reward: { coins: 200 } },
     { pts: 70,  reward: { chest: 1, stars: 2 }, story: "mid" },
-    { pts: 100, reward: { energy: 40, coins: 500 } },
+    { pts: 100, reward: { energy: 25, coins: 300 } },
     { pts: 140, reward: { chest: 2, stars: 5 }, story: "final" }
   ],
   story: {
@@ -925,15 +925,15 @@ const EVENT = {
 /* ============================================================
    МЕХАНІКИ: втома й злиття генераторів, павутиння, піч, термінові замовлення
    ============================================================ */
-const GEN_CHARGE = [15, 22, 30];        // заряд генератора рівня 1/2/3
-const GEN_REST_MIN = [40, 35, 30];      // скільки хвилин «відпочиває»
+const GEN_CHARGE = [12, 18, 25];        // заряд генератора рівня 1/2/3
+const GEN_REST_MIN = [50, 45, 40];      // скільки хвилин «відпочиває»
 const GEN_MAX_LEVEL = 3;
-const WAKE_COINS = 40;                   // розбудити генератор
-const LOCK_COINS = 60;                   // розчистити павутиння одразу
-const OVEN_RUSH_COINS = 50;              // пришвидшити піч
+const WAKE_COINS = 60;                   // розбудити генератор
+const LOCK_COINS = 80;                   // розчистити павутиння одразу
+const OVEN_RUSH_COINS = 80;              // пришвидшити піч
 const OVEN_FROM_CHAPTER = 2;             // піч з'являється після «Літньої кухні»
 /* Страви з печі — не об'єднуються, їх просять сусіди */
-CHAINS.dish = { name: "Страви", nomerge: true, value: 60, items: [
+CHAINS.dish = { name: "Страви", nomerge: true, value: 45, items: [
   ["🍲", "Борщ"], ["🥟", "Вареники з вишнями"], ["🥘", "Гарбузова каша"], ["🧇", "Вафлі з медом"] ] };
 const RECIPES = [
   { l: 0, need: [{ c: "veg", l: 5 }, { c: "veg", l: 4 }], min: 30 },
@@ -961,9 +961,9 @@ const DAILY = {
   snow:    { icon: "❄️", text: "Збери сніжинки на свято" }
 };
 /* Завдання тижня: з понеділка до неділі, нагорода — скриня-сюрприз, монетки й зірочки */
-const WEEKLY_REWARD = { chest: 2, coins: 300, stars: 5, energy: 30 };
+const WEEKLY_REWARD = { chest: 2, coins: 200, stars: 5, energy: 20 };
 const FRIEND_STEPS = [3, 6, 10];
-const FRIEND_REWARD = [{ coins: 100 }, { chest: 1 }, { stars: 5, gift: true }];
+const FRIEND_REWARD = [{ coins: 60 }, { chest: 1 }, { stars: 5, gift: true }];
 /* Подарунок сусіда для дворика (на 10 сердечках) і три маленькі історії */
 const FRIENDS = {
   halya: { gift: "🧺", giftName: "Бабусин кошик", scenes: [
@@ -1015,7 +1015,7 @@ const TREASURE = {
           ["halya", "Копаймо! Ой, лопата у щось стукнула!"],
           ["stepan", "Дідова скриня… А в ній — вишитий рушник, старі монети й лист: «Тому, хто знайде, — бережіть цей дворик» 🥹"],
           ["halya", "Бережемо, діду. Бережемо 💛"]],
-  reward: { chest: 2, coins: 400, stars: 5 }
+  reward: { chest: 2, coins: 300, stars: 5 }
 };
 
 /* Карта мальованих картинок (емодзі → файл). Стоїть у кінці, щоб бачити всі ланцюжки, зокрема святкові. */

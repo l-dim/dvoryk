@@ -138,14 +138,14 @@ window.QUEST = (() => {
     trackWeek("daily", 1);
     const big = d.streak >= 7;
     placeItem({ c: "chest", l: big ? 2 : 0 });
-    regen(); S.energy += 10;
+    regen(); S.energy += 5;
     if (big) d.streak = 0;     // після тижня серія починається знову
     save(); renderAll(); renderButton();
     confetti(); sfx.level();
     modal({
       title: big ? "Тиждень поспіль! 🏆" : "Завдання дня виконано! ✅",
       html: `<div class="big-emoji">${big ? "💝" : "🎁"}</div><p>${big ? "Сім днів поспіль — ти неймовірна! Тримай скриню-сюрприз:" : "Тримай подарунок — він уже на дошці:"}</p>` +
-        `<p class="rewards">${big ? "💝" : "🎁"} &nbsp; +10 ⚡</p><p class="hint-s">Нові завдання — завтра. ${big ? "" : "Виконуй щодня 7 днів поспіль — і отримаєш скриню-сюрприз 💝"}</p>`,
+        `<p class="rewards">${big ? "💝" : "🎁"} &nbsp; +5 ⚡</p><p class="hint-s">Нові завдання — завтра. ${big ? "" : "Виконуй щодня 7 днів поспіль — і отримаєш скриню-сюрприз 💝"}</p>`,
       buttons: [{ label: "Дякую! 💛" }]
     });
   }
