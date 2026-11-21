@@ -568,3 +568,32 @@ body.farm .sell.store-b { background: linear-gradient(#bfe98d, #8ccf4f 52%, #79b
 @keyframes pcIn { 0% { transform: rotateY(90deg) scale(.6); opacity: 0; } 100% { transform: none; opacity: 1; } }
 .pc-stamps { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 14px; font-weight: 700; }
 .pc-stamps .s-btn { padding: 7px 10px; font-size: 13px; border-radius: 12px; }
+
+/* ---------- Сезонна стежка ---------- */
+.ph-head { display: flex; align-items: center; gap: 10px; text-align: left; padding: 4px 2px 6px; }
+.ph-big { font-size: 38px; font-family: var(--emoji); }
+.ph-big .e3d { width: 1.1em; height: 1.1em; }
+.ph-head > span:nth-child(2) { flex: 1; display: flex; flex-direction: column; gap: 2px; font-size: 16px; }
+.ph-head small { font-size: 12px; font-weight: 700; color: var(--ink-soft); }
+.ph-lvl { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 54px; height: 54px; border-radius: 50%;
+  background: radial-gradient(circle at 50% 35%, #ffe68a, #f2a516); box-shadow: 0 3px 0 #b8730c, inset 0 2px 0 rgba(255, 255, 255, .6); color: #6a3a00; }
+.ph-lvl b { font: 900 22px/1 var(--font); }
+.ph-lvl small { font-size: 9.5px; font-weight: 900; color: #7a4a10; }
+.ph-bar { position: relative; height: 20px; border-radius: 10px; background: #e8cf9b; overflow: hidden; box-shadow: inset 0 1px 3px rgba(120, 70, 20, .35); }
+.ph-bar i { display: block; height: 100%; background: linear-gradient(#ffd36b, #f0a21e); border-radius: 10px; }
+.ph-bar span { position: absolute; inset: 0; display: grid; place-items: center; font: 900 12px/1 var(--font); color: #5b3416; }
+.ph-list { max-height: 34vh; overflow-y: auto; margin: 8px -6px 0; padding: 0 6px; display: flex; flex-direction: column; gap: 5px; }
+.ph-row { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 12px; background: rgba(255, 255, 255, .45); text-align: left; min-height: 42px; }
+.ph-row.big { background: linear-gradient(90deg, #fff1c9, rgba(255, 255, 255, .5)); }
+.ph-row.trophy { background: linear-gradient(90deg, #ffe08a, #fff1c9); box-shadow: 0 0 0 2px #f2b52a; }
+.ph-row.got { opacity: .55; }
+.ph-row.can { background: #e9f8dc; box-shadow: 0 0 0 2px #7cc94a; }
+.ph-n { flex: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font: 900 12px/1 var(--font); background: #e8cf9b; color: #6a4520; }
+.ph-row.can .ph-n, .ph-row.got .ph-n { background: linear-gradient(#a6ec66, #5bb02a); color: #fff; }
+.ph-ic { flex: none; font-size: 24px; width: 30px; text-align: center; font-family: var(--emoji); }
+.ph-ic .e3d { width: 1.1em; height: 1.1em; }
+.ph-t { flex: 1; min-width: 0; font-size: 13px; font-weight: 800; line-height: 1.15; }
+.ph-ok, .ph-lock { flex: none; font-size: 16px; font-family: var(--emoji); }
+.ph-ok .e3d, .ph-lock .e3d { width: 1.1em; height: 1.1em; }
+.ph-row .s-btn { flex: none; padding: 6px 9px; font-size: 12.5px; border-radius: 11px; }
+.ph-all { margin: 8px 0 0 !important; }

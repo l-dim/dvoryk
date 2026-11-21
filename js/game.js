@@ -377,6 +377,7 @@ function deliver(id) {
   window.WD && WD.onDeliver(o);
   window.XTRA && XTRA.onDeliver(o, card);
   window.ALB && ALB.onDeliver(o);
+  window.PATH && PATH.onDeliver(o);
   if (o.dish) window.QUEST && QUEST.track("dish");
   if (o.urgent) window.QUEST && QUEST.track("urgent");
   sfx.deliver();
@@ -1220,6 +1221,7 @@ function startGame() {
   if (window.SIDE) SIDE.onStart();
   if (window.UNL) UNL.init();
   if (window.XTRA) { XTRA.initDisc(); XTRA.renderBoost(); }
+  if (window.PATH) PATH.init();
   MECH.migrate();
   if (window.QUEST) { QUEST.init(); QUEST.renderButton(); }
   fillOrders();
@@ -1293,6 +1295,7 @@ function init() {
     if (window.SIDE) SIDE.tick();
     if (window.UNL) UNL.tick();
     if (window.ALB) ALB.tick();
+    if (window.PATH) PATH.tick();
     if (Date.now() % 5000 < 1000) MECH.checkOven();
     if (!$("tab-shop").hidden) renderShop();
     if (S.energy !== before) save();

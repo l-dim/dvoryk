@@ -98,6 +98,7 @@ window.SIDE = (() => {
     if (ok) {
       const r = SIDE_REWARD;
       placeItem({ c: "chest", l: r.chest }); S.stars += r.stars; S.coins += r.coins;
+      if (window.PATH) PATH.add(PATH_PTS.side);
       if (S.fr && FRIENDS[k.host]) S.fr[k.host] = Math.min(FRIEND_STEPS[2], (S.fr[k.host] || 0) + r.hearts);
       confetti(); sfx.level();
     }

@@ -54,6 +54,7 @@ window.QUEST = (() => {
     const r = WEEKLY_REWARD;
     placeItem({ c: "chest", l: r.chest }); S.coins += r.coins; S.stars += r.stars; regen(); S.energy += r.energy;
     if (window.ALB) ALB.give(5, "За тиждень", 2);
+    if (window.PATH) PATH.add(PATH_PTS.week);
     save(); renderAll(); renderButton();
     confetti(); sfx.level();
     modal({
@@ -142,6 +143,7 @@ window.QUEST = (() => {
     regen(); S.energy += 5;
     if (big) d.streak = 0;     // після тижня серія починається знову
     if (window.ALB) ALB.give(big ? 4 : 2, "За завдання дня");
+    if (window.PATH) PATH.add(PATH_PTS.daily);
     save(); renderAll(); renderButton();
     confetti(); sfx.level();
     modal({
@@ -245,6 +247,7 @@ window.QUEST = (() => {
     if (ch.indoor) return [];
     const list = Object.keys(FRIENDS).filter(k => hearts(k) >= FRIEND_STEPS[2]).map(k => ({ e: FRIENDS[k].gift, k: "g-" + k }));
     if (S.map && S.map.done) list.push({ e: TREASURE.gift, k: "g-treasure" });
+    (S.trophies || []).forEach(e => list.push({ e, k: "g-tr-" + e }));
     if (!list.length) return [];
     const slots = [[13, 64], [87, 64], [20, 80], [80, 80], [33, 92], [67, 92], [9, 52], [91, 52], [50, 95], [40, 68], [60, 68], [26, 70], [74, 70]];
     const taken = all.filter(d => d.y >= 34).map(d => [d.x, d.y, d.who ? 12 : d.s]);
@@ -266,7 +269,7 @@ window.QUEST = (() => {
     const done = S.dq.list.filter(q => q.n >= q.t).length;
     $("qProg").textContent = S.dq.claimed ? "✓" : done + "/3";
     const wReady = S.wq && weekDone() && !S.wq.claimed && (!window.UNL || UNL.on("week"));
-    b.classList.toggle("ready", (allDone() && !S.dq.claimed) || !!wReady || !!(window.WD && WD.readyAny()));
+    b.classList.toggle("ready", (allDone() && !S.dq.claimed) || !!wReady || !!(window.WD && WD.readyAny()) || !!(window.PATH && PATH.ready()));
     b.classList.toggle("claimed", S.dq.claimed);
   }
   let panelTab = "day";
@@ -280,6 +283,8 @@ window.QUEST = (() => {
     const winterOn = !!(window.WD && WD.active());
     const weekOn = !window.UNL || UNL.on("week"), mapOn = !window.UNL || UNL.on("map");
     if (panelTab === "week" && !weekOn) panelTab = "day";
+    const pathOn = !!(window.UNL && UNL.on("path") && window.PATH);
+    if (panelTab === "path" && !pathOn) panelTab = "day";
     if (panelTab === "winter" && !winterOn) panelTab = "day";
     const d = S.dq, w = S.wq;
     const shown = d.claimed ? d.streak : d.lastClaim === yesterday() ? d.streak : 0;
@@ -303,8 +308,9 @@ window.QUEST = (() => {
       title: "Завдання 📋",
       html: `<div class="dq-tabs"><button class="dq-tab${panelTab === "day" ? " on" : ""}" data-t="day">Сьогодні${dayReady ? " ❗" : ""}</button>` +
         (weekOn ? `<button class="dq-tab${panelTab === "week" ? " on" : ""}" data-t="week">Тиждень${wkReady ? " ❗" : ""}</button>` : "") +
+        (pathOn ? `<button class="dq-tab${panelTab === "path" ? " on" : ""}" data-t="path">Стежка${PATH.ready() ? " ❗" : ""}</button>` : "") +
         (winterOn ? `<button class="dq-tab${panelTab === "winter" ? " on" : ""}" data-t="winter">Зима${WD.readyAny() ? " ❗" : ""}</button>` : "") + `</div>` +
-        (panelTab === "day" ? dayHtml : panelTab === "week" ? wkHtml : WD.html()),
+        (panelTab === "day" ? dayHtml : panelTab === "week" ? wkHtml : panelTab === "path" ? PATH.html() : WD.html()),
       buttons: [
         { label: "💛 Мої сусіди", cls: "ghost", onClick: () => { showTab("coll"); $("tab-coll").scrollTop = 0; } },
         { label: "Закрити", cls: "ghost" }
@@ -313,6 +319,7 @@ window.QUEST = (() => {
     document.querySelectorAll(".dq-tab").forEach(b => b.onclick = () => { sfx.pop(); panel(b.dataset.t); });
     document.querySelectorAll(".dq-swap").forEach(b => b.onclick = () => swap(+b.dataset.i));
     if (panelTab === "winter") WD.bind();
+    if (panelTab === "path") PATH.bind();
     const c = document.querySelector(".dq-claim[data-c]");
     if (c) c.onclick = () => { $("modal").classList.remove("show"); panelTab === "day" ? claim() : claimWeek(); };
   }
