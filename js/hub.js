@@ -74,6 +74,9 @@ window.HUB = (() => {
     // конкурс
     if (on("contest")) { const c = CONTEST.card(); out.push(Object.assign(c, { act: "contest", btn: "Відкрити" })); }
     else out.push(lock("🏆", "Кулінарний конкурс", "contest"));
+    // образ дня
+    if (on("look")) out.push(LOOK.card());
+    else out.push(lock("💃", "Образ дня", "look"));
     // гардероб
     if (on("fashion")) out.push(FASH.card());
     else out.push(lock("👗", "Гардероб сусідів", "fashion"));
@@ -135,6 +138,7 @@ window.HUB = (() => {
     else if (a === "toloka") TOLOKA.panel();
     else if (a === "ech") ECH.panel();
     else if (a === "fashion") FASH.panel();
+    else if (a === "look") LOOK.panel();
     else if (a === "medals") MEDAL.panel();
   }
   function renderDot() {
