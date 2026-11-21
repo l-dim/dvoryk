@@ -798,7 +798,9 @@ function yardPeople(ch, all) {
   }));
   // хто вже стоїть у дворику окремою фігуркою (наречені) — двічі не ставимо
   all.forEach(d => { if (d.pic) delete count[d.pic.split("-")[0]]; });
-  const who = Object.keys(count).sort((a, b) => count[b] - count[a]).slice(0, 3);
+  const wed = window.FAM && FAM.wedding();              // весілля — гостей повен двір
+  if (wed) ["halya", "stepan", "olya", "marichka", "andriy", "liza", "ivan", "taras", "iryna"].forEach(w => { if (PORTRAITS_FULL.includes(w) && !(window.WD && WD.isSick(w))) count[w] = (count[w] || 0) + 0.5; });
+  const who = Object.keys(count).sort((a, b) => count[b] - count[a]).slice(0, wed ? 7 : 3);
   const slots = [[27, 72], [73, 72], [36, 87], [64, 87], [17, 60], [83, 60], [40, 76], [60, 76], [12, 74], [88, 74], [24, 86], [76, 86], [50, 64], [8, 66], [92, 66], [30, 94], [70, 94], [50, 92]];
   const taken = all.filter(d => d.y >= 34 && (!d.who || d.hero)).map(d => [d.x, d.y, d.s, !!d.hero]);
   const out = [];
@@ -859,7 +861,8 @@ function renderStory(animateLast) {
   if (window.Yard3D) {
     // котик у светрику, якщо йому видали светрик і зараз зима
     if (winterLook("cat", ch)) all.forEach(d => { if (d.e === "🐱") { d.catPic = "cat-winter"; d.key += "-w"; } });
-    if (window.DECOR) all.push(...DECOR.yard(ch));                // прикраси, які поставила сама
+    if (window.DECOR) all.push(...DECOR.yard(ch));
+    if (window.FAM) all.push(...FAM.yard(ch));                // прикраси, які поставила сама
     if (window.HERO) all.push(...HERO.yard(ch, all));          // героїня — попереду, сусіди стають довкола
     all.push(...yardPeople(ch, all));
     if (window.QUEST && !ch.loc) all.push(...QUEST.yardGifts(ch, all));
@@ -1438,6 +1441,7 @@ function init() {
     if (window.CRAFT) CRAFT.tick();
     if (window.GUIDE) GUIDE.tick();
     if (window.FARM2) FARM2.tick();
+    if (window.FAM) FAM.tick();
     if (window.CONTEST) CONTEST.tick();
     if (window.TOLOKA) TOLOKA.tick();
     if (window.MAIL) MAIL.tick();

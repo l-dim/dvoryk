@@ -82,6 +82,7 @@ window.HERO = (() => {
      S.heroLook: "auto" (за замовчуванням) або вибраний вручну "day" | "fest" | "winter" */
   const FEST_RE = /Свято|свята|Весілля|Весільне|Сватання|Коровай|Масляна|Великдень|Галинка|вертеп/;
   function lookFor(ch) {
+    if (window.FAM && FAM.festive()) return "fest";   // весільні дні — святкове вбрання
     const m = S.heroLook || "auto";
     if (m !== "auto") return m;
     const s = window.WD && WD.season();

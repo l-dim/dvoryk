@@ -1104,3 +1104,31 @@ body.dc-placing #scene { outline: 3px dashed #f2b33d; outline-offset: -6px; curs
 .fr-b .s-btn { padding: 6px 9px; font-size: 13px; }
 .fr-ok { color: #3f8a1c; font-weight: 700; }
 .fr-gone { color: #a2552f; }
+
+/* ---------- сім'я: весілля, хата ---------- */
+.fm-list { display: flex; flex-direction: column; gap: 5px; text-align: left; margin-top: 6px; }
+.fm-row { display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, .65); border-radius: 12px; padding: 6px 8px; }
+.fm-row.done { opacity: .6; }
+.fm-ic { width: 34px; flex: none; text-align: center; font-size: 26px; font-family: var(--emoji); }
+.fm-ic .e3d { width: 32px; height: 32px; }
+.fm-t { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.fm-t small { opacity: .75; }
+.fm-row .s-btn { flex: none; padding: 6px 10px; font-size: 13px; }
+.fm-house { max-height: 50vh; overflow-y: auto; text-align: left; margin: 4px -6px 0; padding: 0 6px; -webkit-overflow-scrolling: touch; }
+.fm-room { margin-bottom: 8px; }
+.fm-rh { font-weight: 800; color: #6b3f1d; margin: 2px 2px 5px; font-size: 14px; }
+.fm-rh small { font-weight: 600; opacity: .7; }
+.fm-slots { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; }
+.fm-slot { border: 2px dashed rgba(107, 63, 29, .3); background: rgba(255, 255, 255, .45); border-radius: 12px; padding: 4px 2px; display: flex; flex-direction: column; align-items: center; gap: 1px; min-height: 64px; font: inherit; color: inherit; }
+.fm-slot span { font-size: 24px; font-family: var(--emoji); opacity: .45; filter: grayscale(.6); }
+.fm-slot span .e3d { width: 30px; height: 30px; }
+.fm-slot small { font-size: 9.5px; line-height: 1.1; text-align: center; opacity: .75; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.fm-slot.can { border-color: #7bb342; background: rgba(214, 240, 190, .7); }
+.fm-slot.can span { opacity: .8; filter: none; }
+.fm-slot.ok { border-style: solid; border-color: #e0a63b; background: rgba(255, 244, 214, .95); }
+.fm-slot.ok span { opacity: 1; filter: none; }
+.fm-slot.ok small { color: #3f8a1c; font-weight: 800; font-size: 13px; }
+.fm-slot.lock span { font-size: 18px; }
+.fm-names { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin: 6px 0; }
+.fm-names .s-btn { padding: 6px 10px; font-size: 13px; }
+.fm-in { width: 100%; box-sizing: border-box; padding: 9px 12px; border-radius: 12px; border: 2px solid rgba(107, 63, 29, .25); font: inherit; font-size: 16px; background: #fffaf0; }
