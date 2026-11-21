@@ -92,13 +92,13 @@ window.HUB = (() => {
     // вилазки
     ["fish", "mush"].forEach(id => {
       const k = SIDE.kinds().find(x => x.id === id);
-      if (!on("outing")) { out.push(lock(k.icon, k.title, "outing")); return; }
+      if (!on("outing")) { out.push(lock((GENS["side_" + id] || {}).icon || k.icon, k.title, "outing")); return; }
       let sub, btn, ready = false;
       if (S.side && S.side.kind === id) { sub = S.side.done ? "Ціль є — можна йти додому або ловити ще" : "Ти зараз тут"; btn = S.sideOn ? "Ти тут" : "Перейти"; ready = true; }
       else if (S.side) { sub = "Спершу заверши іншу пригоду"; btn = "—"; }
       else if (SIDE.canGo(id)) { sub = `${k.items[0][0]} → ${k.items[4][0]} · доба на дошці · нагорода 🎁 ⭐ 🪙`; btn = "Іти!"; ready = true; }
       else { sub = "Знову можна за " + hm(S.outNext[id] - Date.now()); btn = "⏳"; }
-      out.push({ icon: k.icon, title: k.title, sub, btn, act: "out:" + id, ready });
+      out.push({ icon: (GENS["side_" + id] || {}).icon || k.icon, title: k.title, sub, btn, act: "out:" + id, ready });
     });
     // пригода сусіда
     if (S.side && !(SIDE.kinds().find(x => x.id === S.side.kind) || {}).outing) {

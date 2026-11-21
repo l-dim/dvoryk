@@ -1162,7 +1162,9 @@ const DECO_ICONS = { "⛲": "deco-fountain", "⛱️": "deco-umbrella", "🕸️
   "🎀": "deco-bow", "💖": "deco-heart", "💕": "deco-hearts", "🌟": "deco-star", "✨": "deco-sparkles", "💍": "deco-ring", "🍊": "deco-tangerine", "🍂": "deco-leaves", "🍁": "deco-maple", "🛏️": "deco-cradle", "🖼️": "deco-picture", "🪞": "deco-mirror", "👗": "deco-dress", "🥾": "deco-boots", "🍼": "deco-bottle", "🧵": "deco-thread", "🐑": "deco-lamb", "🔔": "deco-bell", "📸": "deco-camera", "🎲": "deco-dice", "🃏": "deco-cards", "🥳": "deco-party", "🕷️": "deco-spider", "🟫": "deco-soil", "👼": "deco-angel", "🪡": "deco-needle", "👶": "deco-baby" };
 /* Мальовані значки інтерфейсу: емодзі → items/<назва>.webp (аркуш sheet-ui) */
 const UI_ICONS = { "⭐": "ui-star", "⚙️": "ui-gear", "🏡": "ui-home", "🛍️": "ui-shop", "📖": "ui-book",
-  "✅": "ui-check", "🔨": "ui-hammer", "🔒": "ui-lock", "📜": "ui-scroll", "❄️": "ui-snow", "♨️": "st-oven", "🪢": "ui-thread" };
+  "✅": "ui-check", "🔨": "ui-hammer", "🔒": "ui-lock", "📜": "ui-scroll", "❄️": "ui-snow", "♨️": "st-oven", "🪢": "ui-thread",
+  "🎪": "ui-events", "🥄": "ui-spoon", "🏅": "ui-medal", "🥇": "ui-gold", "🥈": "ui-silver", "🥉": "ui-bronze",
+  "✉️": "ui-mail", "📅": "ui-calendar", "🗄️": "ui-cabinet", "💃": "ui-look", "🗳️": "ui-vote", "📷": "ui-album" };
 
 
 /* ============================================================
