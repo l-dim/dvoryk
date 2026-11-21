@@ -1164,7 +1164,9 @@ const DECO_ICONS = { "⛲": "deco-fountain", "⛱️": "deco-umbrella", "🕸️
 const UI_ICONS = { "⭐": "ui-star", "⚙️": "ui-gear", "🏡": "ui-home", "🛍️": "ui-shop", "📖": "ui-book",
   "✅": "ui-check", "🔨": "ui-hammer", "🔒": "ui-lock", "📜": "ui-scroll", "❄️": "ui-snow", "♨️": "st-oven", "🪢": "ui-thread",
   "🎪": "ui-events", "🥄": "ui-spoon", "🏅": "ui-medal", "🥇": "ui-gold", "🥈": "ui-silver", "🥉": "ui-bronze",
-  "✉️": "ui-mail", "📅": "ui-calendar", "🗄️": "ui-cabinet", "💃": "ui-look", "🗳️": "ui-vote", "📷": "ui-album", "💌": "ui-postcards" };
+  "✉️": "ui-mail", "📅": "ui-calendar", "🗄️": "ui-cabinet", "💃": "ui-look", "🗳️": "ui-vote", "📷": "ui-album", "💌": "ui-postcards",
+  "📋": "ui-quests", "📥": "ui-inbox", "⏰": "ui-timer", "💤": "ui-sleep", "🗺️": "ui-map", "🐾": "ui-paw",
+  "💛": "ui-friend", "🗓️": "ui-week", "🔄": "ui-swap", "❔": "ui-unknown", "💗": "ui-heart", "🎡": "ui-wheel" };
 
 
 /* ============================================================
