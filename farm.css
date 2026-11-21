@@ -1030,3 +1030,12 @@ body.farm .order.pic .o-items { min-width: 34px; }
 .fx-it b { font-size: 34px; font-family: var(--emoji); line-height: 1; }
 .fx-it b .e3d { width: 1.1em; height: 1.1em; }
 .fx-it small { font-size: 11px; font-weight: 800; }
+.o-angry { background: linear-gradient(#ffb37a, #e86a2e) !important; }
+.order:has(.o-angry) { animation: angry 1.6s ease-in-out infinite; }
+@keyframes angry { 0%, 100% { transform: none; } 45% { transform: rotate(-1.2deg); } 55% { transform: rotate(1.2deg); } }
+.bg-btn { background: linear-gradient(#fff0b8, #ffd76a) !important; }
+.bg-row { display: flex; align-items: center; gap: 9px; padding: 8px 9px; margin-top: 6px; border-radius: 14px; background: rgba(255, 255, 255, .55); text-align: left; }
+.bg-ic { font-size: 30px; font-family: var(--emoji); }
+.bg-ic .e3d { width: 1.1em; height: 1.1em; }
+.bg-mid { flex: 1; display: flex; flex-direction: column; gap: 3px; font-size: 13.5px; }
+.bg-mid small { font-size: 11px; font-weight: 800; color: var(--ink-soft); }

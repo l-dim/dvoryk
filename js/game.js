@@ -98,7 +98,7 @@ const MALE_FORMS = [
   ["вже купила", "вже купив"], ["ти зберігала", "ти зберігав"], ["ти повернула", "ти повернув"], ["донечко", "синку"],
   ["Ти найкраща!", "Ти найкращий!"], ["моя хороша", "мій хороший"], ["самій піти", "самому піти"], ["Ти всіх вдягнула", "Ти всіх вдягнув"],
   ["Моя найкраща сусідка", "Мій найкращий сусід"], ["сама обираєш", "сам обираєш"], ["сама прочитаєш", "сам прочитаєш"],
-  ["кулінарок із сусідніх сіл", "кулінарів із сусідніх сіл"]
+  ["кулінарок із сусідніх сіл", "кулінарів із сусідніх сіл"], ["Готова?", "Готовий?"], ["Почни, коли маєш", "Почни, коли маєш"]
 ];
 function gx(t) {
   if (!t || !S || S.sex !== "m") return t;
@@ -299,6 +299,7 @@ function handleDrop(a, b) {
     MECH.crackAround(b);
     window.QUEST && QUEST.track("merge");
     if (nl >= 4) window.QUEST && QUEST.track("high");
+    window.TP && TP.onMerge(A.c, nl);
     // невеликий бонус за злиття
     const bonus = Math.random();
     if (bonus < 0.008) placeItem({ c: "energy", l: 0 }, b);
@@ -365,7 +366,8 @@ function newOrder() {
   let coins = 0, xp = 0, top = 0;
   items.forEach(it => { coins += Math.round(itemValue(it.c, it.l) * 0.9); xp += (it.l + 1) * 3; top = Math.max(top, it.l); });
   const stars = top >= 5 || items.length >= 2 && top >= 4 ? 2 : 1;
-  return MECH.maybeUrgent({ id: ++S.orderSeq, ch, items, coins, xp, stars, line: rnd(3) });
+  const o = MECH.maybeUrgent({ id: ++S.orderSeq, ch, items, coins, xp, stars, line: rnd(3) });
+  return window.TP ? TP.stamp(o) : o;
 }
 function orderSlots() { return window.XTRA ? XTRA.slots() : 3; }
 function fillOrders() {
@@ -631,6 +633,7 @@ function renderOrders() {
         ? `<button class="o-btn">Віддати</button>`
         : `<div class="o-rew">🪙${o.coins} · ${o.ev ? "❄️" + o.pts : o.paw ? "🐾" + XTRA.catProg() : "⭐".repeat(o.stars)}</div>`) +
       (o.paw ? `<span class="o-paw">${CAT_ICON}</span>` + (o.bonus ? `<span class="o-bonus">+${XTRA.bonusIcon(o)}</span>` : "") : "") +
+      (window.TP ? TP.badge(o) : "") +
       (o.until || o.catUntil ? `<span class="o-timer" data-until="${o.until || o.catUntil}">⏰ ${MECH.hhmm((o.until || o.catUntil) - Date.now())}</span>` : "");
     el.addEventListener("click", e => {
       if (ready && e.target.closest(".o-btn")) { deliver(o.id); return; }
@@ -1281,6 +1284,7 @@ function startGame() {
   if (window.SIDE) SIDE.onStart();
   if (window.UNL) UNL.init();
   if (window.HARD) HARD.init();
+  if (window.TP) TP.init();
   if (window.XTRA) { XTRA.initDisc(); XTRA.renderBoost(); }
   if (window.PATH) PATH.init();
   if (window.MAIL) MAIL.render();
@@ -1346,6 +1350,7 @@ function init() {
   $("qBtn").onclick = () => window.QUEST && QUEST.panel();
   $("sideBtn").onclick = () => window.SIDE && SIDE.toggle();
   $("flashBtn").onclick = () => window.RARE && RARE.panel();
+  $("bigBtn").onclick = () => window.TP && TP.panel();
   $("boostBtn").onclick = () => window.XTRA && XTRA.toggleBoost();
   $("teaBtn").onclick = () => { takeTea(); renderShop(); };
   $("energyChip").onclick = () => { showNoEnergyInfo(); };
@@ -1366,6 +1371,7 @@ function init() {
     if (window.XTRA) { XTRA.catTick(); XTRA.slotsTick(); }
     if (window.RARE) RARE.tick();
     if (window.HARD) HARD.tick();
+    if (window.TP) TP.tick();
     if (window.CONTEST) CONTEST.tick();
     if (window.TOLOKA) TOLOKA.tick();
     if (window.MAIL) MAIL.tick();

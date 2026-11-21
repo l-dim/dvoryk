@@ -84,6 +84,7 @@ window.HUB = (() => {
     if (on("ech")) out.push(ECH.card());
     else out.push(lock("⚡", "Виклик енергії", "ech"));
     if (window.RARE) out.unshift(...RARE.cards());
+    if (window.TP && TP.card()) out.unshift(TP.card());
     // толока
     if (on("toloka")) { const c = TOLOKA.card(); out.push(c); }
     else out.push(lock("🥄", "Толока вихідного дня", "toloka"));
@@ -139,6 +140,7 @@ window.HUB = (() => {
     else if (a === "toloka") TOLOKA.panel();
     else if (a === "ech") ECH.panel();
     else if (a === "flash") RARE.panel();
+    else if (a === "big") TP.panel();
     else if (a === "fashion") FASH.panel();
     else if (a === "look") LOOK.panel();
     else if (a === "medals") MEDAL.panel();

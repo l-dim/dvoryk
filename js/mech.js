@@ -185,8 +185,8 @@ window.MECH = (() => {
     return null;
   }
   function maybeUrgent(o) {
-    if (!(window.UNL ? UNL.on("urgent") : S.level >= 4) || o.ev || o.dish || o.paw || S.orders.some(x => x.until) || Math.random() >= 0.15) return o;
-    o.until = now() + (2 + rnd(3)) * 3600e3;
+    if (!(window.UNL ? UNL.on("urgent") : S.level >= 4) || o.ev || o.dish || o.paw || S.orders.filter(x => x.urgent).length >= 2 || Math.random() >= 0.3) return o;
+    o.until = now() + (60 + rnd(61)) * 60e3;          // 1–2 години
     o.coins = Math.round(o.coins * 1.6); o.stars += 1; o.urgent = true;
     return o;
   }
