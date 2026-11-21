@@ -979,3 +979,4 @@ body.farm .nav .dot { right: 16%; }
 .hr-lk .e3d { width: 1.15em; height: 1.15em; vertical-align: -2px; }
 .hr-prev { display: flex; justify-content: center; align-items: flex-end; gap: 8px; margin: 8px 0 2px; }
 .hr-prev img { height: 92px; width: auto; }
+.ct-ava .hero-face.riv, .ct-row .hero-face.riv { width: 30px; height: 30px; }

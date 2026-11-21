@@ -27,7 +27,7 @@ const LOOK_THEMES = [
   { name: "День вишиванки", icon: "🌸", tags: ["folk", "bright"] },
   { name: "Святковий концерт", icon: "🎶", tags: ["fest", "bright"] }
 ];
-const LOOK_RIVALS = [["👩‍🦰", "Оксана"], ["👧", "Соломійка"], ["👩", "Ганна"], ["👱‍♀️", "Ірина з Липового"], ["👩‍🍳", "Тетяна"], ["🧕", "Віра"], ["👵", "Баба Явдоха"], ["👩‍🎤", "Даринка"], ["🙍‍♀️", "Леся"]];
+const LOOK_RIVALS = [["👩‍🦰", "Оксана"], ["👧", "Соломійка"], ["👩", "Ганна"], ["👱‍♀️", "Ірина з Липового"], ["👩‍🍳", "Тетяна"], ["🧕", "Віра"], ["👵", "Баба Явдоха"], ["👩‍🎤", "Даринка"], ["🧑‍🍳", "Марко"]];
 const LOOK_REWARDS = [
   { chest: 2, coins: 150, thread: 10, stars: 2 }, { chest: 1, coins: 80, thread: 6 }, { chest: 1, coins: 80, thread: 6 },
   { chest: 0, coins: 40, thread: 4 }, { chest: 0, coins: 40, thread: 4 }, { chest: 0, coins: 40, thread: 4 },
@@ -144,7 +144,7 @@ window.LOOK = (() => {
       const tb = table(s.done.score);
       body = `<div class="lk-res"><div class="lk-model">${face(CHARS[who], "big")}<div class="lk-mini">${Object.values(s.sel).filter(Boolean).map(icon).join("")}</div></div>` +
         `<p>Твій образ: <b>${s.done.score} 💗</b> · <b>${s.done.place}-е місце</b>${s.done.place === 1 ? " — королева дня! 👑" : ""}</p></div>` +
-        `<div class="ct-table">${tb.map((x, k) => `<div class="ct-row${x.me ? " me" : ""}"><span class="ct-pl">${["🥇", "🥈", "🥉"][k] || k + 1}</span><span class="ct-ava">${x.e}</span><span class="ct-name"><b>${x.me ? "Ти — " + (S.name || "господиня") : x.name}</b></span><span class="ct-pts">${x.pts} 💗</span></div>`).join("")}</div>` +
+        `<div class="ct-table">${tb.map((x, k) => `<div class="ct-row${x.me ? " me" : ""}"><span class="ct-pl">${["🥇", "🥈", "🥉"][k] || k + 1}</span><span class="ct-ava">${x.me || typeof rivalFace !== "function" ? x.e : rivalFace(x.name, x.e)}</span><span class="ct-name"><b>${x.me ? "Ти — " + (S.name || "господиня") : x.name}</b></span><span class="ct-pts">${x.pts} 💗</span></div>`).join("")}</div>` +
         `<p class="hint-s">Нова тема — завтра. А поки можна проголосувати за чужі образи: ще ${LOOK_VOTES - s.votes} з ${LOOK_VOTES} (+1 🪢 за голос).</p>`;
     } else {
       body = `<div class="lk-who-row">${models}</div><div class="lk-board"><div class="lk-model">${face(CHARS[who], "big")}</div><div class="lk-slots">${slots}</div></div>` +
