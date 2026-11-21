@@ -55,7 +55,7 @@ window.HARD = (() => {
     const s = nextStrip(); if (!s) return;
     const ok = S.stars >= s.stars && S.coins >= s.coins;
     modal({ title: "Більше місця 🌱",
-      html: `<div class="big-emoji">🧑‍🌾</div><p>Дід Степан розчистить <b>${s.name}</b> — це ще ${s.cells.length} клітинок для городу.</p>` +
+      html: `<div class="big-emoji">${face(CHARS.stepan, "big")}</div><p>Дід Степан розчистить <b>${s.name}</b> — це ще ${s.cells.length} клітинок для городу.</p>` +
         `<p class="rewards">${s.stars} ⭐ &nbsp; + &nbsp; ${s.coins} 🪙</p>` +
         `<p class="hint-s">Відкрито ${S.bstage} з ${BOARD_STRIPS.length}. Зірочки потрібні й для ремонту дворика — обирай, що важливіше 🙂</p>`,
       buttons: [{ label: ok ? "Розчистити" : `Бракує ${S.stars < s.stars ? (s.stars - S.stars) + " ⭐" : ""}${S.stars < s.stars && S.coins < s.coins ? " і " : ""}${S.coins < s.coins ? (s.coins - S.coins) + " 🪙" : ""}`, disabled: !ok, onClick: () => {
