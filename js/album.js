@@ -17,7 +17,8 @@ const ALBUM = [
 const ALB_RARE = k => (k < 3 ? 1 : k < 5 ? 2 : 3);        // позиція в наборі → кількість зірок
 const ALB_SET_REWARD = { coins: 150, chest: 1, stars: 2 };
 const ALB_ALL_REWARD = { coins: 600, chest: 2, stars: 8 };
-const ALB_SWAP = 12;                                        // марочок за обмін
+const ALB_SWAP = 12;
+const ALB_ART = true;                                       // усі 36 листівок мальовані                                        // марочок за обмін
 
 window.ALB = (() => {
   const on = () => window.UNL && UNL.on("album");
@@ -65,6 +66,9 @@ window.ALB = (() => {
   }
   function cardHtml(s, k, extra = "") {
     const have = st().have[cid(s, k)] || 0, c = s.cards[k];
+    // мальована листівка: items/pc-<набір>-<k>.webp (поки не знайдена — сіра й розмита)
+    if (ALB_ART) return `<div class="pc art r${ALB_RARE(k)}${have ? "" : " no"}${extra}"><img src="items/pc-${s.id}-${k}.webp" alt="">` +
+      `<small>${have ? c[1] : "★".repeat(ALB_RARE(k))}</small>${have > 1 ? `<i>×${have}</i>` : ""}</div>`;
     return `<div class="pc r${ALB_RARE(k)}${have ? "" : " no"}${extra}"><span class="pc-e">${have ? c[0] : "❔"}</span>` +
       `<small>${have ? c[1] : "★".repeat(ALB_RARE(k))}</small>${have > 1 ? `<i>×${have}</i>` : ""}</div>`;
   }

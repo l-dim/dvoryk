@@ -980,3 +980,12 @@ body.farm .nav .dot { right: 16%; }
 .hr-prev { display: flex; justify-content: center; align-items: flex-end; gap: 8px; margin: 8px 0 2px; }
 .hr-prev img { height: 92px; width: auto; }
 .ct-ava .hero-face.riv, .ct-row .hero-face.riv { width: 30px; height: 30px; }
+/* мальовані листівки */
+.pc.art { padding: 0; background: none !important; box-shadow: 0 2px 4px rgba(90, 50, 10, .35) !important; justify-content: flex-start; overflow: visible; }
+.pc.art img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.pc.art small { position: absolute; left: 50%; bottom: -3px; transform: translateX(-50%); width: 112%; padding: 1px 2px; border-radius: 6px; background: rgba(255, 250, 236, .95); box-shadow: 0 1px 2px rgba(90, 50, 10, .3); }
+.pc.art.no img { filter: grayscale(1) blur(1.5px); opacity: .5; }
+.pc.art.no { filter: none; opacity: 1; }
+.pc.art.r3 { box-shadow: 0 0 0 2px #e7a92a, 0 0 8px rgba(255, 190, 40, .7) !important; }
+.pc.art.r2 { box-shadow: 0 0 0 2px #8fb6e6, 0 2px 4px rgba(90, 50, 10, .3) !important; }
+.pc-row { row-gap: 9px; }
