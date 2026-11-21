@@ -180,7 +180,7 @@ window.SIDE = (() => {
     const host = document.createElement("div");
     host.className = "order side-host pic";
     host.innerHTML = `<div class="o-who"><span class="o-name">${CHARS[k.host].name.split(" ").pop()}</span></div>` +
-      `<div class="o-body"><div class="o-pic">${PORTRAITS_FULL.includes(k.host) || PORTRAITS.includes(k.host) ? `<img src="portraits/${k.host}.webp" alt="" style="object-position:${(PORTRAITS_FACE_X(k.host))}% 0">` : CHARS[k.host].icon}</div>` +
+      `<div class="o-body"><div class="o-pic">${PORTRAITS_FULL.includes(k.host) || PORTRAITS.includes(k.host) ? `<img src="portraits/${k.host}.webp" alt="">` : CHARS[k.host].icon}</div>` +
       `<div class="side-info"><b>${k.title}</b><span class="side-time">⏰ ${hm(left())}</span></div></div>` +
       (k.outing && S.side.done ? `<button class="o-btn side-home">Додому ✓</button>` : "");
     const hb = host.querySelector(".side-home"); if (hb) hb.onclick = () => finish(true);

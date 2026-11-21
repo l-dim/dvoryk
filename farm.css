@@ -1004,3 +1004,7 @@ body.farm .nav .dot { right: 16%; }
 .fl-bar i { position: absolute; top: 0; bottom: 0; width: 2px; background: rgba(90, 50, 10, .45); }
 .fl-bar span { position: absolute; inset: 0; display: grid; place-items: center; font: 900 12.5px/1 var(--font); color: #4a2709; }
 .fl-rew { display: flex; flex-direction: column; gap: 3px; font-size: 13px; font-weight: 800; text-align: left; }
+/* портрет у картці замовлення — цілий, без обрізання по ширині */
+body.farm .o-pic { width: 60px; }
+body.farm .o-pic img { object-fit: contain; object-position: 50% 100%; }
+body.farm .order.pic .o-items { min-width: 34px; }

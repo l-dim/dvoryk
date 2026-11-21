@@ -617,7 +617,7 @@ function renderOrders() {
     const itemsHtml = `<div class="o-items">${o.items.map((it, k) => `<span class="o-item${found[k] >= 0 ? " have" : ""}">${itemIcon(it)}</span>`).join("")}</div>`;
     el.innerHTML = (pic
       ? `<div class="o-who"><span class="o-name">${ch.name.split(" ").pop()}</span></div>` +
-        `<div class="o-body"><div class="o-pic"><img src="portraits/${ch.key}.webp" alt="" style="object-position:${(PORTRAIT_FACE[ch.key] || [50])[0]}% 0"></div>${itemsHtml}</div>`
+        `<div class="o-body"><div class="o-pic"><img src="portraits/${ch.key}.webp" alt=""></div>${itemsHtml}</div>`
       : `<div class="o-who"><span class="o-ava">${face(ch, "mini")}</span><span class="o-name">${ch.name.split(" ").pop()}</span></div>` + itemsHtml) +
       (ready
         ? `<button class="o-btn">Віддати</button>`
