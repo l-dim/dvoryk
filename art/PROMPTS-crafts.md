@@ -40,7 +40,22 @@ Game item icon sheet for a cozy mobile farm game, in the same hand-painted carto
 12 a cozy small wooden workshop house with a saw sign above the door (button icon: workshop).
 ```
 
+## C. Електроніка: аркуш 3×3 (7 виробів, генератор і значок)
+```
+Game item icon sheet for a cozy mobile farm game, in the same hand-painted cartoon art style and warm lighting as the attached image. Glossy, chunky, cute retro electronics with soft painterly shading and a subtle rim light, warm vintage colors (cream, mint, wood and brass), clean readable silhouettes, slight 3/4 front view. Each next item looks more crafted and valuable than the previous one. Arrange them in a strict grid of 3 columns by 3 rows of equal square cells, left to right, top to bottom, in the numbered order below. Each object centered in its own cell, fully inside it with a generous white margin, all about the same size. Plain solid pure white background, no cell borders, no shadows on the background, no text, no numbers.
+1 a coiled electric wire with an old plug,
+2 a glowing vintage light bulb with a warm filament,
+3 a chunky retro battery,
+4 a retro metal flashlight shining a soft beam,
+5 a vintage rotary dial telephone in cream and red,
+6 a vintage wooden tube radio with a fabric speaker and brass knobs,
+7 a retro wooden tube television with a rounded screen and little antenna,
+8 a cozy radio repair workbench with a soldering iron, a lamp, wires and an open radio (generator: radio workshop),
+9 a small vintage multimeter tester with a needle dial and two probes (icon: test the device).
+```
+
 ## Ріжемо (для мене)
 - `art/slice.sh art/src/sheet-craft-a.webp 4 4 clay-0 … clay-6 gen-clay forge-0 … forge-6 gen-forge`
 - `art/slice.sh art/src/sheet-craft-b.webp 4 3 amber-0 … amber-6 gen-amber inclusion shards woodjunk ui-workshop`
+- `art/slice.sh art/src/sheet-craft-c.webp 3 3 electro-0 … electro-6 gen-electro ui-test`
 - id → `CRAFT_ART` у js/crafts.js; woodjunk → PUA 0xE480 у js/woodhard.js; ui-workshop → кнопка майстерні.

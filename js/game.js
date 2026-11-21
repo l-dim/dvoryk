@@ -294,7 +294,7 @@ function handleDrop(a, b) {
   if (window.CRAFT && CRAFT.feed(a, b)) return;
   if (MECH.canMergeGens(A, B)) { MECH.mergeGens(a, b); renderBoard(); renderOrders(); renderInfo(); save(); return; }
   if (B && !A.g && !B.g && A.c === B.c && A.l === B.l && window.WH && (!WH.usable(A) || !WH.usable(B))) {
-    sfx.nope(); toast(A.worm || B.worm ? "🐛 Там шашіль — спершу виведи його" : "💧 Клей ще сохне — зачекай трохи"); renderBoard(); return;
+    sfx.nope(); toast(A.worm || B.worm ? "🐛 Там шашіль — спершу виведи його" : A.untested || B.untested || A.short || B.short ? "❔ Спершу перевір виріб — тапни на нього" : "💧 Клей ще сохне — зачекай трохи"); renderBoard(); return;
   }
   if (!B) {
     S.board[b] = A; S.board[a] = null;
@@ -1290,6 +1290,7 @@ function tap(i) {
   if (!it) return;
   if (it.lock) { selected = i; renderBoard(); renderInfo(); MECH.lockModal(i); return; }
   if (it.worm && window.WH) { selected = i; renderBoard(); renderInfo(); WH.wormModal(i); return; }
+  if ((it.untested || it.short) && window.CRAFT) { selected = i; renderBoard(); renderInfo(); CRAFT.testModal(i); return; }
   if (it.st) { selected = i; renderInfo(); MECH.ovenModal(i); return; }
   if (it.g) { selected = i; produce(i); renderInfo(); return; }
   const ch = CHAINS[it.c];

@@ -74,7 +74,7 @@ window.WH = (() => {
     cureAround(b);
   }
   /* чи можна зливати/віддавати */
-  const usable = it => !wet(it) && !(it && it.worm);
+  const usable = it => !wet(it) && !(it && it.worm) && !(window.CRAFT && CRAFT.unusable(it));
 
   /* ---------- 3. шашіль ---------- */
   function cureAround(b) {
@@ -137,10 +137,11 @@ window.WH = (() => {
   }
 
   /* ---------- вигляд плиток ---------- */
-  function tileKey(it) { return (wet(it) ? ":w" : "") + (it && it.worm ? ":b" : ""); }
+  function tileKey(it) { return (wet(it) ? ":w" : "") + (it && it.worm ? ":b" : "") + (window.CRAFT ? CRAFT.tileKey(it) : ""); }
   function decorate(t, it) {
     if (!t || !it || it.g) return;
     t.classList.toggle("wet", wet(it));
+    if (window.CRAFT && (it.untested || it.short || t.querySelector(".test-b"))) CRAFT.decorate(t, it);
     t.classList.toggle("worm", !!it.worm);
     let w = t.querySelector(".worm-b");
     if (it.worm && !w) { w = document.createElement("span"); w.className = "worm-b"; w.textContent = "🐛"; t.appendChild(w); }
