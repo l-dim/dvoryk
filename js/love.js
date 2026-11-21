@@ -8,12 +8,19 @@
    МАЙСТЕРНЯ — окрема дошка з дерев'яними ланцюжками, своїми замовленнями й розширенням.
    Стан: S.wood = { board, stage, orders, seq, gens: [], done }, S.woodOn — зараз у майстерні.
    ============================================================ */
-CHARS.maksym = { key: "maksym", icon: "👨‍🔧", name: "Майстер Максим", from: 999,
-  ask: ["Мені б для майстерні… 🪚", "Допоможеш? Без цього не доробити 😊", "Можна попросити тебе?"],
-  thanks: ["Дякую, ти неймовірна 💛", "Оце так виручила! 🪵", "Що б я без тебе робив 😊"] };
-CHARS.khrystyna = { key: "khrystyna", icon: "👩‍🎨", name: "Майстриня Христина", from: 999,
-  ask: ["Мені б для майстерні… 🪚", "Допоможеш? Без цього не доробити 😊", "Можна попросити тебе?"],
-  thanks: ["Дякую, ти неймовірний 💛", "Оце так виручив! 🪵", "Що б я без тебе робила 😊"] };
+/* Партнер — один із намальованих героїв протилежної статі (того ж варіанта: Гулька ↔ Вуса). */
+const PARTNER_NAMES = { hero1: "Настя", hero2: "Катерина", hero3: "Христина", hero4: "Мар'яна", hero5: "Олена", hero6: "Софія",
+  man1: "Максим", man2: "Богдан", man3: "Назар", man4: "Василь", man5: "Роман", man6: "Ярослав" };
+Object.entries(PARTNER_NAMES).forEach(([id, n]) => {
+  const he = id.startsWith("man");
+  CHARS[id] = { key: id, icon: he ? "👨" : "👩", name: (he ? "Майстер " : "Майстриня ") + n, from: 999,
+    ask: ["Мені б для майстерні… 🪚", "Допоможеш? Без цього не доробити 😊", "Можна попросити тебе?"],
+    thanks: he ? ["Дякую, ти неймовірна 💛", "Оце так виручила! 🪵", "Що б я без тебе робив 😊"]
+               : ["Дякую, ти неймовірний 💛", "Оце так виручив! 🪵", "Що б я без тебе робила 😊"] };
+  if (!PORTRAITS.includes(id)) PORTRAITS.push(id);          // portraits/<id>.webp — по пояс, з фігури героя
+  const f = typeof HERO_FACE !== "undefined" && HERO_FACE[id];
+  if (f) PORTRAIT_FACE[id] = [f[0], Math.min(60, f[1] / 0.55), Math.round(58 / (f[2] / 100))];
+});
 
 /* дерев'яні ланцюжки — символи приватної зони (картинки: items/wood-<l>.webp, items/carve-<l>.webp) */
 const WOOD_ART = [];
@@ -34,7 +41,14 @@ window.PUA_MAP = window.PUA_MAP || {};
 window.LOVE = (() => {
   const on = () => S && S.love && S.love.stage >= 1;
   const st = () => (S.love || (S.love = { stage: 0, n: 0 }));
-  const who = () => (S.sex === "m" ? "khrystyna" : "maksym");
+  function who() {
+    const l = S.love || {};
+    if (l.partner && CHARS[l.partner]) return l.partner;
+    const h = (window.HERO && HERO.cur()) || { id: S.sex === "m" ? "man1" : "hero1" };
+    const n = h.id.replace(/\D/g, "") || "1";
+    return (S.sex === "m" ? "hero" : "man") + n;
+  }
+  const male = () => who().startsWith("man");
   const nm = () => CHARS[who()].name.split(" ").pop();
   const busyUI = () => $("modal").classList.contains("show") || $("dialog").classList.contains("show");
   const GIFT = { c: "flower", l: 6 };                 // святковий букет на побачення
@@ -55,16 +69,15 @@ window.LOVE = (() => {
     setTimeout(() => l.stage === 2 ? dateInvite() : propose(), 1500);
   }
   function meet() {
-    const l = st(); l.stage = 1; l.n = 0; CHARS[who()].from = 0; save();
-    const he = who() === "maksym";
+    const l = st(); l.partner = who(); l.stage = 1; l.n = 0; CHARS[who()].from = 0; save();
+    const he = male();
     playDialog([
       ["halya", `{name}, ${S.sex === "m" ? "ти чув" : "ти чула"}? У село ${he ? "приїхав новий майстер" : "приїхала нова майстриня"} з дерева! ${he ? "Купив" : "Купила"} стару хату біля млина.`],
-      [who(), `Добридень! Я ${he ? "Максим" : "Христина"}. Різьблю з дерева — ложки, скриньки, колиски… Тільки ще нікого тут не знаю 😅`],
+      [who(), `Добридень! Я ${PARTNER_NAMES[who()]}. Різьблю з дерева — ложки, скриньки, колиски… Тільки ще нікого тут не знаю 😅`],
       [who(), "Допоможеш мені облаштуватися? Я поки буду в тебе дещо замовляти — а потім віддячу 💛"]
-    ], () => { fillOrders(); renderOrders(); toast(`💕 Віддай ${nm()} 3 замовлення`); });
+    ], () => { fillOrders(); renderOrders(); toast(`💕 Віддай ${PARTNER_NAMES[who()]} 3 замовлення`); });
   }
   function dateInvite() {
-    const he = who() === "maksym";
     playDialog([
       [who(), `{name}, ти так мені ${S.sex === "m" ? "допоміг" : "допомогла"}… Ходімо ввечері до річки? Там такий захід сонця 🌅`],
       ["olya", "Ой, та це ж побачення! 😍 Тільки з порожніми руками не йди — подаруй святковий букет 💐"]
@@ -78,12 +91,12 @@ window.LOVE = (() => {
     l.stage = 3; l.n = 0; save(); renderAll(); confetti(); sfx.level();
     playDialog([
       [who(), "Це мені? 🥹 Найгарніший букет у моєму житті…"],
-      [who(), `Знаєш… я давно ${who() === "maksym" ? "хотів" : "хотіла"} сказати — з тобою мені тут, як удома 💛`],
+      [who(), `Знаєш… я давно ${male() ? "хотів" : "хотіла"} сказати — з тобою мені тут, як удома 💛`],
       ["halya", "Ой, дивіться-но, голубки над річкою 😊 Будуть люди!"]
     ], () => toast(`💕 Віддай ${nm()} ще 5 замовлень`));
   }
   function propose() {
-    const he = who() === "maksym";
+    const he = male();
     playDialog([
       [who(), `{name}, я довго ${he ? "думав" : "думала"}… Хату біля млина я вже майже ${he ? "відремонтував" : "відремонтувала"}. Тільки без тебе вона порожня.`],
       [who(), `Будемо жити разом? 💍 А стару повітку я ${he ? "переробив" : "переробила"} на майстерню — для нас обох!`],
@@ -107,11 +120,10 @@ window.LOVE = (() => {
   }
   function card() {
     const l = st(); if (l.stage < 1) return null;
-    const he = who() === "maksym";
     const sub = l.stage === 1 ? `знайомство: замовлення ${l.n}/3` : l.stage === 2 ? `побачення: подаруй ${itemIcon(GIFT)} святковий букет` : l.stage === 3 ? `ближче: замовлення ${l.n}/5` : "живете разом 💕 · майстерня 🪚";
     return { icon: face(CHARS[who()], "mini"), title: CHARS[who()].name, sub, btn: l.stage === 2 ? "Подарувати 💐" : l.stage >= 4 ? "Майстерня" : "", act: l.stage === 2 ? "love-gift" : l.stage >= 4 ? "wood" : "", ready: l.stage === 2 && findGift() >= 0 };
   }
-  return { init, onDeliver, tick, card, giveGift, who, stage: () => st().stage };
+  return { init, onDeliver, tick, card, giveGift, who, stage: () => st().stage, together: () => st().stage >= 4 };
 })();
 
 /* ============================================================ */
@@ -168,7 +180,7 @@ window.WOOD = (() => {
     const w = S.wood; w.done++;
     if (w.done === 10 && !w.gens.includes("carve")) {
       w.gens.push("carve"); placeItem({ g: "w_carve", gl: 1 });
-      setTimeout(() => playDialog([[LOVE.who(), `Ти так гарно працюєш! Я ${LOVE.who() === "maksym" ? "поставив" : "поставила"} тобі різьбярський стіл 🪓 — тепер і коників, і скрипки робитимемо!`]]), 1500);
+      setTimeout(() => playDialog([[LOVE.who(), `Ти так гарно працюєш! Я ${LOVE.who().startsWith("man") ? "поставив" : "поставила"} тобі різьбярський стіл 🪓 — тепер і коників, і скрипки робитимемо!`]]), 1500);
     }
     save();
   }

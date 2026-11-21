@@ -97,8 +97,18 @@ window.HERO = (() => {
     // вільне місце попереду: не заступати наречених, фігури й великі прикраси
     const taken = all.filter(d => d.y >= 34).map(d => [d.x, d.y, d.pic || d.who ? 12 : d.s || 6]);
     const spots = [[50, 80], [36, 84], [64, 84], [50, 91], [28, 78], [72, 78], [22, 88], [78, 88], [44, 70], [56, 70]];
-    const [x, y] = spots.find(([sx, sy]) => taken.every(([tx, ty, ts]) => Math.hypot(tx - sx, (ty - sy) * 1.4) > (ts + 10) * 0.75)) || spots[0];
-    return [{ key: "hero-" + f, who: f, hero: true, x, y, s: 10 }];
+    const free = ([sx, sy]) => taken.every(([tx, ty, ts]) => Math.hypot(tx - sx, (ty - sy) * 1.4) > (ts + 10) * 0.75);
+    const [x, y] = spots.find(free) || spots[0];
+    const out = [{ key: "hero-" + f, who: f, hero: true, x, y, s: 10 }];
+    // кохана людина стоїть поруч (після переїзду), у тому ж вбранні за сезоном
+    if (window.LOVE && LOVE.together()) {
+      const pid = LOVE.who(), pf = fileOf({ id: pid }, lookFor(ch));
+      taken.push([x, y, 10]);
+      const near = [[x + 11, y], [x - 11, y], [x + 9, y + 7], [x - 9, y + 7], [x, y + 9]].filter(([a, b]) => a > 8 && a < 92 && b < 96);
+      const p = near.find(free) || near[0];
+      if (p) out.push({ key: "partner-" + pf, who: pf, hero: true, x: p[0], y: p[1], s: 10 });
+    }
+    return out;
   }
   const LOOK_NAMES = [["auto", "✨ Само"], ["day", "👕 Звичайне"], ["fest", "🌻 Святкове"], ["winter", "❄️ Зимове"]];
   const looksHtml = () => !has(cur()) || !HERO_LOOKS.includes(cur().id) ? "" :
