@@ -205,8 +205,8 @@ window.SIDE = (() => {
   /* ---------- кнопка ---------- */
   function renderButton() {
     const b = $("sideBtn"); if (!b || !S) return;
-    b.hidden = !S.side;
-    if (!S.side) return;
+    b.hidden = !S.side || !!S.woodOn;          // у майстерні — лише кнопка «Город» майстерні
+    if (!S.side || S.woodOn) return;
     const k = kind();
     b.classList.toggle("on", !!S.sideOn);
     b.innerHTML = S.sideOn ? `<span class="sd-ic">🪴</span><small>Город</small>`

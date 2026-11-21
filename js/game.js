@@ -211,6 +211,7 @@ function produce(i) {
   if (MECH.resting(gIt)) { MECH.restModal(i); return; }
   if (window.HARD && HARD.broken(gIt)) { HARD.repairModal(i); return; }
   if (window.WH && !WH.canTap(i)) return;
+  if (window.CRAFT && !CRAFT.canTap(i)) return;
   if (emptyNear(i) < 0) { sfx.nope(); toast("Немає місця 🙈 Об'єднай або продай щось"); return; }
   // сила ×2: 2 ⚡ і 2 заряди — зате предмет одразу на рівень вищий
   const x2 = window.XTRA && XTRA.boosted() && S.energy >= 2;
@@ -233,6 +234,7 @@ function produce(i) {
   const at = placeItem(item, i);
   if (at >= 0) spawnFrom.set(at, i);
   window.QUEST && QUEST.track("tap");
+  window.CRAFT && CRAFT.afterTap(i);
   window.RARE && RARE.onTap(i);
   window.SEAS && SEAS.onTap(i);
   sfx.pop();
@@ -289,6 +291,7 @@ function handleDrop(a, b) {
   if (!A) return;
   if (A.lock || (B && B.lock)) { renderBoard(); return; }   // павутиння не рухається
   if (typeof cellOpen === "function" && !cellOpen(b)) { renderBoard(); return; }   // закрита клітинка
+  if (window.CRAFT && CRAFT.feed(a, b)) return;
   if (MECH.canMergeGens(A, B)) { MECH.mergeGens(a, b); renderBoard(); renderOrders(); renderInfo(); save(); return; }
   if (B && !A.g && !B.g && A.c === B.c && A.l === B.l && window.WH && (!WH.usable(A) || !WH.usable(B))) {
     sfx.nope(); toast(A.worm || B.worm ? "🐛 Там шашіль — спершу виведи його" : "💧 Клей ще сохне — зачекай трохи"); renderBoard(); return;
@@ -310,6 +313,7 @@ function handleDrop(a, b) {
     selected = b;
     MECH.crackAround(b);
     window.WH && WH.onMerged(b, nl);
+    window.CRAFT && CRAFT.onMerged(b, nl);
     window.QUEST && QUEST.track("merge");
     if (nl >= 4) window.QUEST && QUEST.track("high");
     window.TP && TP.onMerge(A.c, nl);
@@ -735,7 +739,7 @@ function renderInfo() {
     const lv = MECH.gl(it) > 1 ? ` <span class="lvl-tag">рів. ${MECH.gl(it)}</span>` : "";
     text = MECH.resting(it)
       ? `<b>${GENS[it.g].name}</b>${lv}<small>💤 Відпочиває ще ${Math.ceil((it.rest - Date.now()) / 60e3)} хв</small>`
-      : `<b>${GENS[it.g].name}</b>${lv}<small>Заряд ${it.ch}/${MECH.cap(it)}${window.HARD ? HARD.genInfo(it) : ""}${window.WH ? WH.genInfo(it) : ""} · тапай, щоб отримати ${ch.items[0][0]} (−1 ⚡)</small>`;
+      : `<b>${GENS[it.g].name}</b>${lv}<small>Заряд ${it.ch}/${MECH.cap(it)}${window.HARD ? HARD.genInfo(it) : ""}${window.WH ? WH.genInfo(it) : ""}${window.CRAFT ? CRAFT.genInfo(it) : ""} · тапай, щоб отримати ${ch.items[0][0]} (−1 ⚡)</small>`;
   } else if (it.c === "dish") {
     text = `<b>${itemName(it)}</b><small>Страву просять сусіди за ⭐⭐</small>`;
     btn = `<button class="sell${window.ECON && !ECON.canSell() ? " dim" : ""}" id="sellBtn"><small>продати${window.ECON && ECON.sellNote() ? " " + ECON.sellNote() : ""}</small><span>+${sellPrice(it)}🪙</span></button>`;
@@ -1422,6 +1426,7 @@ function init() {
     if (window.LOVE) LOVE.tick();
     if (window.WOOD) WOOD.tick();
     if (window.WH) WH.tick();
+    if (window.CRAFT) CRAFT.tick();
     if (window.CONTEST) CONTEST.tick();
     if (window.TOLOKA) TOLOKA.tick();
     if (window.MAIL) MAIL.tick();

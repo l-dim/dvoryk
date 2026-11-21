@@ -170,7 +170,8 @@ window.WOOD = (() => {
     const ch = LOVE.who() && !busy.includes(LOVE.who()) && Math.random() < 0.3 ? LOVE.who() : pick(pool);
     const count = Math.random() < 0.6 ? 1 : 2, items = [];
     const cap = Math.min(7, 2 + Math.floor(w.done / 6));
-    for (let n = 0; n < count; n++) { const c = pick(chains), len = CHAINS[c].items.length; items.push({ c, l: Math.min(len - 1, 1 + rnd(cap)) }); }
+    const since = c => (w.since && w.since[c] != null ? w.since[c] : c === "carve" ? 10 : 0);   // нове ремесло — спершу прості вироби
+    for (let n = 0; n < count; n++) { const c = pick(chains), len = CHAINS[c].items.length, cc = Math.min(cap, 2 + Math.floor((w.done - since(c)) / 6)); items.push({ c, l: Math.min(len - 1, 1 + rnd(cc)) }); }
     let coins = 0, xp = 0, top = 0;
     items.forEach(it => { coins += Math.round(itemValue(it.c, it.l) * 1.1); xp += (it.l + 1) * 3; top = Math.max(top, it.l); });
     const o = { id: ++S.orderSeq, ch, items, coins, xp, stars: top >= 4 ? 2 : 1, wood: true, line: rnd(3), born: Date.now() };
@@ -180,13 +181,14 @@ window.WOOD = (() => {
     if (!o.wood) return;
     const w = S.wood; w.done++;
     if (w.done === 10 && !w.gens.includes("carve")) {
-      w.gens.push("carve"); placeItem({ g: "w_carve", gl: 1 });
+      w.gens.push("carve"); (w.since = w.since || {}).carve = w.done; placeItem({ g: "w_carve", gl: 1 });
       setTimeout(() => playDialog([[LOVE.who(), `Ти так гарно працюєш! Я ${LOVE.who().startsWith("man") ? "поставив" : "поставила"} тобі різьбярський стіл 🪓 — тепер і коників, і скрипки робитимемо!`]]), 1500);
     }
+    window.CRAFT && CRAFT.onDeliver();
     save();
   }
   function stripPrice(k) { return WOOD_STRIP_PRICE[k] || null; }
-  function card() { return open() ? { icon: "🪚", title: "Майстерня", sub: `виробів віддано: ${S.wood.done} · дошка ${S.wood.stage}/4`, btn: S.woodOn ? "Ти тут" : "Перейти", act: "wood" } : null; }
+  function card() { return open() ? { icon: "🪚", title: "Майстерня", sub: `виробів віддано: ${S.wood.done} · дошка ${S.wood.stage}/4${window.CRAFT ? CRAFT.cardSub() : ""}`, btn: S.woodOn ? "Ти тут" : "Перейти", act: "wood" } : null; }
   function tick() { renderButton(); }
   return { ensure, enter, leave, toggle, renderButton, order, onDeliver, stripPrice, card, tick, open };
 })();

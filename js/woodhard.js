@@ -19,8 +19,8 @@ const DRY_MIN = l => (l - 2) * 10, WORM_EVERY_H = [3, 6], WORM_SPREAD_H = 6, WOR
 window.WH = (() => {
   const now = () => window.DVORYK_NOW || Date.now();
   const busyUI = () => $("modal").classList.contains("show") || $("dialog").classList.contains("show");
-  const woody = it => !!(it && !it.g && CHAINS[it.c] && CHAINS[it.c].woody);
-  const woodGen = it => !!(it && it.g && GENS[it.g] && CHAINS[GENS[it.g].chain] && CHAINS[GENS[it.g].chain].woody);
+  const woody = it => !!(it && !it.g && CHAINS[it.c] && CHAINS[it.c].timber);   // лише деревина
+  const woodGen = it => !!(it && it.g && GENS[it.g] && CHAINS[GENS[it.g].chain] && CHAINS[GENS[it.g].chain].timber);
   const wboard = () => (S.woodOn ? S.board : S.wood && S.wood.board);
   const hm = ms => { const t = Math.max(1, Math.ceil(ms / 6e4)); return t >= 60 ? Math.floor(t / 60) + " год " + (t % 60) + " хв" : t + " хв"; };
   function hint(flag, lines) {
