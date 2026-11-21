@@ -1079,3 +1079,28 @@ body.farm .sell.sharp-b { background: linear-gradient(#d6dde6, #9eaabb 55%, #879
 .gd-lock { display: flex; align-items: center; gap: 8px; opacity: .7; font-size: 14px; }
 .gd-lock small { margin-left: auto; font-size: 12px; opacity: .8; text-align: right; }
 .pf-btns { flex-wrap: wrap; }
+
+/* ---------- двір на свій смак ---------- */
+.dc-list { max-height: 44vh; overflow-y: auto; text-align: left; margin: 6px -6px 0; padding: 0 6px; display: flex; flex-direction: column; gap: 5px; -webkit-overflow-scrolling: touch; }
+.dc-row { display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, .65); border-radius: 12px; padding: 6px 8px; }
+.dc-ic { width: 34px; flex: none; text-align: center; font-size: 26px; font-family: var(--emoji); }
+.dc-ic .e3d { width: 32px; height: 32px; }
+.dc-t { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.dc-t small { opacity: .75; }
+.dc-row .s-btn { flex: none; padding: 6px 9px; font-size: 13px; }
+.dc-here { text-align: left; margin: 4px 0 2px; }
+.dc-here > div { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
+.dc-placed { position: relative; width: 40px; height: 40px; border-radius: 10px; border: 0; background: rgba(255, 255, 255, .8); font-size: 22px; font-family: var(--emoji); }
+.dc-placed .e3d { width: 28px; height: 28px; }
+.dc-placed i { position: absolute; right: -3px; top: -4px; font-style: normal; font-size: 10px; background: #c0533a; color: #fff; border-radius: 50%; width: 15px; height: 15px; line-height: 15px; }
+body.dc-placing #scene { outline: 3px dashed #f2b33d; outline-offset: -6px; cursor: crosshair; }
+/* ---------- ярмарок ---------- */
+.fr-list { display: flex; flex-direction: column; gap: 6px; text-align: left; margin-top: 6px; }
+.fr-row { display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, .65); border-radius: 12px; padding: 6px 8px; flex-wrap: wrap; }
+.fr-row.done { opacity: .6; }
+.fr-t { flex: 1; min-width: 120px; display: flex; flex-direction: column; }
+.fr-t small { opacity: .8; }
+.fr-b { display: flex; gap: 5px; margin-left: auto; }
+.fr-b .s-btn { padding: 6px 9px; font-size: 13px; }
+.fr-ok { color: #3f8a1c; font-weight: 700; }
+.fr-gone { color: #a2552f; }

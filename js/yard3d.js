@@ -532,6 +532,17 @@ async function render(chIndex, ch, list, animate) {
   }
   req(3);
 }
+/* тап по екрану → точка на землі дворика у відсотках сцени (для власних прикрас) */
+const ray = new THREE.Raycaster(), groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+function pick(cx, cy) {
+  if (!renderer || indoorNow) return null;
+  const r = renderer.domElement.getBoundingClientRect();
+  ray.setFromCamera(new THREE.Vector2(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1), camera);
+  const p = new THREE.Vector3();
+  if (!ray.ray.intersectPlane(groundPlane, p)) return null;
+  if (Math.hypot(p.x, p.z) > R - 0.5) return null;
+  return { x: p.x / (R * 0.95) * 50 + 50, y: (p.z + R) / (2 * R) * 66 + 26 };
+}
 /* знімок дворика для фотоальбому: небо-градієнт + 3D-сцена, JPEG */
 function snapshot(sky1, sky2, w = 480) {
   if (!renderer || !host) return null;
@@ -563,6 +574,6 @@ function mount(el) {
 try {
   const test = document.createElement("canvas");
   if (!(test.getContext("webgl2") || test.getContext("webgl"))) throw new Error("no webgl");
-  window.Yard3D = { mount, render, setActive, snapshot };
+  window.Yard3D = { mount, render, setActive, snapshot, pick };
   window.dispatchEvent(new Event("yard3d-ready"));
 } catch (e) { /* без WebGL лишається звичайна 2D-сцена */ }

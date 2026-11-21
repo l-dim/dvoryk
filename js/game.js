@@ -212,6 +212,7 @@ function produce(i) {
   if (window.HARD && HARD.broken(gIt)) { HARD.repairModal(i); return; }
   if (window.WH && !WH.canTap(i)) return;
   if (window.CRAFT && !CRAFT.canTap(i)) return;
+  if (window.FARM2 && !FARM2.canTap(i)) return;
   if (emptyNear(i) < 0) { sfx.nope(); toast("Немає місця 🙈 Об'єднай або продай щось"); return; }
   // сила ×2: 2 ⚡ і 2 заряди — зате предмет одразу на рівень вищий
   const x2 = window.XTRA && XTRA.boosted() && S.energy >= 2;
@@ -231,6 +232,8 @@ function produce(i) {
   }
   if (x2) item.l = Math.min(CHAINS[item.c].items.length - 1, item.l + 1);
   if (window.WH) item = WH.afterTap(gIt, item);
+  if (window.FARM2) item = FARM2.afterTap(gIt, item, i);
+  if (!item) { sfx.nope(); bounce(i); renderBoard(); renderTop(); renderInfo(); save(); return; }   // квітка зів'яла на спеці
   const at = placeItem(item, i);
   if (at >= 0) spawnFrom.set(at, i);
   window.QUEST && QUEST.track("tap");
@@ -292,6 +295,7 @@ function handleDrop(a, b) {
   if (A.lock || (B && B.lock)) { renderBoard(); return; }   // павутиння не рухається
   if (typeof cellOpen === "function" && !cellOpen(b)) { renderBoard(); return; }   // закрита клітинка
   if (window.CRAFT && CRAFT.feed(a, b)) return;
+  if (window.FARM2 && FARM2.drop(a, b)) return;
   if (MECH.canMergeGens(A, B)) { MECH.mergeGens(a, b); renderBoard(); renderOrders(); renderInfo(); save(); return; }
   if (B && !A.g && !B.g && A.c === B.c && A.l === B.l && window.WH && (!WH.usable(A) || !WH.usable(B))) {
     sfx.nope(); toast(A.worm || B.worm ? "🐛 Там шашіль — спершу виведи його" : A.untested || B.untested || A.short || B.short ? "❔ Спершу перевір виріб — тапни на нього" : "💧 Клей ще сохне — зачекай трохи"); renderBoard(); return;
@@ -739,7 +743,7 @@ function renderInfo() {
     const lv = MECH.gl(it) > 1 ? ` <span class="lvl-tag">рів. ${MECH.gl(it)}</span>` : "";
     text = MECH.resting(it)
       ? `<b>${GENS[it.g].name}</b>${lv}<small>💤 Відпочиває ще ${Math.ceil((it.rest - Date.now()) / 60e3)} хв</small>`
-      : `<b>${GENS[it.g].name}</b>${lv}<small>Заряд ${it.ch}/${MECH.cap(it)}${window.HARD ? HARD.genInfo(it) : ""}${window.WH ? WH.genInfo(it) : ""}${window.CRAFT ? CRAFT.genInfo(it) : ""} · тапай, щоб отримати ${ch.items[0][0]} (−1 ⚡)</small>`;
+      : `<b>${GENS[it.g].name}</b>${lv}<small>Заряд ${it.ch}/${MECH.cap(it)}${window.HARD ? HARD.genInfo(it) : ""}${window.WH ? WH.genInfo(it) : ""}${window.CRAFT ? CRAFT.genInfo(it) : ""}${window.FARM2 ? FARM2.genInfo(it) : ""} · тапай, щоб отримати ${ch.items[0][0]} (−1 ⚡)</small>`;
   } else if (it.c === "dish") {
     text = `<b>${itemName(it)}</b><small>Страву просять сусіди за ⭐⭐</small>`;
     btn = `<button class="sell${window.ECON && !ECON.canSell() ? " dim" : ""}" id="sellBtn"><small>продати${window.ECON && ECON.sellNote() ? " " + ECON.sellNote() : ""}</small><span>+${sellPrice(it)}🪙</span></button>`;
@@ -855,6 +859,7 @@ function renderStory(animateLast) {
   if (window.Yard3D) {
     // котик у светрику, якщо йому видали светрик і зараз зима
     if (winterLook("cat", ch)) all.forEach(d => { if (d.e === "🐱") { d.catPic = "cat-winter"; d.key += "-w"; } });
+    if (window.DECOR) all.push(...DECOR.yard(ch));                // прикраси, які поставила сама
     if (window.HERO) all.push(...HERO.yard(ch, all));          // героїня — попереду, сусіди стають довкола
     all.push(...yardPeople(ch, all));
     if (window.QUEST && !ch.loc) all.push(...QUEST.yardGifts(ch, all));
@@ -1432,6 +1437,7 @@ function init() {
     if (window.WH) WH.tick();
     if (window.CRAFT) CRAFT.tick();
     if (window.GUIDE) GUIDE.tick();
+    if (window.FARM2) FARM2.tick();
     if (window.CONTEST) CONTEST.tick();
     if (window.TOLOKA) TOLOKA.tick();
     if (window.MAIL) MAIL.tick();

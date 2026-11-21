@@ -88,6 +88,7 @@ window.HUB = (() => {
     if (window.SEAS && SEAS.card()) out.unshift(SEAS.card());
     if (window.WOOD && WOOD.card()) out.unshift(WOOD.card());
     if (window.LOVE && LOVE.card()) out.unshift(LOVE.card());
+    (window.HUB_EXTRA || []).forEach(f => { const c = f(); if (c) (c.locked ? out.push(c) : out.unshift(c)); });
     // толока
     if (on("toloka")) { const c = TOLOKA.card(); out.push(c); }
     else out.push(lock("🥄", "Толока вихідного дня", "toloka"));
@@ -149,6 +150,7 @@ window.HUB = (() => {
     else if (a === "fashion") FASH.panel();
     else if (a === "look") LOOK.panel();
     else if (a === "medals") MEDAL.panel();
+    else if (window.HUB_ACTS && HUB_ACTS[a]) HUB_ACTS[a]();
   }
   function renderDot() {
     const d = $("navHubDot"); if (!d || !S) return;
