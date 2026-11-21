@@ -226,6 +226,7 @@ function produce(i) {
   if (at >= 0) spawnFrom.set(at, i);
   window.QUEST && QUEST.track("tap");
   window.RARE && RARE.onTap(i);
+  window.SEAS && SEAS.onTap(i);
   sfx.pop();
   bounce(i);
   if (S.tut === 0) setTut(1);
@@ -341,6 +342,8 @@ function newOrder() {
   if (evo) return evo;
   const spo = MECH.specialOrder();
   if (spo) return spo;
+  const so = window.SEAS && SEAS.order();
+  if (so) return window.TP ? TP.stamp(so) : so;
   const busy = S.orders.map(o => o.ch);
   const catBox = window.UNL && UNL.on("cat");   // котик на скрині замовляє окремо
   const healthy = Object.keys(CHARS).filter(c => (CHARS[c].from || 0) <= S.chapter && !(window.WD && WD.isSick(c)) && !(catBox && c === "cat"));
@@ -627,7 +630,7 @@ function renderOrders() {
     const ch = CHARS[o.ch];
     const el = document.createElement("div");
     const pic = FARM && PORTRAITS.includes(ch.key);
-    el.className = "order" + (ready ? " ready" : "") + (pic ? " pic" : "") + (o.ev ? " ev" : "") + (o.paw ? " paw" : "") + (o.rare ? " rare" : "") + (o.urgent ? " urgent" : "") + (o.dish ? " dish" : "");
+    el.className = "order" + (ready ? " ready" : "") + (pic ? " pic" : "") + (o.ev ? " ev" : "") + (o.paw ? " paw" : "") + (o.rare ? " rare" : "") + (o.seas ? " seas" : "") + (o.urgent ? " urgent" : "") + (o.dish ? " dish" : "");
     el.dataset.id = o.id;
     const itemsHtml = `<div class="o-items">${o.items.map((it, k) => `<span class="o-item${found[k] >= 0 ? " have" : ""}">${itemIcon(it)}</span>`).join("")}</div>`;
     el.innerHTML = (pic
@@ -1378,6 +1381,7 @@ function init() {
     if (window.RARE) RARE.tick();
     if (window.HARD) HARD.tick();
     if (window.TP) TP.tick();
+    if (window.SEAS) SEAS.tick();
     if (window.CONTEST) CONTEST.tick();
     if (window.TOLOKA) TOLOKA.tick();
     if (window.MAIL) MAIL.tick();

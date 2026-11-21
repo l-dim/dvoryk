@@ -54,6 +54,13 @@ window.RARE = (() => {
     const best = Object.keys(S.collection).filter(k => k.startsWith("rare:")).map(k => +k.split(":")[1]);
     const top = best.length ? Math.max(...best) : 0;
     const l = Math.min(5, Math.max(1, Math.min(top + 1, 1 + rnd(3) + (S.level >= 15 ? 1 : 0))));
+    // пара: два РІЗНІ скарби одночасно, чекає 5 діб, платить ще щедріше
+    if (top >= 2 && Math.random() < 0.45) {
+      let l2 = Math.max(1, Math.min(5, l + (Math.random() < 0.5 ? -1 : 1))); if (l2 === l) l2 = l > 1 ? l - 1 : l + 1;
+      const v = CHAINS.rare.vals[l] + CHAINS.rare.vals[l2];
+      return { id: ++S.orderSeq, ch: "collector", items: [{ c: "rare", l }, { c: "rare", l: l2 }], coins: Math.round(v * 3.6), xp: 60 + (l + l2) * 15,
+        stars: 4 + l + l2, rare: true, pair: true, line: rnd(3), until: now() + 5 * 24 * 3600e3, rchest: 2 };
+    }
     const v = CHAINS.rare.vals[l];
     return { id: ++S.orderSeq, ch: "collector", items: [{ c: "rare", l }], coins: Math.round(v * 3), xp: 30 + l * 15,
       stars: 2 + l, rare: true, line: rnd(3), until: now() + COLLECTOR.waitH * 3600e3, rchest: l >= 3 ? 2 : 1 };
@@ -65,7 +72,9 @@ window.RARE = (() => {
     if (now() < S.rareNext) return;
     const o = rareOrder(); S.orders.unshift(o); S.rareNext = 0;
     renderOrders(); save();
-    playDialog([["collector", `Добридень! Я — Орест, збираю старовину 🧐 Мені б ${CHAINS.rare.items[o.items[0].l][0]} «${CHAINS.rare.items[o.items[0].l][1]}». Чекатиму три доби — і заплачу щедро!`]]);
+    const want = o.items.map(it => `${CHAINS.rare.items[it.l][0]} «${CHAINS.rare.items[it.l][1]}»`).join(" і ");
+    playDialog([["collector", o.pair ? `Добридень! Цього разу мені потрібна пара для вітрини 🧐 ${want} — разом! Чекатиму п'ять діб і заплачу по-царськи.`
+      : `Добридень! Я — Орест, збираю старовину 🧐 Мені б ${want}. Чекатиму три доби — і заплачу щедро!`]]);
   }
   function onDeliver(o) {
     if (!o.rare) return;
@@ -149,7 +158,7 @@ window.RARE = (() => {
     const got = CHAINS.rare.items.map((x, l) => S.collection["rare:" + l] ? x[0] : "❔").join("");
     const o = S.orders.find(x => x.rare);
     const out = [{ icon: RARE_ICON, title: "Бабусині скарби", sub: `${got} · знахідки з генераторів, два однакові → цінніша`, btn: "", act: "" },
-      { icon: face(CHARS.collector, "mini"), title: "Колекціонер Орест", sub: o ? `чекає ${CHAINS.rare.items[o.items[0].l][0]} ще ${hm(o.until - now())}` : `прийде за ${hm((S.rareNext || now()) - now())}`, btn: "", act: "" }];
+      { icon: face(CHARS.collector, "mini"), title: "Колекціонер Орест", sub: o ? `чекає ${o.items.map(it => CHAINS.rare.items[it.l][0]).join(" + ")} ще ${hm(o.until - now())}` : `прийде за ${hm((S.rareNext || now()) - now())}`, btn: "", act: "" }];
     if (UNL.on("flash")) { const f = fl(); out.unshift({ icon: "⏳", title: "Виклик на час", sub: f ? `${kind(f).text}: ${f.n}/${f.t} · ${hm(f.until - now())}` : `наступний за ${hm((S.flashNext || now()) - now())}`, btn: f ? "Відкрити" : "", act: f ? "flash" : "", ready: !!f }); }
     return out;
   }

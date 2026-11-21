@@ -85,6 +85,7 @@ window.HUB = (() => {
     else out.push(lock("⚡", "Виклик енергії", "ech"));
     if (window.RARE) out.unshift(...RARE.cards());
     if (window.TP && TP.card()) out.unshift(TP.card());
+    if (window.SEAS && SEAS.card()) out.unshift(SEAS.card());
     // толока
     if (on("toloka")) { const c = TOLOKA.card(); out.push(c); }
     else out.push(lock("🥄", "Толока вихідного дня", "toloka"));
