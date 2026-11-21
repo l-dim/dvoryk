@@ -12,7 +12,7 @@
    ============================================================ */
 window.PUA_MAP = window.PUA_MAP || {};
 CHAINS.woodjunk = { name: "Брак", side: true, woody: true, nomerge: true, value: 2, items: [[String.fromCharCode(0xE480), "Кривий брусок"]] };
-PUA_MAP[String.fromCharCode(0xE480)] = { e: "🪃", img: null };   // кривий, як бумеранг 😄
+PUA_MAP[String.fromCharCode(0xE480)] = { e: "🪃", img: "items/woodjunk.webp" };   // кривий, як бумеранг 😄
 const DULL_AT = 60, DULL_JUNK = 0.35, SHARPEN_MIN = 30, SHARPEN_COINS = 120;
 const DRY_MIN = l => (l - 2) * 10, WORM_EVERY_H = [3, 6], WORM_SPREAD_H = 6, WORM_CURE = 90;
 

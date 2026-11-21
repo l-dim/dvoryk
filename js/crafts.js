@@ -14,7 +14,7 @@
      У 25% — коротке замикання 💥: лагодиш, перетягнувши на виріб дріт (перший предмет ланцюжка).
      Стан на предметі: it.untested, it.short
    ============================================================ */
-const CRAFT_ART = [];   // мальовані: додаються сюди, коли буде аркуш (clay-0…, forge-0…, amber-0…, gen-*, shards, inclusion)
+const CRAFT_ART = [...["clay", "forge", "amber", "electro"].flatMap(c => [0, 1, 2, 3, 4, 5, 6].map(l => `${c}-${l}`).concat("gen-" + c)), "shards", "inclusion"];   // усі мальовані
 window.PUA_MAP = window.PUA_MAP || {};
 const CRAFT_LIST = [
   { id: "clay", at: 20, gen: ["🏺", "Гончарний круг"], name: "Кераміка", base: 0xE490,
@@ -161,8 +161,8 @@ window.CRAFT = (() => {
       modal({ title: "Коротке замикання 💥", html: `<div class="big-emoji">${itemIcon(it)}</div><p>«${itemName(it)}» не працює.</p><p class="hint-s">Перетягни на нього <b>${CHAINS.electro.items[0][0]} ${CHAINS.electro.items[0][1].toLowerCase()}</b> — і полагодиш.</p>`, buttons: [{ label: "Добре" }] });
       return;
     }
-    modal({ title: "Перевірити виріб ❔", html: `<div class="big-emoji">${itemIcon(it)}</div><p>«${itemName(it)}» ще не перевірений — віддати чи злити його поки не можна.</p><p class="hint-s">Буває, що замикає (${Math.round(SHORT_P * 100)}%) — тоді знадобиться дріт.</p>`,
-      buttons: [{ label: "Перевірити · 1 ⚡", onClick: () => test(i) }, { label: "Пізніше", cls: "ghost" }] });
+    modal({ title: "Перевірити виріб 🧪", html: `<div class="big-emoji">${itemIcon(it)}</div><p>«${itemName(it)}» — ще не перевірено, тож віддати чи злити поки не можна.</p><p class="hint-s">Буває, що замикає (${Math.round(SHORT_P * 100)}%) — тоді знадобиться дріт.</p>`,
+      buttons: [{ label: "🧪 Перевірити · 1 ⚡", onClick: () => test(i) }, { label: "Пізніше", cls: "ghost" }] });
   }
   function test(i) {
     const it = S.board[i]; if (!it || !it.untested) return;
