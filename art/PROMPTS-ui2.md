@@ -23,3 +23,21 @@ Game UI icon sheet for a cozy mobile farm game, in the same hand-painted cartoon
 art/slice.sh art/src/sheet-ui2.webp 3 4 ui-events ui-spoon ui-medal ui-gold ui-silver ui-bronze ui-mail ui-calendar ui-cabinet ui-look ui-vote ui-album
 ```
 Мапа в UI_ICONS: 🎪 ui-events · 🥄 ui-spoon · 🏅 ui-medal · 🥇 ui-gold · 🥈 ui-silver · 🥉 ui-bronze · ✉️ ui-mail · 📅 ui-calendar · 🗄️ ui-cabinet · 💃 ui-look · 🗳️ ui-vote · 📷 ui-album
+
+---
+
+# Котик на скрині й альбом листівок — аркуш 2×1
+
+Прикріпи аркуш значків вище як зразок стилю (і портрет котика `cat` — щоб це був саме Пиріжок).
+
+```
+Game UI icon sheet for a cozy mobile farm game, in the same hand-painted cartoon art style and warm lighting as the attached image. Glossy, chunky, cute icons with soft painterly shading, a subtle rim light and a thin darker outline, rich saturated warm colors, clean readable silhouettes that still read well at a small size, slight 3/4 front view. Exactly 2 icons side by side in a strict grid of 2 columns by 1 row of equal square cells, each icon centered in its own cell with a generous white margin, both about the same size. Plain solid pure white background, no cell borders, no shadows on the background, no text, no letters, no numbers. Wide image, 2:1.
+1 the same fluffy ginger cat with a little blue bow tie as in the attached cat picture, sitting proudly on top of a closed old wooden treasure chest with iron corners and a golden lock, a few gold coins peeking out from under the lid, the cat looking smug and pleased,
+2 a cozy postcard album: an open little album with a red cloth cover and gold corners, with three colorful picture postcards (a sunflower, a cherry branch, a little village house) fanned out of it and a small red heart sticker on top.
+```
+
+Збережи як `sheet-ui3`. Ріжемо:
+```
+art/slice.sh art/src/sheet-ui3.webp 2 1 ui-catchest ui-postcards
+```
+ui-catchest — картинкою в картці «Котик на скрині» і значку на замовленні котика; ui-postcards — замість 💌 по всій грі.
