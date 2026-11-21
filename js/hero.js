@@ -25,6 +25,7 @@ const HEROES = [
 ];
 const HERO_ART = ["hero1", "hero2", "hero3", "hero4", "hero5", "hero6", "man1", "man2", "man3", "man4", "man5", "man6"];   // намальовані (portraits/<id>-full.webp)
 /* де обличчя на картинці (знайдено Apple Vision): центр x, центр y (% від ширини/висоти), ширина лиця (%), пропорції картинки */
+const HERO_LOOKS = ["hero1", "hero2", "hero3", "hero4", "hero5", "hero6", "man1", "man2", "man3", "man4", "man5", "man6"];   // є зимовий і святковий образи: <id>-winter, <id>-fest
 const HERO_FACE = { hero1: [52.6, 11.0, 30.4, 0.373], hero2: [52.6, 11.3, 30.2, 0.380], hero3: [46.9, 12.4, 29.7, 0.406], hero4: [51.4, 13.5, 28.6, 0.456], hero5: [51.0, 13.4, 29.8, 0.422], hero6: [54.4, 14.0, 27.3, 0.452], man1: [48.8, 12.1, 25.5, 0.466], man2: [47.6, 11.1, 24.3, 0.473], man3: [43.7, 11.5, 27.6, 0.412], man4: [43.1, 11.0, 25.8, 0.450], man5: [41.9, 11.3, 28.7, 0.434], man6: [50.7, 12.9, 26.2, 0.459] };
 
 window.HERO = (() => {
@@ -62,17 +63,41 @@ window.HERO = (() => {
     const c = cur();
     modal({ title: "Моя зовнішність",
       html: sexHtml() + `<p class="hint-s">Так тебе бачитимуть сусіди — у дворику, в аватарці й на конкурсах.</p><div class="hr-grid">${cards(c && c.id)}</div>` +
-        (c ? `<p class="hr-look">${c.look}</p>` : "") +
+        (c ? `<p class="hr-look">${c.look}</p>` : "") + looksHtml() +
         (HERO_ART.length ? "" : `<p class="hint-s">Мальовані героїні скоро з'являться 🎨 Поки — значки.</p>`),
       buttons: [{ label: "Готово", onClick: back }] });
     document.querySelectorAll(".hr-card").forEach(b => b.onclick = () => { set(b.dataset.id); picker(back); });
+    document.querySelectorAll(".hr-lk").forEach(b => b.onclick = () => { S.heroLook = b.dataset.k; save(); sfx.pop(); if (!$("tab-story").hidden) renderStory(); picker(back); });
     document.querySelectorAll(".hr-sex").forEach(b => b.onclick = () => { setSex(b.dataset.s); sfx.pop(); if (!$("tab-story").hidden) renderStory(); picker(back); });
   }
   /* для дворика: героїня стоїть попереду, біля стежки */
-  function yard() {
-    const h = cur(); if (!has(h)) return [];
-    return [{ key: "hero-" + h.id, who: h.id + "-full", hero: true, x: 50, y: 80, s: 10 }];
+  /* який образ зараз: зимовий узимку (зимові розділи або справжні морози), святковий на свята, інакше звичайний.
+     S.heroLook: "auto" (за замовчуванням) або вибраний вручну "day" | "fest" | "winter" */
+  const FEST_RE = /Свято|свята|Весілля|Весільне|Сватання|Коровай|Масляна|Великдень|Галинка|вертеп/;
+  function lookFor(ch) {
+    const m = S.heroLook || "auto";
+    if (m !== "auto") return m;
+    const s = window.WD && WD.season();
+    if (ch && (ch.winter || /Зимов/.test(ch.title))) return "winter";
+    if (ch && FEST_RE.test(ch.title)) return "fest";
+    if (s && s.phase === "winter") return "winter";
+    return "day";
   }
+  const fileOf = (h, look) => h.id + (look === "winter" && HERO_LOOKS.includes(h.id) ? "-winter" : look === "fest" && HERO_LOOKS.includes(h.id) ? "-fest" : "-full");
+  function yard(ch, all = []) {
+    const h = cur(); if (!has(h)) return [];
+    const f = fileOf(h, lookFor(ch));
+    // вільне місце попереду: не заступати наречених, фігури й великі прикраси
+    const taken = all.filter(d => d.y >= 34).map(d => [d.x, d.y, d.pic || d.who ? 12 : d.s || 6]);
+    const spots = [[50, 80], [36, 84], [64, 84], [50, 91], [28, 78], [72, 78], [22, 88], [78, 88], [44, 70], [56, 70]];
+    const [x, y] = spots.find(([sx, sy]) => taken.every(([tx, ty, ts]) => Math.hypot(tx - sx, (ty - sy) * 1.4) > (ts + 10) * 0.75)) || spots[0];
+    return [{ key: "hero-" + f, who: f, hero: true, x, y, s: 10 }];
+  }
+  const LOOK_NAMES = [["auto", "✨ Само"], ["day", "👕 Звичайне"], ["fest", "🌻 Святкове"], ["winter", "❄️ Зимове"]];
+  const looksHtml = () => !has(cur()) || !HERO_LOOKS.includes(cur().id) ? "" :
+    `<p class="hr-lbl">Вбрання в дворику</p><div class="hr-looks">${LOOK_NAMES.map(([k, n]) => `<button class="hr-lk${(S.heroLook || "auto") === k ? " on" : ""}" data-k="${k}">${n}</button>`).join("")}</div>` +
+    `<div class="hr-prev">${["full", "fest", "winter"].map(v => `<img src="portraits/${cur().id}-${v}.webp" alt="">`).join("")}</div>` +
+    `<p class="hint-s">«Само»: узимку — у теплому, на свята — у вишиванці, а в будні — як завжди.</p>`;
   /* стартовий екран */
   const sexHtml = () => `<div class="hr-sexes"><button class="hr-sex${sex() === "f" ? " on" : ""}" data-s="f">👩 Жінка</button><button class="hr-sex${sex() === "m" ? " on" : ""}" data-s="m">👨 Чоловік</button></div>`;
   function startRow() {

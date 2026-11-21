@@ -802,7 +802,7 @@ function renderStory(animateLast) {
   if (window.Yard3D) {
     // котик у светрику, якщо йому видали светрик і зараз зима
     if (winterLook("cat", ch)) all.forEach(d => { if (d.e === "🐱") { d.catPic = "cat-winter"; d.key += "-w"; } });
-    if (window.HERO) all.push(...HERO.yard(ch));          // героїня — попереду, сусіди стають довкола
+    if (window.HERO) all.push(...HERO.yard(ch, all));          // героїня — попереду, сусіди стають довкола
     all.push(...yardPeople(ch, all));
     if (window.QUEST && !ch.loc) all.push(...QUEST.yardGifts(ch, all));
     // справжній 3D-дворик

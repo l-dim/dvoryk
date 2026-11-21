@@ -972,3 +972,10 @@ body.farm .nav .dot { right: 16%; }
 .hr-sex { padding: 7px 14px; border-radius: 14px; font: 900 14px/1 var(--font); color: #6a4520; background: rgba(255, 255, 255, .7); box-shadow: 0 0 0 2px #e3c38a; font-family: var(--font), var(--emoji); }
 .hr-sex.on { background: linear-gradient(#a6ec66, #5bb02a); color: #fff; box-shadow: 0 2px 0 #3d7a14; }
 .hr-sex .e3d { width: 1.2em; height: 1.2em; vertical-align: -3px; }
+.hr-lbl { margin: 10px 0 4px; font-size: 13px; font-weight: 800; }
+.hr-looks { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+.hr-lk { padding: 7px 2px; border-radius: 11px; font: 800 11.5px/1.1 var(--font); color: #6a4520; background: rgba(255, 255, 255, .7); box-shadow: 0 0 0 2px #e3c38a; }
+.hr-lk.on { background: linear-gradient(#a6ec66, #5bb02a); color: #fff; box-shadow: 0 2px 0 #3d7a14; }
+.hr-lk .e3d { width: 1.15em; height: 1.15em; vertical-align: -2px; }
+.hr-prev { display: flex; justify-content: center; align-items: flex-end; gap: 8px; margin: 8px 0 2px; }
+.hr-prev img { height: 92px; width: auto; }
