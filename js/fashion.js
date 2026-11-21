@@ -23,7 +23,7 @@ const FASHION = [
 const FASH_REWARD = { chest: 2, coins: 300, stars: 5, hearts: 3 };
 const FASH_ALL = { chest: 2, coins: 800, stars: 10 };
 const FASH_ART = ["vinok", "kozak", "nedilia", "yarmarok"].flatMap(c => [0, 1, 2, 3, 4, 5, 6, 7].map(i => `fash-${c}-${i}`));   // мальовані речі; фігури в строях — FASH_LOOKS
-const FASH_LOOKS = [];        // які фігури вже намальовані (portraits/<сусід>-<колекція>.webp)
+const FASH_LOOKS = ["olya-vinok", "andriy-kozak", "halya-nedilia", "marichka-yarmarok"];   // намальовані фігури (portraits/<сусід>-<колекція>.webp)
 
 function fashIcon(c, i) { const id = `fash-${c.id}-${i}`; return FASH_ART.includes(id) ? `<img class="e3d pnt" src="items/${id}.webp" alt="">` : c.items[i][0]; }
 
