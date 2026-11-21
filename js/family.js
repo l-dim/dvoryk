@@ -34,6 +34,10 @@ const HOUSE_SLOTS = [
 ];
 const BABY_NAMES = { girl: ["Соломійка", "Марійка", "Даринка", "Злата", "Ганнуся"], boy: ["Остапчик", "Тарасик", "Богданчик", "Матвійко", "Назарчик"] };
 const BABY_EVERY_MIN = [25, 45];
+/* вік: 0 — немовля (2 тижні, лише в колисці), 1 — малюк ~1 рік (до 6 тижнів), 2 — дитина ~4 роки */
+const KID_AGE_D = [14, 42];
+const KID_HELP = [null, { min: [25, 45], up: 0.2, up2: 0 }, { min: [15, 30], up: 0.35, up2: 0.05 }];
+const KID_ART = [];   // portraits/kid-girl-1, kid-girl-2, kid-boy-1, kid-boy-2 — коли буде картинка
 
 window.FAM = (() => {
   const now = () => window.DVORYK_NOW || Date.now();
@@ -153,32 +157,54 @@ window.FAM = (() => {
     ], () => { renderHub(); toast("👶 Малюк з'явиться десь за місяць — а поки готуйте дитячу в «Нашій хаті»!"); });
   }
   function born() {
-    const f = st();
-    const opts = [...BABY_NAMES.girl.slice(0, 3), ...BABY_NAMES.boy.slice(0, 3)];
     modal({ title: "Народився малюк! 👶",
-      html: `<div class="big-emoji">👶</div><p>Усе село прибігло вітати! Як назвемо?</p><div class="fm-names">${opts.map(n => `<button class="s-btn ghost fm-nm" data-n="${n}">${n}</button>`).join("")}</div><input id="fmName" class="fm-in" maxlength="16" placeholder="або своє ім'я…">`,
-      buttons: [{ label: "Так і назвемо 💛", onClick: () => { const v = ($("fmName").value || "").trim(); finishBorn(v || opts[0]); } }] });
+      html: `<div class="big-emoji">👶</div><p>Усе село прибігло вітати! Хто ж у нас?</p>`,
+      buttons: [{ label: "👧 Донечка", onClick: () => setTimeout(() => nameIt("girl"), 50) }, { label: "👦 Синочок", onClick: () => setTimeout(() => nameIt("boy"), 50) }] });
+  }
+  function nameIt(sex) {
+    const opts = BABY_NAMES[sex];
+    modal({ title: sex === "girl" ? "Донечка! 👧" : "Синочок! 👦",
+      html: `<div class="big-emoji">👶</div><p>Як назвемо?</p><div class="fm-names">${opts.map(n => `<button class="s-btn ghost fm-nm" data-n="${n}">${n}</button>`).join("")}</div><input id="fmName" class="fm-in" maxlength="16" placeholder="або своє ім'я…">`,
+      buttons: [{ label: "Так і назвемо 💛", onClick: () => { const v = ($("fmName").value || "").trim(); finishBorn(v || opts[0], sex); } }] });
     document.querySelectorAll(".fm-nm").forEach(b => b.onclick = () => { $("fmName").value = b.dataset.n; });
   }
-  function finishBorn(name) {
-    const f = st(); f.st = 4; f.baby = { name, born: now() }; f.babyNext = now() + 20 * 60e3; save();
+  function finishBorn(name, sex) {
+    const f = st(); f.st = 4; f.baby = { name, sex, born: now(), age: 0 }; save();
     S.energy += 30; confetti(); sfx.level(); renderAll();
     playDialog([
       ["ivan", `Вітаю! ${name} — найгарніше ім'я в селі! 🍼`],
-      [who(), `Дивись, ${name} вже тягнеться до тріски 😄 Справжній майстер росте! Будемо ${Q("брати", "брати")} в майстерню — хай допомагає.`]
-    ], () => toast(`👶 ${name} іноді приноситиме тріски в майстерню. А в хаті відкрилась дитяча!`));
+      [who(), `${sex === "girl" ? "Яка вона крихітна" : "Який він крихітний"}… 🥹 Підросте — буде в майстерні помагати, побачиш! А поки — колиска й колискові 💛`]
+    ], () => toast(`👶 ${name} підростатиме: за 2 тижні почне повзати й носити тріски в майстерню`));
   }
   /* малюк «допомагає»: приносить тріску на дошку майстерні */
   function babyHelp() {
-    const f = st(), b = wboard(); if (!b || !S.woodOn) return;            // допомагає, коли ти в майстерні
+    const f = st(), b = wboard(), h = KID_HELP[age()]; if (!b || !S.woodOn || !h) return;      // допомагає, коли ти в майстерні й уже не немовля
     const free = b.map((x, i) => (!x && (typeof cellOpen !== "function" || cellOpen(i)) ? i : -1)).filter(i => i >= 0);
-    f.babyNext = now() + (BABY_EVERY_MIN[0] + Math.random() * (BABY_EVERY_MIN[1] - BABY_EVERY_MIN[0])) * 60e3;
+    f.babyNext = now() + (h.min[0] + Math.random() * (h.min[1] - h.min[0])) * 60e3;
     if (!free.length) { save(); return; }
-    const near = b.findIndex(x => x && x.g === "w_wood"), j = placeItem({ c: "wood", l: Math.random() < 0.2 ? 1 : 0 }, near >= 0 ? near : undefined);
+    const r = Math.random(), lv = r < h.up2 ? 2 : r < h.up ? 1 : 0;
+    const near = b.findIndex(x => x && x.g === "w_wood"), j = placeItem({ c: "wood", l: lv }, near >= 0 ? near : undefined);
     if (j >= 0) { popIdx.add(j); sparkle(j, "👶", 5); } renderBoard();
     save();
-    toast(`👶 ${f.baby.name} приносить тріску! 🪵`);
+    toast(`${kidIcon()} ${f.baby.name} приносить ${lv === 2 ? "дошки! 🪜" : lv === 1 ? "брусок! 🟫" : "тріску! 🪵"}`);
   }
+  /* вік малюка й підростання */
+  function age() { const k = S.fam && S.fam.baby; if (!k) return -1; const d = (now() - k.born) / 864e5; return d < KID_AGE_D[0] ? 0 : d < KID_AGE_D[1] ? 1 : 2; }
+  const kidSex = () => { const k = S.fam.baby; return k.sex || (BABY_NAMES.boy.includes(k.name) ? "boy" : "girl"); };
+  const kidIcon = () => age() <= 0 ? "👶" : kidSex() === "girl" ? "👧" : "👦";
+  const AGE_NAMES = ["немовля", "повзає й лепече", "бігає й помагає"];
+  function grow() {
+    const k = S.fam.baby, a = age(); if (k.age === a) return false;
+    const was = k.age || 0; k.age = a; f0next(); save();
+    if (a > was) {
+      const lines = a === 1 ? [[who(), `{name}, дивись! ${k.name} вже повзає — і тягне в рот кожну стружку 😄 Візьмімо в майстерню — хай подає тріски.`], ["halya", "Ой, як швидко ростуть! Ще вчора в колисці лежало 🥹"]]
+        : [[who(), `${k.name} сьогодні ${kidSex() === "girl" ? "сама принесла" : "сам приніс"} цілий оберемок трісок! І навіть брусок 🪵 Справжній помічник!`], ["stepan", "Майстер росте! Скоро й рубанок тримати навчиться 👏"]];
+      playDialog(lines, () => { renderAll(); toast(`${kidIcon()} ${k.name} — ${AGE_NAMES[a]}`); });
+      return true;
+    }
+    return false;
+  }
+  function f0next() { const f = S.fam, h = KID_HELP[age()]; if (h && (!f.babyNext || f.babyNext < now())) f.babyNext = now() + h.min[0] * 60e3; }
 
   /* ---------- дворик ---------- */
   function yard(ch) {
@@ -188,7 +214,11 @@ window.FAM = (() => {
       { key: "wd-arch", e: "💒", x: 50, y: 62, s: 12 }, { key: "wd-table", e: "🍽️", x: 30, y: 60, s: 11 },
       { key: "wd-ball1", e: "🎈", x: 18, y: 40, s: 6 }, { key: "wd-ball2", e: "🎈", x: 82, y: 40, s: 6 },
       { key: "wd-notes", e: "🎶", x: 66, y: 30, s: 5 }, { key: "wd-hearts", e: "💕", x: 40, y: 30, s: 5 }, { key: "wd-cake", e: "🎂", x: 30, y: 54, s: 5 });
-    if (f.baby) out.push({ key: "baby", e: "👶", x: 58, y: 90, s: 5 });
+    if (f.baby) {
+      const a = age(), id = `kid-${kidSex()}-${a}`;
+      if (a > 0 && KID_ART.includes(id)) out.push({ key: "kid-" + id, who: id, x: 58, y: 90, s: a === 1 ? 3.5 : 5 });
+      else out.push({ key: "kid-" + a, e: a === 0 ? "👶" : kidSex() === "girl" ? "👧" : "👦", x: 58, y: 90, s: a === 0 ? 5 : 6 });
+    }
     return out;
   }
 
@@ -202,7 +232,8 @@ window.FAM = (() => {
     if (f.st === 3) { const wk = Math.floor((now() - (f.babyAt - BABY_WAIT_H * 3600e3)) / (7 * 864e5)), v = BABY_VISITS[wk - 1];
       if (wk >= 1 && v && (f.visits || 0) < wk) { f.visits = wk; S.energy += v[2]; S.coins += v[3]; save(); renderTop();
         playDialog([[v[0], `{name}, ${v[1]}`]], () => toast(`🎁 Гостинець для малюка: +${v[2]} ⚡ +${v[3]} 🪙`)); return; } }
-    if (f.st === 4 && f.baby && now() >= (f.babyNext || 0)) babyHelp();
+    if (f.st === 4 && f.baby && grow()) return;
+    if (f.st === 4 && f.baby && f.babyNext && now() >= f.babyNext) babyHelp();
     if (wedding() !== lastWed) { lastWed = wedding(); if (typeof renderStory === "function") renderStory(); }
   }
   let lastWed = null;
@@ -213,7 +244,7 @@ window.FAM = (() => {
     const n = filled(), gift = n > 0 && f.giftDay !== new Date(now()).toDateString();
     const left = f.babyAt - now(), dd = Math.ceil(left / 864e5);
     const sub = f.st === 3 ? `чекаємо малюка 👶 ще ${left > 2 * 864e5 ? dd + " дн." : Math.max(1, Math.ceil(left / 3600e3)) + " год"} · готуй дитячу · затишок ${n}` :
-      f.st === 4 ? `${f.baby.name} підростає 👶 · затишок ${n}${gift ? " · є гостинець!" : ""}` :
+      f.st === 4 ? `${kidIcon()} ${f.baby.name} — ${AGE_NAMES[Math.max(0, age())]}${age() === 0 ? ` (ще ${Math.ceil((f.baby.born + KID_AGE_D[0] * 864e5 - now()) / 864e5)} дн.)` : ""} · затишок ${n}${gift ? " · є гостинець!" : ""}` :
       `затишок ${n} з ${HOUSE_SLOTS.length - 4}${gift ? " · є гостинець!" : ""}${wedding() ? " · весільні дні 💒" : ""}`;
     return { icon: "🏡", title: "Наша хата", sub, btn: "Відкрити", act: "fam-house", ready: gift };
   }
@@ -226,5 +257,5 @@ window.HUB_ACTS = Object.assign(window.HUB_ACTS || {}, { "fam-prep": () => FAM.p
 if (typeof GUIDE_WOOD !== "undefined") GUIDE_WOOD.push(
   ["💍", "Сватання й весілля", "Коли майстерня розкрутиться (12 виробів, 13 рівень), прийдуть старости. Для весілля збери букет, торт, тістечка, солодощі й скриню з майстерні — список у «Подіях».", w => S.fam && S.fam.st >= 1],
   ["🏡", "Наша хата", "Після весілля обставляй хату виробами: світлиця, кухня, сіни, скарби, а згодом і дитяча. Кожна річ — +1 ⭐ і більший затишок; щодня в хаті чекає гостинець — монети й енергія.", w => S.fam && S.fam.st >= 2],
-  ["👶", "Малюк", "Через 2 тижні після весілля, коли в хаті стоятиме 10 речей, — новина про малюка; ще місяць чекання (сусіди щотижня навідуються з гостинцями, а дитячу можна готувати заздалегідь). Коли ти в майстерні, малюк раз на пів години-годину приносить тріску (іноді й брусок). Справжній помічник росте!", w => S.fam && S.fam.st >= 4]
+  ["👶", "Малюк", "Через 2 тижні після весілля, коли в хаті стоятиме 10 речей, — новина про малюка; ще місяць чекання (сусіди щотижня навідуються з гостинцями, а дитячу можна готувати заздалегідь). Малюк підростає: перші 2 тижні лише в колисці; потім повзає й раз на пів години-годину приносить у майстерню тріску; а з 6 тижнів бігає — приносить частіше, іноді брусок чи дошки. Помагає, коли ти в майстерні.", w => S.fam && S.fam.st >= 4]
 );
