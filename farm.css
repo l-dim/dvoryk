@@ -1011,8 +1011,8 @@ body.farm .order.pic .o-items { min-width: 34px; }
 .hub-ic .face.mini { width: 42px; height: 42px; }
 
 /* ---------- Закриті клітинки, зламані генератори, черстві продукти ---------- */
-.cell.shut { background: repeating-linear-gradient(45deg, #8a5a2c 0 7px, #7a4d24 7px 14px) !important; box-shadow: inset 0 2px 4px rgba(0, 0, 0, .35) !important; opacity: .55; cursor: pointer; }
-.cell.shut-next { opacity: .85; outline: 2px dashed rgba(255, 230, 160, .8); outline-offset: -3px; }
+.cell.shut { background: url("items/cell-weeds.webp") center / 108% 108% no-repeat, #6a8a3a !important; box-shadow: inset 0 0 0 1px rgba(60, 40, 10, .35) !important; filter: brightness(.62) saturate(.8); cursor: pointer; }
+.cell.shut-next { filter: none; outline: 2px dashed rgba(255, 236, 170, .95); outline-offset: -3px; }
 .shut-lbl { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; font-size: 18px; font-family: var(--emoji); line-height: 1; }
 .shut-lbl .e3d { width: 1.1em; height: 1.1em; }
 .shut-lbl small { font: 900 11px/1 var(--font); color: #fff3d0; text-shadow: 0 1px 1px rgba(0, 0, 0, .6); margin-top: 2px; font-family: var(--font), var(--emoji); }

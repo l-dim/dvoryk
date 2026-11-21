@@ -120,7 +120,7 @@ window.HARD = (() => {
   const stale = it => on("spoil") && perish(it) && !!it.old;
   function freshInfo(it) {
     if (!on("spoil") || !perish(it)) return "";
-    if (it.old) return " · 🥀 зачерствіло — коштує вдвічі менше";
+    if (it.old) return " · 🍞‍🥀 зачерствіло — коштує вдвічі менше";
     const h = Math.max(1, Math.ceil((SPOIL_MS - (now() - (it.t || now()))) / 36e5));
     return ` · свіже ще ${h} год`;
   }
@@ -130,7 +130,7 @@ window.HARD = (() => {
     lastSpoil = Date.now();
     let ch = false;
     S.board.forEach((it, i) => { if (perish(it) && !it.old && it.t && now() - it.t >= SPOIL_MS) { it.old = 1; ch = true; popIdx.add(i); } });
-    if (ch) { renderBoard(); renderInfo(); save(); toast("🥀 Частина продуктів на дошці зачерствіла — віддай чи продай свіжими!"); }
+    if (ch) { renderBoard(); renderInfo(); save(); toast("🍞‍🥀 Частина продуктів на дошці зачерствіла — віддай чи продай свіжими!"); }
   }
   /* скільки монет зняти з замовлення за зачерствілі предмети */
   function stalePenalty(idx) {

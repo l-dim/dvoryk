@@ -1166,7 +1166,7 @@ const UI_ICONS = { "⭐": "ui-star", "⚙️": "ui-gear", "🏡": "ui-home", "�
   "🎪": "ui-events", "🥄": "ui-spoon", "🏅": "ui-medal", "🥇": "ui-gold", "🥈": "ui-silver", "🥉": "ui-bronze",
   "✉️": "ui-mail", "📅": "ui-calendar", "🗄️": "ui-cabinet", "💃": "ui-look", "🗳️": "ui-vote", "📷": "ui-album", "💌": "ui-postcards",
   "📋": "ui-quests", "📥": "ui-inbox", "⏰": "ui-timer", "💤": "ui-sleep", "🗺️": "ui-map", "🐾": "ui-paw",
-  "💛": "ui-friend", "🗓️": "ui-week", "🔄": "ui-swap", "❔": "ui-unknown", "💗": "ui-heart", "🎡": "ui-wheel" };
+  "💛": "ui-friend", "🗓️": "ui-week", "🔄": "ui-swap", "❔": "ui-unknown", "💗": "ui-heart", "🎡": "ui-wheel", "🔧": "ui-repair", "⏳": "ui-hourglass", "🍞‍🥀": "ui-stale" };
 
 
 /* ============================================================
