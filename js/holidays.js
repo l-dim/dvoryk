@@ -6,7 +6,11 @@
    Рухомі свята (Масляна, Великдень, Зелені свята) рахуються від православної пасхалії.
    Стан: S.ev — поточне свято (як і раніше); S.evDone — id уже завершених.
    ============================================================ */
-const HOL_ART = [];   // мальовані: hol-<key>-<l>, gen-hol-<key> — коли буде аркуш
+const HOL_KEYS = ["rizdvo", "maslyana", "velykden", "triytsia", "kupala", "spas", "nezalezhnist", "pokrova"];
+const HOL_ART = HOL_KEYS.flatMap(k => [0, 1, 2, 3, 4, 5].map(l => `hol-${k}-${l}`).concat("gen-hol-" + k, "yard-" + k));   // аркуші H1–H4
+/* де в дворику стоїть велика мальована прикраса свята: x, y, розмір */
+const HOL_YARD = { rizdvo: [22, 58, 17], maslyana: [26, 62, 17], velykden: [22, 58, 17], triytsia: [24, 62, 17],
+  kupala: [50, 60, 17], spas: [24, 62, 16], nezalezhnist: [24, 60, 17], pokrova: [24, 60, 16] };
 const HOL_MS = [
   { pts: 10, reward: { energy: 10 } }, { pts: 25, reward: { chest: 0 } }, { pts: 45, reward: { coins: 200 } },
   { pts: 70, reward: { chest: 1, stars: 2 }, story: "mid" }, { pts: 100, reward: { energy: 25, coins: 300 } },
@@ -113,6 +117,14 @@ HOLIDAYS.forEach((h, k) => {
   const g = String.fromCharCode(0xE6A0 + k);
   PUA_MAP[g] = { e: h.gen[0], img: art("gen-hol-" + h.key) };
   GENS[chain] = { icon: g, name: h.gen[1], chain, holiday: true };
+  /* велика прикраса двору: мальована фігура замість емодзі поруч */
+  const at = HOL_YARD[h.key], yimg = art("yard-" + h.key);
+  if (at && yimg) {
+    const yc = String.fromCharCode(0xE6B0 + k);
+    PUA_MAP[yc] = { e: h.deco[0][0], img: yimg };
+    window.PAINTED[yc.codePointAt(0).toString(16)] = yimg;
+    h.deco = [[yc, ...at]].concat(h.deco.filter(d => Math.abs(d[1] - at[0]) > 15 || d[3] < 6));
+  }
   Object.assign(h, { chain, gen: chain, genName: h.gen[1], milestones: HOL_MS });
 });
 if (GENS.mykolai) GENS.mykolai.holiday = true;
