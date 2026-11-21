@@ -21,7 +21,7 @@ Collectible postcard sheet for a cozy mobile farm game, in the same hand-painted
 9 a lit candle in a clay candlestick on a windowsill at dusk,
 10 an old plush teddy bear sitting on a bench,
 11 a framed painting of a village house on a whitewashed wall,
-12 a puffy feather bed with embroidered pillows piled high (perynа).
+12 a puffy feather bed with embroidered pillows piled high (peryna).
 ```
 
 ## sheet-pc2 — Природа · Ремесла
