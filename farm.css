@@ -1054,3 +1054,11 @@ body.on-board .menu-btn { display: block; }
 .wood-btn.on { background: linear-gradient(#bfe98d, #79bf3c) !important; }
 .order.woody { border-color: #b9824a !important; background: linear-gradient(#fbf0dc, #ecd2a6) !important; }
 body.wood-mode .board { background: repeating-linear-gradient(90deg, #8a5a2c 0 26px, #7d5026 26px 28px, #96643a 28px 50px, #744a22 50px 52px) !important; }
+/* ---------- Майстерня: сохне, шашіль, тупий інструмент ---------- */
+.tile.wet > .e3d:first-child, .tile.wet > img:first-child { filter: saturate(.6) brightness(.95) drop-shadow(0 0 3px rgba(80, 160, 230, .8)); }
+.wet-t { position: absolute; right: 0; bottom: 0; z-index: 3; font: 900 10px/14px var(--font); color: #fff; background: #4a9ad8; border-radius: 7px; padding: 0 3px; font-family: var(--font), var(--emoji); }
+.wet-t .e3d { width: 1em; height: 1em; }
+.worm-b { position: absolute; left: -2px; top: -4px; z-index: 4; font-size: 20px; font-family: var(--emoji); animation: wiggle 1.2s ease-in-out infinite; }
+.worm-b .e3d { width: 1.1em; height: 1.1em; }
+.tile.worm > .e3d:first-child, .tile.worm > img:first-child { filter: sepia(.6) brightness(.85); }
+body.farm .sell.sharp-b { background: linear-gradient(#d6dde6, #9eaabb 55%, #8794a6); border-color: #5d6878; box-shadow: 0 3px 0 #4a5462; }

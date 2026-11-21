@@ -173,7 +173,8 @@ window.WOOD = (() => {
     for (let n = 0; n < count; n++) { const c = pick(chains), len = CHAINS[c].items.length; items.push({ c, l: Math.min(len - 1, 1 + rnd(cap)) }); }
     let coins = 0, xp = 0, top = 0;
     items.forEach(it => { coins += Math.round(itemValue(it.c, it.l) * 1.1); xp += (it.l + 1) * 3; top = Math.max(top, it.l); });
-    return { id: ++S.orderSeq, ch, items, coins, xp, stars: top >= 4 ? 2 : 1, wood: true, line: rnd(3), born: Date.now() };
+    const o = { id: ++S.orderSeq, ch, items, coins, xp, stars: top >= 4 ? 2 : 1, wood: true, line: rnd(3), born: Date.now() };
+    return window.WH ? WH.maybeSet(o) : o;
   }
   function onDeliver(o) {
     if (!o.wood) return;
