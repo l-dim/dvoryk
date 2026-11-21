@@ -48,7 +48,7 @@ const INGS = [
   ["peas", "Зелений горошок", "🫛", "veg", 2], ["salo", "Сало", "🥓", "veg", 3], ["pepper", "Солодкий перець", "🫑", "veg", 2]
 ].map(([id, name, e, cat, r]) => ({ id, name, e, cat, r, v: [0, 8, 14, 22][r] }));
 const ING = Object.fromEntries(INGS.map(x => [x.id, x]));
-const ING_ART = [];                       // мальовані: додаються сюди, коли буде картинка items/ing-<id>.webp
+const ING_ART = INGS.map(x => x.id);      // усі 60 мальовані: items/ing-<id>.webp
 /* звідки беруться: ланцюжок замовлення → групи інгредієнтів */
 const ING_FROM = { veg: ["veg"], bake: ["grain"], fruit: ["berry"], flower: ["sweet", "berry"], tea: ["sweet", "dairy"], sweet: ["sweet", "nuts"], dairy: ["dairy"] };
 const CT_THEMES = [
