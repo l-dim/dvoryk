@@ -11,10 +11,16 @@
 CHAINS.rare = { name: "Бабусині скарби", rare: true, vals: [15, 35, 80, 180, 400, 900, 2000], items: [
   ["📿", "Коралове намисто"], ["🥄", "Розписна ложка"], ["💍", "Бабусин перстень"], ["🏺", "Розписний глечик"],
   ["🕰️", "Годинник із зозулею"], ["💎", "Дорогоцінний камінь"], ["👑", "Родинна реліквія"] ] };
+/* мальовані скарби: символи приватної зони Unicode → items/rare-<l>.webp (щоб не плутати з іншими 💍 🕰️ у грі) */
+window.PUA_MAP = window.PUA_MAP || {};
+CHAINS.rare.items = CHAINS.rare.items.map(([e, name], l) => { const c = String.fromCharCode(0xE200 + l); PUA_MAP[c] = { e, img: "items/rare-" + l + ".webp" }; return [c, name]; });
+const RARE_ICON = `<img class="e3d pnt" src="items/ui-rare.webp" alt="">`;
 const RARE_DROP = [0.02, 0.01];                         // рів.1 ≈ 1/50, рів.2 ≈ 1/100 тапів
 CHARS.collector = { key: "collector", icon: "🧐", name: "Колекціонер Орест", from: 999,
   ask: ["Шукаю одну річ для колекції… Заплачу, як ніхто в окрузі 🧐", "Кажуть, у вашому дворику бувають справжні скарби?", "Я терплячий. Але така річ — на вагу золота!"],
   thanks: ["Неймовірно! Саме такої бракувало моїй колекції 🧐✨", "Оце знахідка! Тримайте — заслужили сповна", "Ваш дворик — справжня скарбниця!"] };
+PORTRAITS.push("collector");                            // мальований портрет portraits/collector.webp
+PORTRAIT_FACE.collector = [35.5, 23.1, 205];
 const COLLECTOR = { waitH: 72, gapH: [16, 28], firstMin: 10 };
 const FLASH_DUR = 90 * 60e3, FLASH_GAP = [4, 8];        // год між викликами
 const FLASH_KINDS = [
@@ -40,7 +46,7 @@ window.RARE = (() => {
     const at = placeItem({ c: "rare", l }, near);
     if (at >= 0) { spawnFrom.set(at, near); setTimeout(() => sparkle(at, "✨", 10), 250); }
     sfx.level();
-    setTimeout(() => toast(`✨ Рідкісна знахідка: ${CHAINS.rare.items[l][0]} ${CHAINS.rare.items[l][1]}! Два однакові — ще цінніша річ`), 300);
+    setTimeout(() => toast(`💎 Рідкісна знахідка: ${CHAINS.rare.items[l][0]} ${CHAINS.rare.items[l][1]}! Два однакові — ще цінніша річ`), 300);
   }
 
   /* ---------- колекціонер ---------- */
@@ -142,8 +148,8 @@ window.RARE = (() => {
     if (!on()) return [];
     const got = CHAINS.rare.items.map((x, l) => S.collection["rare:" + l] ? x[0] : "❔").join("");
     const o = S.orders.find(x => x.rare);
-    const out = [{ icon: "💎", title: "Бабусині скарби", sub: `${got} · знахідки з генераторів, два однакові → цінніша`, btn: "", act: "" },
-      { icon: "🧐", title: "Колекціонер Орест", sub: o ? `чекає ${CHAINS.rare.items[o.items[0].l][0]} ще ${hm(o.until - now())}` : `прийде за ${hm((S.rareNext || now()) - now())}`, btn: "", act: "" }];
+    const out = [{ icon: RARE_ICON, title: "Бабусині скарби", sub: `${got} · знахідки з генераторів, два однакові → цінніша`, btn: "", act: "" },
+      { icon: face(CHARS.collector, "mini"), title: "Колекціонер Орест", sub: o ? `чекає ${CHAINS.rare.items[o.items[0].l][0]} ще ${hm(o.until - now())}` : `прийде за ${hm((S.rareNext || now()) - now())}`, btn: "", act: "" }];
     if (UNL.on("flash")) { const f = fl(); out.unshift({ icon: "⏳", title: "Виклик на час", sub: f ? `${kind(f).text}: ${f.n}/${f.t} · ${hm(f.until - now())}` : `наступний за ${hm((S.flashNext || now()) - now())}`, btn: f ? "Відкрити" : "", act: f ? "flash" : "", ready: !!f }); }
     return out;
   }
