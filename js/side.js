@@ -78,7 +78,7 @@ window.SIDE = (() => {
     sfx.pop(); renderAll(); save();
   }
   function leave() {
-    if (!S.sideOn) return;
+    if (!S.sideOn || S.woodOn) return;
     S.side ? (S.side.board = S.board) : null;
     S.board = S.main; delete S.main; S.sideOn = false; selected = -1;
     renderAll(); save();
@@ -212,7 +212,9 @@ window.SIDE = (() => {
     b.innerHTML = S.sideOn ? `<span class="sd-ic">🪴</span><small>Город</small>`
       : `<span class="sd-ic">${CHAINS[chainId()].items[0][0]}</span><small>${hm(left())}</small>`;
   }
-  function toggle() { S.sideOn ? leave() : enter(); renderButton(); }
+  function toggle() {
+    if (S.woodOn) { sfx.nope(); toast("Спершу вийди з майстерні 🪚"); return; }
+    S.sideOn ? leave() : enter(); renderButton(); }
 
   /* ---------- щосекунди ---------- */
   function tick() {

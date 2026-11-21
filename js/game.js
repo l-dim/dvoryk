@@ -34,6 +34,11 @@ function defaultState() {
   };
 }
 function idx(r, c) { return r * COLS + c; }
+/* дошка стала вищою (9 рядів) — старі збереження доповнюємо порожніми клітинками знизу */
+function padBoards(st) {
+  const pad = b => { if (Array.isArray(b)) while (b.length < N) b.push(null); };
+  pad(st.board); pad(st.main); if (st.side) pad(st.side.board); if (st.wood) pad(st.wood.board);
+}
 
 let S = null;
 function load() {
@@ -45,6 +50,7 @@ function load() {
     const data = JSON.parse(raw);
     if (!data || typeof data !== "object" || !Array.isArray(data.board)) return null;
     const st = Object.assign(defaultState(), data);
+    padBoards(st);
     st.infinite = false; // режим «без обмежень» прибрано — енергія тепер справжня
     return st;
   } catch (e) { return null; }
@@ -373,7 +379,15 @@ function newOrder() {
   return window.TP ? TP.stamp(o) : o;
 }
 function orderSlots() { return window.XTRA ? XTRA.slots() : 3; }
+/* у майстерні — свій список замовлень */
+const OL = () => (S.woodOn && S.wood ? S.wood.orders : S.orders);
+function setOL(list) { if (S.woodOn && S.wood) S.wood.orders = list; else S.orders = list; }
 function fillOrders() {
+  if (S.woodOn && S.wood && window.WOOD) {
+    S.wood.orders = S.wood.orders.filter(o => o && CHARS[o.ch]);
+    while (S.wood.orders.length < 3) { const o = WOOD.order(); if (!o) break; S.wood.orders.push(o); }
+    return;
+  }
   S.orders = S.orders.filter(o => o && CHARS[o.ch]);
   // котик — без черги, тож його замовлення не займає місця
   const regular = () => S.orders.filter(o => !o.paw && !o.rare).length;
@@ -393,7 +407,7 @@ function matchOrder(o) {
   return found;
 }
 function deliver(id) {
-  const o = S.orders.find(x => x.id === id);
+  const o = OL().find(x => x.id === id);
   if (!o) return;
   const found = matchOrder(o);
   if (found.some(i => i < 0)) { sfx.nope(); return; }
@@ -418,12 +432,14 @@ function deliver(id) {
   window.TOLOKA && TOLOKA.onDeliver(o);
   window.CONTEST && CONTEST.onDeliver(o);
   window.RARE && RARE.onDeliver(o);
+  window.LOVE && LOVE.onDeliver(o);
+  window.WOOD && WOOD.onDeliver(o);
   window.FASH && FASH.onDeliver(o);
   if (o.dish) window.QUEST && QUEST.track("dish");
   if (o.urgent) window.QUEST && QUEST.track("urgent");
   sfx.deliver();
   bubble(CHARS[o.ch], pick(CHARS[o.ch].thanks), card);
-  S.orders = S.orders.filter(x => x.id !== id);
+  setOL(OL().filter(x => x.id !== id));
   if (S.ordersDone % 4 === 0) placeItem({ c: "chest", l: 0 });
   gainXp(o.xp);
   if (S.tut === 2) setTut(3);
@@ -623,15 +639,15 @@ function renderOrders() {
   const box = $("orders");
   neededIdx = new Set();
   box.innerHTML = "";
-  if (S.sideOn && S.side && window.SIDE) { SIDE.renderGoals(box); return; }
-  S.orders.forEach(o => {
+  if (S.sideOn && !S.woodOn && S.side && window.SIDE) { SIDE.renderGoals(box); return; }
+  OL().forEach(o => {
     const found = matchOrder(o);
     const ready = found.every(i => i >= 0);
     found.forEach(i => { if (i >= 0) neededIdx.add(i); });
     const ch = CHARS[o.ch];
     const el = document.createElement("div");
     const pic = FARM && PORTRAITS.includes(ch.key);
-    el.className = "order" + (ready ? " ready" : "") + (pic ? " pic" : "") + (o.ev ? " ev" : "") + (o.paw ? " paw" : "") + (o.rare ? " rare" : "") + (o.seas ? " seas" : "") + (o.urgent ? " urgent" : "") + (o.dish ? " dish" : "");
+    el.className = "order" + (ready ? " ready" : "") + (pic ? " pic" : "") + (o.ev ? " ev" : "") + (o.paw ? " paw" : "") + (o.rare ? " rare" : "") + (o.seas ? " seas" : "") + (o.wood ? " woody" : "") + (o.urgent ? " urgent" : "") + (o.dish ? " dish" : "");
     el.dataset.id = o.id;
     const itemsHtml = `<div class="o-items">${o.items.map((it, k) => `<span class="o-item${found[k] >= 0 ? " have" : ""}">${itemIcon(it)}</span>`).join("")}</div>`;
     el.innerHTML = (pic
@@ -936,6 +952,7 @@ function renderNavBadge() {
   const can = !S.storyDone && ch && ch.tasks[S.task] && (window.ECON ? ECON.taskReady(S.chapter, S.task) : S.stars >= ch.tasks[S.task].cost);
   $("navStoryDot").hidden = !can;
   const cd = $("navCollDot"); if (cd) cd.hidden = !(window.XTRA && XTRA.discCount());
+  const md = $("menuDot"); if (md) md.hidden = [...document.querySelectorAll(".nav .dot")].every(d => d.hidden);
 }
 
 /* ---------------- Підказки-навчання ---------------- */
@@ -1122,7 +1139,7 @@ async function readBackup(code) {
   let bytes = unb64(m[2]);
   if (m[1] === "1") bytes = await pipeBytes(bytes, new DecompressionStream("gzip"));
   const data = JSON.parse(new TextDecoder().decode(bytes));
-  if (!data || typeof data !== "object" || !Array.isArray(data.board) || data.board.length !== N) throw new Error("bad");
+  if (!data || typeof data !== "object" || !Array.isArray(data.board) || data.board.length > N) throw new Error("bad");
   return data;
 }
 async function showExport() {
@@ -1206,6 +1223,7 @@ function openSettings() {
    ============================================================ */
 let drag = null;
 function onDown(e) {
+  document.body.classList.remove("nav-open");
   const tile = e.target.closest(".tile");
   if (!tile) {
     const sc = e.target.closest(".cell.shut");
@@ -1273,6 +1291,9 @@ function tap(i) {
 
 /* ---------------- Навігація ---------------- */
 function showTab(name) {
+  // на дошці нижнє меню сховане — більше місця для городу; відкривається кнопкою ☰
+  document.body.classList.toggle("on-board", name === "board");
+  document.body.classList.remove("nav-open");
   document.querySelectorAll(".tab").forEach(t => t.hidden = t.id !== "tab-" + name);
   document.querySelectorAll(".nav button").forEach(b => b.classList.toggle("on", b.dataset.tab === name));
   if (window.Yard3D) Yard3D.setActive(name === "story");
@@ -1292,12 +1313,14 @@ function startGame() {
   if (window.ENDLESS) ENDLESS.ensure(S.chapter + 10);     // історія без кінця
   $("start").classList.remove("show");
   $("app").hidden = false;
+  if (S.woodOn && window.WOOD) WOOD.leave();
   if (window.SIDE) SIDE.onStart();
   if (window.UNL) UNL.init();
   if (window.HARD) HARD.init();
   if (window.TP) TP.init();
   if (window.XTRA) { XTRA.initDisc(); XTRA.renderBoost(); }
   if (window.PATH) PATH.init();
+  if (window.LOVE) LOVE.init();
   if (window.MAIL) MAIL.render();
   if (window.PROFILE) PROFILE.renderAva();
   MECH.migrate();
@@ -1354,6 +1377,8 @@ function init() {
 
   document.querySelectorAll(".nav button").forEach(b => b.onclick = () => { audio(); showTab(b.dataset.tab); });
   $("settingsBtn").onclick = openSettings;
+  $("woodBtn").onclick = () => window.WOOD && WOOD.toggle();
+  $("menuBtn").onclick = () => { audio(); document.body.classList.toggle("nav-open"); };
   $("profileBtn").onclick = () => window.PROFILE ? PROFILE.open() : openSettings();
   $("mailBtn").onclick = () => window.MAIL && MAIL.panel();
   $("inboxBtn").onclick = takeInbox;
@@ -1385,6 +1410,8 @@ function init() {
     if (window.TP) TP.tick();
     if (window.SEAS) SEAS.tick();
     if (window.ENDLESS) ENDLESS.tick();
+    if (window.LOVE) LOVE.tick();
+    if (window.WOOD) WOOD.tick();
     if (window.CONTEST) CONTEST.tick();
     if (window.TOLOKA) TOLOKA.tick();
     if (window.MAIL) MAIL.tick();

@@ -1,7 +1,7 @@
 "use strict";
 /* ============================================================
    УСКЛАДНЕННЯ
-   1. Менша дошка: спершу 5×6 (30 клітинок), ще 4 смуги відкриваються за ⭐ і 🪙.
+   1. Менша дошка: спершу 5×7 (35 клітинок), ще 4 смуги відкриваються за ⭐ і 🪙.
       Стан S.bstage = 0…4 (скільки смуг відкрито). Дошка пригоди не обмежена.
    2. Генератори зношуються: після ~90 тапів ламаються, лагодить дід Степан —
       треба принести 2 предмети або заплатити монетами. Злиття генераторів дає новий.
@@ -12,18 +12,22 @@
       Стан на предметі: it.t (коли з'явився), it.old (зачерствів)
    ============================================================ */
 const BOARD_STRIPS = [
-  { cells: [1, 2, 3, 4, 5, 6].map(r => r * 7 + 6), stars: 3, coins: 150, name: "праву грядку" },
-  { cells: [1, 2, 3, 4, 5, 6].map(r => r * 7 + 0), stars: 5, coins: 300, name: "ліву грядку" },
-  { cells: [0, 1, 2, 3, 4, 5, 6].map(c => 7 * 7 + c), stars: 8, coins: 500, name: "нижній ряд" },
-  { cells: [0, 1, 2, 3, 4, 5, 6].map(c => c), stars: 12, coins: 800, name: "верхній ряд" }
+  { cells: Array.from({ length: ROWS - 2 }, (_, k) => (k + 1) * COLS + COLS - 1), stars: 3, coins: 150, name: "праву грядку" },
+  { cells: Array.from({ length: ROWS - 2 }, (_, k) => (k + 1) * COLS), stars: 5, coins: 300, name: "ліву грядку" },
+  { cells: Array.from({ length: COLS }, (_, c) => (ROWS - 1) * COLS + c), stars: 8, coins: 500, name: "нижній ряд" },
+  { cells: Array.from({ length: COLS }, (_, c) => c), stars: 12, coins: 800, name: "верхній ряд" }
 ];
 const WEAR_MAX = gl => 90 + 30 * (gl - 1);
 const PERISH = ["dairy", "fruit", "bake"], SPOIL_MS = 24 * 3600e3;
 
 /* відкрита клітинка головної дошки? */
+/* скільки смуг відкрито на поточній дошці (город — S.bstage, майстерня — S.wood.stage) */
+function boardStage() { return S && S.woodOn && S.wood ? S.wood.stage : S ? S.bstage : undefined; }
 function cellOpen(i) {
-  if (!S || S.sideOn || S.bstage === undefined || S.bstage >= BOARD_STRIPS.length) return true;
-  for (let k = S.bstage; k < BOARD_STRIPS.length; k++) if (BOARD_STRIPS[k].cells.includes(i)) return false;
+  if (!S || (S.sideOn && !S.woodOn)) return true;
+  const st = boardStage();
+  if (st === undefined || st >= BOARD_STRIPS.length) return true;
+  for (let k = st; k < BOARD_STRIPS.length; k++) if (BOARD_STRIPS[k].cells.includes(i)) return false;
   return true;
 }
 
@@ -49,7 +53,9 @@ window.HARD = (() => {
   }
 
   /* ---------- 1. розширення дошки ---------- */
-  const nextStrip = () => S.bstage < BOARD_STRIPS.length ? BOARD_STRIPS[S.bstage] : null;
+  const nextStrip = () => { const st = boardStage(); if (st >= BOARD_STRIPS.length) return null;
+    const s = BOARD_STRIPS[st]; if (!S.woodOn) return s;
+    const p = WOOD.stripPrice(st); return Object.assign({}, s, { stars: p[0], coins: p[1], name: s.name.replace("грядку", "стіну").replace("ряд", "ряд майстерні") }); };
   const isNextLabel = i => { const s = nextStrip(); return !!s && s.cells[Math.floor(s.cells.length / 2)] === i; };
   function expandModal() {
     const s = nextStrip(); if (!s) return;
@@ -57,9 +63,9 @@ window.HARD = (() => {
     modal({ title: "Більше місця 🌱",
       html: `<div class="big-emoji">${face(CHARS.stepan, "big")}</div><p>Дід Степан розчистить <b>${s.name}</b> — це ще ${s.cells.length} клітинок для городу.</p>` +
         `<p class="rewards">${s.stars} ⭐ &nbsp; + &nbsp; ${s.coins} 🪙</p>` +
-        `<p class="hint-s">Відкрито ${S.bstage} з ${BOARD_STRIPS.length}. Зірочки потрібні й для ремонту дворика — обирай, що важливіше 🙂</p>`,
+        `<p class="hint-s">Відкрито ${boardStage()} з ${BOARD_STRIPS.length}. Зірочки потрібні й для ремонту дворика — обирай, що важливіше 🙂</p>`,
       buttons: [{ label: ok ? "Розчистити" : `Бракує ${S.stars < s.stars ? (s.stars - S.stars) + " ⭐" : ""}${S.stars < s.stars && S.coins < s.coins ? " і " : ""}${S.coins < s.coins ? (s.coins - S.coins) + " 🪙" : ""}`, disabled: !ok, onClick: () => {
-        S.stars -= s.stars; S.coins -= s.coins; S.bstage++;
+        S.stars -= s.stars; S.coins -= s.coins; if (S.woodOn) S.wood.stage++; else S.bstage++;
         s.cells.forEach(i => popIdx.add(i));
         sfx.level(); confetti(); toast("🌱 Дошка більшає: +" + s.cells.length + " клітинок!");
         renderAll(); save();

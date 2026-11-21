@@ -86,6 +86,8 @@ window.HUB = (() => {
     if (window.RARE) out.unshift(...RARE.cards());
     if (window.TP && TP.card()) out.unshift(TP.card());
     if (window.SEAS && SEAS.card()) out.unshift(SEAS.card());
+    if (window.WOOD && WOOD.card()) out.unshift(WOOD.card());
+    if (window.LOVE && LOVE.card()) out.unshift(LOVE.card());
     // толока
     if (on("toloka")) { const c = TOLOKA.card(); out.push(c); }
     else out.push(lock("🥄", "Толока вихідного дня", "toloka"));
@@ -142,6 +144,8 @@ window.HUB = (() => {
     else if (a === "ech") ECH.panel();
     else if (a === "flash") RARE.panel();
     else if (a === "big") TP.panel();
+    else if (a === "love-gift") LOVE.giveGift();
+    else if (a === "wood") { if (!S.woodOn) WOOD.enter(); showTab("board"); }
     else if (a === "fashion") FASH.panel();
     else if (a === "look") LOOK.panel();
     else if (a === "medals") MEDAL.panel();
@@ -149,7 +153,9 @@ window.HUB = (() => {
   function renderDot() {
     const d = $("navHubDot"); if (!d || !S) return;
     const outReady = on("outing") && !S.side && ["fish", "mush"].some(id => SIDE.canGo(id));
+    const md = $("menuDot");
     d.hidden = !(outReady || (window.PATH && PATH.ready()) || (window.TOLOKA && TOLOKA.ready()) || (window.MEDAL && MEDAL.ready()) || (window.ECH && ECH.ready()) || (window.FASH && FASH.ready()));
+    if (md) md.hidden = [...document.querySelectorAll(".nav .dot")].every(x => x.hidden);
   }
   return { render, renderDot };
 })();

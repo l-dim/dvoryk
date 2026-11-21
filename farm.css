@@ -1040,3 +1040,17 @@ body.farm .order.pic .o-items { min-width: 34px; }
 .bg-mid { flex: 1; display: flex; flex-direction: column; gap: 3px; font-size: 13.5px; }
 .bg-mid small { font-size: 11px; font-weight: 800; color: var(--ink-soft); }
 .order.seas { border-color: #7cc0e8 !important; background: linear-gradient(#f0f8ff, #dceefc) !important; box-shadow: 0 0 0 2px #a6d4f2, 0 0 10px rgba(110, 180, 230, .45) !important; }
+
+/* ---------- Нижнє меню сховане на дошці ---------- */
+body.on-board .nav { display: none; }
+body.on-board.nav-open .nav { display: grid; position: fixed; left: 0; right: 0; bottom: calc(env(safe-area-inset-bottom) + 4px); z-index: 60; animation: navUp .22s ease-out; }
+@keyframes navUp { from { transform: translateY(30px); opacity: 0; } to { transform: none; opacity: 1; } }
+body.on-board #app { padding-bottom: env(safe-area-inset-bottom); }
+.menu-btn { display: none; flex: none; position: relative; width: 44px; height: 100%; border-radius: 14px; font: 900 24px/1 var(--font); color: #fff8e6; text-shadow: var(--outline);
+  background: linear-gradient(#9a5f2c, #7a4519 55%, #6a3a12); border: 2px solid #4a2709; box-shadow: 0 3px 0 #3a1e06, inset 0 2px 0 rgba(255, 210, 150, .35); }
+body.on-board .menu-btn { display: block; }
+.menu-btn .dot { position: absolute; top: -4px; right: -4px; width: 12px; height: 12px; border-radius: 50%; background: linear-gradient(#ff7a5c, #e04a2a); border: 2px solid #fff3d0; }
+.wood-btn { background: linear-gradient(#e9c79a, #c9965a) !important; }
+.wood-btn.on { background: linear-gradient(#bfe98d, #79bf3c) !important; }
+.order.woody { border-color: #b9824a !important; background: linear-gradient(#fbf0dc, #ecd2a6) !important; }
+body.wood-mode .board { background: repeating-linear-gradient(90deg, #8a5a2c 0 26px, #7d5026 26px 28px, #96643a 28px 50px, #744a22 50px 52px) !important; }
