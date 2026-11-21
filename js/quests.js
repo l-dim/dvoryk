@@ -35,7 +35,7 @@ window.QUEST = (() => {
     const extra = [{ k: "chest", t: Math.round(7 * k) }];
     if (lvl >= 5) extra.push({ k: "high", t: Math.round(10 * k) });
     if (S.oven) extra.push({ k: "cook", t: 4 }, { k: "dish", t: 3 });
-    if (lvl >= 4) extra.push({ k: "urgent", t: 2 });
+    if (window.UNL ? UNL.on("urgent") : lvl >= 4) extra.push({ k: "urgent", t: 2 });
     if (S.board.some(x => x && x.lock)) extra.push({ k: "lock", t: Math.min(4, S.board.filter(x => x && x.lock).length) });
     list.push(pick(extra));
     S.wq = { week: weekKey(), list: list.map(q => ({ k: q.k, t: q.t, n: 0 })), claimed: false };
@@ -53,6 +53,7 @@ window.QUEST = (() => {
     S.wq.claimed = true;
     const r = WEEKLY_REWARD;
     placeItem({ c: "chest", l: r.chest }); S.coins += r.coins; S.stars += r.stars; regen(); S.energy += r.energy;
+    if (window.ALB) ALB.give(5, "За тиждень", 2);
     save(); renderAll(); renderButton();
     confetti(); sfx.level();
     modal({
@@ -78,7 +79,7 @@ window.QUEST = (() => {
     const seen = {};
     if (S.board.some(x => { if (!x || !x.g || (x.gl || 1) >= GEN_MAX_LEVEL) return false; const key = x.g + (x.gl || 1); seen[key] = (seen[key] || 0) + 1; return seen[key] >= 2; }))
       c.push({ k: "genmerge", t: 1 });
-    if (lvl >= 4) c.push({ k: "urgent", t: 1 });
+    if (window.UNL ? UNL.on("urgent") : lvl >= 4) c.push({ k: "urgent", t: 1 });
     const who = Object.keys(FRIENDS).filter(k => CHARS[k] && (CHARS[k].from || 0) <= S.chapter);
     if (who.length) c.push({ k: "heart", who: pick(who), t: lvl < 6 ? 1 : 2 });
     if (window.EV && EV.active()) c.push({ k: "snow", t: lvl < 8 ? 10 : 16 });
@@ -140,6 +141,7 @@ window.QUEST = (() => {
     placeItem({ c: "chest", l: big ? 2 : 0 });
     regen(); S.energy += 5;
     if (big) d.streak = 0;     // після тижня серія починається знову
+    if (window.ALB) ALB.give(big ? 4 : 2, "За завдання дня");
     save(); renderAll(); renderButton();
     confetti(); sfx.level();
     modal({
@@ -210,7 +212,7 @@ window.QUEST = (() => {
 
   /* ---------- карта старої скрині ---------- */
   function onChest(level, near) {
-    if (S.map.done || S.ordersDone < 3) return;
+    if (S.map.done || S.ordersDone < 3 || (window.UNL && !UNL.on("map"))) return;
     const chance = [0.1, 0.25, 0.5][level] || 0.1;
     if (Math.random() >= chance) return;
     S.map.n = Math.min(TREASURE.pieces, S.map.n + 1);
@@ -260,9 +262,10 @@ window.QUEST = (() => {
   /* ---------- кнопка й панель ---------- */
   function renderButton() {
     const b = $("qBtn"); if (!b || !S || !S.dq) return;
+    b.hidden = !!(window.UNL && !UNL.on("daily"));
     const done = S.dq.list.filter(q => q.n >= q.t).length;
     $("qProg").textContent = S.dq.claimed ? "✓" : done + "/3";
-    const wReady = S.wq && weekDone() && !S.wq.claimed;
+    const wReady = S.wq && weekDone() && !S.wq.claimed && (!window.UNL || UNL.on("week"));
     b.classList.toggle("ready", (allDone() && !S.dq.claimed) || !!wReady || !!(window.WD && WD.readyAny()));
     b.classList.toggle("claimed", S.dq.claimed);
   }
@@ -275,6 +278,8 @@ window.QUEST = (() => {
     if (!S.wq || S.wq.week !== weekKey()) newWeek();
     if (tab) panelTab = tab;
     const winterOn = !!(window.WD && WD.active());
+    const weekOn = !window.UNL || UNL.on("week"), mapOn = !window.UNL || UNL.on("map");
+    if (panelTab === "week" && !weekOn) panelTab = "day";
     if (panelTab === "winter" && !winterOn) panelTab = "day";
     const d = S.dq, w = S.wq;
     const shown = d.claimed ? d.streak : d.lastClaim === yesterday() ? d.streak : 0;
@@ -288,7 +293,7 @@ window.QUEST = (() => {
       (canSwap ? `<p class="dq-hint">🔄 Не подобається завдання? Одне можна замінити — раз на день.</p>` : "") +
       `<div class="dq-week"><span>Днів поспіль:</span><span class="dq-days">${week}</span></div>` +
       btn(dayReady, d.claimed, "Забрати нагороду 🎁", "Нагороду забрано ✓ Нові завдання завтра", "Виконай усі 3 — отримаєш 🎁") +
-      `<div class="dq-map"><span>🗺️ <b>Таємниця старої скрині</b><br><small>${m.done ? "Скарб знайдено! Скриня — у дворику 🧰" : m.n ? "Шматочки карти: " + m.n + " з " + TREASURE.pieces : "Шматочки карти іноді трапляються в подарунках"}</small></span><span class="dq-pieces">${pieces}</span></div>`;
+      (mapOn ? `<div class="dq-map"><span>🗺️ <b>Таємниця старої скрині</b><br><small>${m.done ? "Скарб знайдено! Скриня — у дворику 🧰" : m.n ? "Шматочки карти: " + m.n + " з " + TREASURE.pieces : "Шматочки карти іноді трапляються в подарунках"}</small></span><span class="dq-pieces">${pieces}</span></div>` : "");
     const left = daysToSunday();
     const wkHtml = `<p class="dq-when">До кінця тижня: <b>${left === 1 ? "останній день!" : left + (left < 5 ? " дні" : " днів")}</b></p>` +
       `<div class="dq-list">${qRows(w.list)}</div>` +
@@ -297,7 +302,7 @@ window.QUEST = (() => {
     modal({
       title: "Завдання 📋",
       html: `<div class="dq-tabs"><button class="dq-tab${panelTab === "day" ? " on" : ""}" data-t="day">Сьогодні${dayReady ? " ❗" : ""}</button>` +
-        `<button class="dq-tab${panelTab === "week" ? " on" : ""}" data-t="week">Тиждень${wkReady ? " ❗" : ""}</button>` +
+        (weekOn ? `<button class="dq-tab${panelTab === "week" ? " on" : ""}" data-t="week">Тиждень${wkReady ? " ❗" : ""}</button>` : "") +
         (winterOn ? `<button class="dq-tab${panelTab === "winter" ? " on" : ""}" data-t="winter">Зима${WD.readyAny() ? " ❗" : ""}</button>` : "") + `</div>` +
         (panelTab === "day" ? dayHtml : panelTab === "week" ? wkHtml : WD.html()),
       buttons: [

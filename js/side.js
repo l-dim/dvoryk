@@ -161,7 +161,7 @@ window.SIDE = (() => {
   function tick() {
     if (!S || !S.started) return;
     if (S.side && now() >= S.side.until && !busyUI()) { finish(false); return; }
-    if (!S.side && !busyUI() && S.level >= 4 && S.ordersDone >= 8 && now() >= (S.sideNext || 0) && !(S.ev && S.ev.intro === false)) offer();
+    if (!S.side && !busyUI() && (window.UNL ? UNL.on("side") : S.level >= 4) && S.ordersDone >= 8 && now() >= (S.sideNext || 0) && !(S.ev && S.ev.intro === false)) offer();
     const t = document.querySelector(".side-time"); if (t && S.side) t.textContent = "⏰ " + hm(left());
     renderButton();
   }

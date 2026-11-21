@@ -185,7 +185,7 @@ window.MECH = (() => {
     return null;
   }
   function maybeUrgent(o) {
-    if (S.level < 4 || o.ev || o.dish || S.orders.some(x => x.until) || Math.random() >= 0.15) return o;
+    if (!(window.UNL ? UNL.on("urgent") : S.level >= 4) || o.ev || o.dish || o.paw || S.orders.some(x => x.until) || Math.random() >= 0.15) return o;
     o.until = now() + (2 + rnd(3)) * 3600e3;
     o.coins = Math.round(o.coins * 1.6); o.stars += 1; o.urgent = true;
     return o;
@@ -276,5 +276,5 @@ window.MECH = (() => {
   }
 
   return { refresh, resting, useCharge, restModal, canMergeGens, mergeGens, tierBonus, maybeGenCopy,
-    crackAround, lockModal, ovenModal, hhmm, specialOrder, maybeUrgent, tileKey, decorate, tick, migrate, checkOven, gl, cap };
+    crackAround, lockModal, ovenModal, addLocks, hhmm, specialOrder, maybeUrgent, tileKey, decorate, tick, migrate, checkOven, gl, cap };
 })();

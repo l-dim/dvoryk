@@ -12,7 +12,7 @@ window.EV = (() => {
   const inWindow = () => now() >= win().start && now() < win().end;
   const st = () => (S.ev && S.ev.id === curId() ? S.ev : null);
   const active = () => !!st() && st().intro && !st().ended && inWindow();
-  const ready = () => S && S.started && S.ordersDone >= 3;   // після навчання
+  const ready = () => S && S.started && S.ordersDone >= 3 && S.level >= 3;   // після навчання
   const busyUI = () => $("modal").classList.contains("show") || $("dialog").classList.contains("show");
 
   function daysLeft() {

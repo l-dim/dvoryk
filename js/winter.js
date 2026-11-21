@@ -100,7 +100,7 @@ window.WD = (() => {
 
   /* ---------- щосекунди ---------- */
   function tick() {
-    if (!S || !S.started || S.ordersDone < 3 || busyUI()) return;
+    if (!S || !S.started || S.ordersDone < 3 || S.level < 3 || busyUI()) return;
     const s = season();
     if (!s) return;
     if (!st()) S.wd = { id: "wd-" + s.y, intro: false, n: {}, dressed: {}, sick: {}, frost: false, warned: "" };

@@ -21,7 +21,7 @@ function defaultState() {
   board[idx(5, 5)] = { c: "bake", l: 0 };
   board[idx(6, 3)] = { c: "chest", l: 0 };
   return {
-    v: 1, name: "", started: false, board,
+    v: 2, name: "", started: false, board,
     energy: ENERGY_MAX, energyAt: Date.now(),
     coins: 50, stars: 0, xp: 0, level: 1,
     orders: [], orderSeq: 0, ordersDone: 0, merges: 0,
@@ -132,11 +132,11 @@ function regen() {
     if (S.energy >= ENERGY_MAX) S.energyAt = now;
   }
 }
-function spendEnergy() {
+function spendEnergy(n = 1) {
   regen();
-  if (S.energy < 1) { showNoEnergy(); return false; }
+  if (S.energy < n) { showNoEnergy(); return false; }
   if (S.energy >= ENERGY_MAX) S.energyAt = Date.now();
-  S.energy -= 1;
+  S.energy -= n;
   return true;
 }
 function addEnergy(n) { regen(); S.energy += n; renderTop(); save(); }
@@ -169,7 +169,10 @@ function discover(it) {
   const k = it.c + ":" + it.l;
   if (!S.collection[k]) {
     S.collection[k] = 1;
-    if (PRODUCT_CHAINS.includes(it.c) && S.started) toast("Нове у колекції: " + itemIcon(it) + " " + itemName(it));
+    if (PRODUCT_CHAINS.includes(it.c) && S.started) {
+      toast("Нове у колекції: " + itemIcon(it) + " " + itemName(it) + (window.UNL && UNL.on("discover") ? " — 🎁 у 📖" : ""));
+      renderNavBadge();
+    }
   }
 }
 
@@ -180,8 +183,12 @@ function produce(i) {
   MECH.refresh(gIt);
   if (MECH.resting(gIt)) { MECH.restModal(i); return; }
   if (emptyNear(i) < 0) { sfx.nope(); toast("Немає місця 🙈 Об'єднай або продай щось"); return; }
-  if (!spendEnergy()) return;
-  const tired = MECH.useCharge(gIt);
+  // сила ×2: 2 ⚡ і 2 заряди — зате предмет одразу на рівень вищий
+  const x2 = window.XTRA && XTRA.boosted() && S.energy >= 2;
+  if (!spendEnergy(x2 ? 2 : 1)) return;
+  const rest = !window.UNL || UNL.on("rest");
+  let tired = rest ? MECH.useCharge(gIt) : false;
+  if (x2 && rest && !tired) tired = MECH.useCharge(gIt);
   let item;
   const roll = Math.random();
   if (roll < 0.01) item = { c: "energy", l: 0 };
@@ -191,6 +198,7 @@ function produce(i) {
     const r = Math.random(), tb = MECH.tierBonus(gIt), up = Math.min(0.35, 0.15 + S.level * 0.01) + tb;
     item = { c: gen.chain, l: r < 0.03 + S.level * 0.002 + tb / 2 ? 2 : r < up ? 1 : 0 };
   }
+  if (x2) item.l = Math.min(CHAINS[item.c].items.length - 1, item.l + 1);
   const at = placeItem(item, i);
   if (at >= 0) spawnFrom.set(at, i);
   window.QUEST && QUEST.track("tap");
@@ -221,6 +229,7 @@ function openChest(i) {
   if (k >= 1) MECH.maybeGenCopy(k === 1 ? 0.12 : 0.25, i);
   window.QUEST && QUEST.track("chest");
   window.QUEST && QUEST.onChest(k, i);
+  window.ALB && ALB.onChest(k);
   sfx.open();
   sparkle(i, "✨", 8);
   renderBoard(); renderOrders(); save();
@@ -288,7 +297,7 @@ function gainXp(n) {
     confetti();
     setTimeout(() => modal({
       title: "Рівень " + S.level + "! 🎉",
-      html: `<div class="big-emoji">🌟</div><p>Ти молодчинка! Тримай подарунки:</p><p class="rewards">+${ENERGY_BONUS.level} ⚡ &nbsp; ${S.level % 5 === 0 ? "📦" : "🎁"}</p>`,
+      html: `<div class="big-emoji">🌟</div><p>Ти молодчинка! Тримай подарунки:</p><p class="rewards">+${ENERGY_BONUS.level} ⚡ &nbsp; ${S.level % 5 === 0 ? "📦" : "🎁"}</p>` + (window.UNL ? UNL.nextHtml() : ""),
       buttons: [{ label: "Дякую! 💛" }]
     }), 350);
   }
@@ -301,10 +310,13 @@ function newOrder() {
   // святкова подія іноді підкидає своє замовлення
   const evo = window.EV && EV.maybeOrder();
   if (evo) return evo;
+  const cato = window.XTRA && XTRA.catOrder();
+  if (cato) return cato;
   const spo = MECH.specialOrder();
   if (spo) return spo;
   const busy = S.orders.map(o => o.ch);
-  const healthy = Object.keys(CHARS).filter(c => (CHARS[c].from || 0) <= S.chapter && !(window.WD && WD.isSick(c)));
+  const catBox = window.UNL && UNL.on("cat");   // котик на скрині замовляє окремо
+  const healthy = Object.keys(CHARS).filter(c => (CHARS[c].from || 0) <= S.chapter && !(window.WD && WD.isSick(c)) && !(catBox && c === "cat"));
   let pool = healthy.filter(c => !busy.includes(c));
   if (!pool.length) pool = healthy;          // мало здорових сусідів — хтось замовить двічі
   if (!pool.length) return null;             // усі на лікарняному
@@ -363,6 +375,8 @@ function deliver(id) {
   window.QUEST && QUEST.onDeliver(o);
   window.QUEST && QUEST.track("deliver");
   window.WD && WD.onDeliver(o);
+  window.XTRA && XTRA.onDeliver(o, card);
+  window.ALB && ALB.onDeliver(o);
   if (o.dish) window.QUEST && QUEST.track("dish");
   if (o.urgent) window.QUEST && QUEST.track("urgent");
   sfx.deliver();
@@ -564,7 +578,7 @@ function renderOrders() {
     const ch = CHARS[o.ch];
     const el = document.createElement("div");
     const pic = FARM && PORTRAITS.includes(ch.key);
-    el.className = "order" + (ready ? " ready" : "") + (pic ? " pic" : "") + (o.ev ? " ev" : "") + (o.urgent ? " urgent" : "") + (o.dish ? " dish" : "");
+    el.className = "order" + (ready ? " ready" : "") + (pic ? " pic" : "") + (o.ev ? " ev" : "") + (o.paw ? " paw" : "") + (o.urgent ? " urgent" : "") + (o.dish ? " dish" : "");
     el.dataset.id = o.id;
     const itemsHtml = `<div class="o-items">${o.items.map((it, k) => `<span class="o-item${found[k] >= 0 ? " have" : ""}">${itemIcon(it)}</span>`).join("")}</div>`;
     el.innerHTML = (pic
@@ -573,7 +587,8 @@ function renderOrders() {
       : `<div class="o-who"><span class="o-ava">${face(ch, "mini")}</span><span class="o-name">${ch.name.split(" ").pop()}</span></div>` + itemsHtml) +
       (ready
         ? `<button class="o-btn">Віддати</button>`
-        : `<div class="o-rew">🪙${o.coins} · ${o.ev ? "❄️" + o.pts : "⭐".repeat(o.stars)}</div>`) +
+        : `<div class="o-rew">🪙${o.coins} · ${o.ev ? "❄️" + o.pts : o.paw ? "🐾" + XTRA.catProg() : "⭐".repeat(o.stars)}</div>`) +
+      (o.paw ? `<span class="o-paw">🧰</span>` : "") +
       (o.until ? `<span class="o-timer" data-until="${o.until}">⏰ ${MECH.hhmm(o.until - Date.now())}</span>` : "");
     el.addEventListener("click", e => {
       if (ready && e.target.closest(".o-btn")) { deliver(o.id); return; }
@@ -620,7 +635,8 @@ function renderInfo() {
   const box = $("info");
   const it = S.board[selected];
   if (!it) {
-    box.innerHTML = `<span class="info-hint">Тапни на предмет, щоб дізнатися про нього більше</span>`;
+    box.innerHTML = `<span class="info-hint">Тапни на предмет, щоб дізнатися про нього більше</span>` + (window.XTRA ? XTRA.hintBtn() : "");
+    const so = $("storeOpen"); if (so) so.onclick = () => XTRA.openStore();
     return;
   }
   let text = "", btn = "";
@@ -648,7 +664,8 @@ function renderInfo() {
     text = `<b>${itemName(it)} <span class="lvl-tag">рів. ${it.l + 1}</span></b><small>${next}</small>`;
     btn = `<button class="sell" id="sellBtn"><small>продати</small><span>+${sellPrice(it)}🪙</span></button>`;
   }
-  box.innerHTML = `<span class="info-ic">${itemIcon(it)}</span><span class="info-txt">${text}</span>${btn}`;
+  box.innerHTML = `<span class="info-ic">${itemIcon(it)}</span><span class="info-txt">${text}</span>${window.XTRA ? XTRA.storeBtn(it) : ""}${btn}`;
+  const stb = $("storeBtn"); if (stb) stb.onclick = () => XTRA.stash(selected);
   const sb = $("sellBtn");
   if (sb) sb.onclick = () => {
     if (it.l >= 3 && !sb.dataset.sure) { sb.dataset.sure = 1; sb.innerHTML = "<small>точно?</small>Так"; return; }
@@ -815,21 +832,32 @@ function renderShop() {
 function renderCollection() {
   const box = $("collList");
   let have = 0, total = 0;
-  box.innerHTML = window.QUEST ? QUEST.friendsPanelHtml() : "";
+  const dn = window.XTRA ? XTRA.discCount() : 0;
+  box.innerHTML = (window.ALB ? ALB.entryHtml() : "") +
+    (dn ? `<button class="btn small disc-all" id="discAll">🎁 Забрати нагороди за нові предмети (${dn})</button>` : "") +
+    (window.QUEST ? QUEST.friendsPanelHtml() : "");
   box.querySelectorAll(".fr-row").forEach(b => b.onclick = () => QUEST.friendModal(b.dataset.who));
+  const ao = $("albOpen"); if (ao) ao.onclick = () => ALB.panel();
+  const da = $("discAll"); if (da) da.onclick = () => XTRA.claimAll();
   PRODUCT_CHAINS.forEach(c => {
     const ch = CHAINS[c];
     const sec = document.createElement("div");
     sec.className = "coll-sec";
     const items = ch.items.map((x, l) => {
       total++;
-      const got = S.collection[c + ":" + l];
+      const got = S.collection[c + ":" + l], gift = window.XTRA && XTRA.discReady(c + ":" + l);
       if (got) have++;
-      return `<span class="coll-it${got ? "" : " no"}" title="${got ? x[1] : "?"}">${got ? x[0] : "❔"}</span>`;
+      return `<span class="coll-it${got ? "" : " no"}${gift ? " gift" : ""}" data-k="${c}:${l}" title="${got ? x[1] : "?"}">${got ? x[0] : "❔"}</span>`;
     }).join("");
     const locked = !unlockedChains().includes(c);
     sec.innerHTML = `<div class="coll-h">${ch.name}${locked ? " <small>🔒 відкриється за сюжетом</small>" : ""}</div><div class="coll-row">${items}</div>`;
     box.appendChild(sec);
+  });
+  if (window.UNL) box.insertAdjacentHTML("beforeend", UNL.roadHtml());
+  box.querySelectorAll(".coll-it.gift").forEach(el => el.onclick = () => {
+    const n = XTRA.claimDisc(el.dataset.k, el);
+    if (n) { sfx.coin(); floatEl(el, "+" + n + " 🪙"); }
+    renderTop(); renderCollection(); renderNavBadge(); save();
   });
   $("collProg").textContent = have + " / " + total;
 }
@@ -838,6 +866,7 @@ function renderNavBadge() {
   const ch = STORY[S.chapter];
   const can = !S.storyDone && ch && ch.tasks[S.task] && S.stars >= ch.tasks[S.task].cost;
   $("navStoryDot").hidden = !can;
+  const cd = $("navCollDot"); if (cd) cd.hidden = !(window.XTRA && XTRA.discCount());
 }
 
 /* ---------------- Підказки-навчання ---------------- */
@@ -856,6 +885,14 @@ function renderTut() {
 
 /* ---------------- Ефекти ---------------- */
 function cellRect(i) { const c = $("board").children[i]; return c ? c.getBoundingClientRect() : null; }
+function floatEl(el, text) {
+  const r = el.getBoundingClientRect();
+  const f = document.createElement("div");
+  f.className = "float"; f.textContent = text;
+  f.style.left = (r.left + r.width / 2) + "px"; f.style.top = r.top + "px";
+  document.body.appendChild(f);
+  setTimeout(() => f.remove(), 1000);
+}
 function floatAt(i, text) {
   const r = cellRect(i); if (!r) return;
   const f = document.createElement("div");
@@ -1181,6 +1218,8 @@ function startGame() {
   $("start").classList.remove("show");
   $("app").hidden = false;
   if (window.SIDE) SIDE.onStart();
+  if (window.UNL) UNL.init();
+  if (window.XTRA) { XTRA.initDisc(); XTRA.renderBoost(); }
   MECH.migrate();
   if (window.QUEST) { QUEST.init(); QUEST.renderButton(); }
   fillOrders();
@@ -1238,6 +1277,7 @@ function init() {
   $("evBtn").onclick = () => window.EV && EV.panel();
   $("qBtn").onclick = () => window.QUEST && QUEST.panel();
   $("sideBtn").onclick = () => window.SIDE && SIDE.toggle();
+  $("boostBtn").onclick = () => window.XTRA && XTRA.toggleBoost();
   $("teaBtn").onclick = () => { takeTea(); renderShop(); };
   $("energyChip").onclick = () => { showNoEnergyInfo(); };
   $("dialog").onclick = nextLine;
@@ -1251,6 +1291,8 @@ function init() {
     if (window.QUEST) QUEST.tick();
     if (window.WD) WD.tick();
     if (window.SIDE) SIDE.tick();
+    if (window.UNL) UNL.tick();
+    if (window.ALB) ALB.tick();
     if (Date.now() % 5000 < 1000) MECH.checkOven();
     if (!$("tab-shop").hidden) renderShop();
     if (S.energy !== before) save();
