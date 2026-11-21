@@ -96,7 +96,7 @@ window.WTH = (() => {
     if (today() !== "sun") toast(`${t.icon} Сьогодні ${t.name.toLowerCase()}: ${t.fx}`);
   }
   function card() {
-    if (!on()) return { icon: "🌦️", title: "Погода", sub: "відкриється на 8 рівні", locked: true };
+    if (!on()) return { icon: "🌦️", title: "Погода", sub: `відкриється на ${window.PACE ? PACE.lvl("weather") : 8} рівні`, locked: true };
     const a = w(today()), b = w(tomorrow());
     return { icon: a.icon, title: `Погода: ${a.name.toLowerCase()}`, sub: `${a.fx} · завтра ${b.icon} ${b.name.toLowerCase()}`, btn: "", act: "" };
   }
@@ -250,7 +250,7 @@ window.DECOR = (() => {
   }
   function renderButton() { const b = $("decorBtn"); if (b) { b.hidden = !on(); b.onclick = panel; } }
   function card() {
-    if (!on()) return { icon: "🎨", title: "Двір на свій смак", sub: "відкриється на 6 рівні", locked: true };
+    if (!on()) return { icon: "🎨", title: "Двір на свій смак", sub: `відкриється на ${window.PACE ? PACE.lvl("decor") : 6} рівні`, locked: true };
     const n = Object.values(st().placed).reduce((a, b) => a + b.length, 0);
     return { icon: "🎨", title: "Двір на свій смак", sub: n ? `розставлено прикрас: ${n}` : "купуй прикраси й став де хочеш", btn: "Відкрити", act: "decor" };
   }

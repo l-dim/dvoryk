@@ -1132,3 +1132,11 @@ body.dc-placing #scene { outline: 3px dashed #f2b33d; outline-offset: -6px; curs
 .fm-names { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin: 6px 0; }
 .fm-names .s-btn { padding: 6px 10px; font-size: 13px; }
 .fm-in { width: 100%; box-sizing: border-box; padding: 9px 12px; border-radius: 12px; border: 2px solid rgba(107, 63, 29, .25); font: inherit; font-size: 16px; background: #fffaf0; }
+
+/* ---------- пригода сусіда: картки цілей на всю ширину, без прокрутки ---------- */
+body.farm .orders.side { display: flex; overflow: hidden; }
+body.farm .orders.side > .order { flex: 1 1 0; min-width: 0; }
+body.farm .orders.side > .side-host { flex: 1.55 1 0; }
+.orders.side .side-info b { white-space: normal; overflow-wrap: anywhere; }
+.orders.side .side-time { white-space: nowrap; }
+.info-hint { font-size: 13px; line-height: 1.2; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }

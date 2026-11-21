@@ -334,7 +334,7 @@ function handleDrop(a, b) {
 }
 
 /* ---------------- Досвід і рівні ---------------- */
-function xpNeed(l) { return 35 + 24 * (l - 1); }
+function xpNeed(l) { return 45 + 32 * (l - 1) + (l - 1) * (l - 1); }   // повільніше, ніж було (35 + 24·(l−1))
 function gainXp(n) {
   S.xp += n;
   let ups = 0;
@@ -653,7 +653,9 @@ function renderOrders() {
   const box = $("orders");
   neededIdx = new Set();
   box.innerHTML = "";
-  if (S.sideOn && !S.woodOn && S.side && window.SIDE) { SIDE.renderGoals(box); return; }
+  const sideMode = !!(S.sideOn && !S.woodOn && S.side && window.SIDE);
+  box.classList.toggle("side", sideMode); if (sideMode) box.classList.remove("more");
+  if (sideMode) { SIDE.renderGoals(box); return; }
   OL().forEach(o => {
     const found = matchOrder(o);
     const ready = found.every(i => i >= 0);
@@ -728,7 +730,9 @@ function renderInfo() {
   const box = $("info");
   const it = S.board[selected];
   if (!it) {
-    box.innerHTML = `<span class="info-hint">Тапни на предмет, щоб дізнатися про нього більше</span>` + (window.XTRA ? XTRA.hintBtn() : "");
+    const hb = window.XTRA ? XTRA.hintBtn() : "";
+    // поруч із кнопкою сховку підказці тісно — тоді лишаємо тільки кнопку
+    box.innerHTML = (hb ? "" : `<span class="info-hint">Тапни на предмет — підкажу, що це</span>`) + hb;
     const so = $("storeOpen"); if (so) so.onclick = () => XTRA.openStore();
     return;
   }

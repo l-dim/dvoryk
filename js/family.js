@@ -226,7 +226,7 @@ window.FAM = (() => {
   function tick() {
     if (!S || !S.started || busyUI() || S.sideOn && !S.woodOn || !window.LOVE || !LOVE.together() || !S.wood) return;
     const f = st();
-    if (f.st === 0 && S.wood.done >= 12 && S.level >= 13) { matchmaking(); return; }
+    if (f.st === 0 && S.wood.done >= 20 && S.level >= 18) { matchmaking(); return; }
     if (f.st === 2 && now() - f.wedAt >= BABY_AFTER_WED_D * 864e5 && filled() >= BABY_NEED_SLOTS) { expecting(); return; }
     if (f.st === 3 && now() >= f.babyAt) { born(); return; }
     if (f.st === 3) { const wk = Math.floor((now() - (f.babyAt - BABY_WAIT_H * 3600e3)) / (7 * 864e5)), v = BABY_VISITS[wk - 1];
@@ -255,7 +255,7 @@ window.FAM = (() => {
 window.HUB_EXTRA = (window.HUB_EXTRA || []).concat([() => FAM.card()]);
 window.HUB_ACTS = Object.assign(window.HUB_ACTS || {}, { "fam-prep": () => FAM.prepPanel(), "fam-house": () => FAM.housePanel() });
 if (typeof GUIDE_WOOD !== "undefined") GUIDE_WOOD.push(
-  ["💍", "Сватання й весілля", "Коли майстерня розкрутиться (12 виробів, 13 рівень), прийдуть старости. Для весілля збери букет, торт, тістечка, солодощі й скриню з майстерні — список у «Подіях».", w => S.fam && S.fam.st >= 1],
+  ["💍", "Сватання й весілля", "Коли майстерня розкрутиться (20 виробів, 18 рівень), прийдуть старости. Для весілля збери букет, торт, тістечка, солодощі й скриню з майстерні — список у «Подіях».", w => S.fam && S.fam.st >= 1],
   ["🏡", "Наша хата", "Після весілля обставляй хату виробами: світлиця, кухня, сіни, скарби, а згодом і дитяча. Кожна річ — +1 ⭐ і більший затишок; щодня в хаті чекає гостинець — монети й енергія.", w => S.fam && S.fam.st >= 2],
   ["👶", "Малюк", "Через 2 тижні після весілля, коли в хаті стоятиме 10 речей, — новина про малюка; ще місяць чекання (сусіди щотижня навідуються з гостинцями, а дитячу можна готувати заздалегідь). Малюк підростає: перші 2 тижні лише в колисці; потім повзає й раз на пів години-годину приносить у майстерню тріску; а з 6 тижнів бігає — приносить частіше, іноді брусок чи дошки. Помагає, коли ти в майстерні.", w => S.fam && S.fam.st >= 4]
 );

@@ -87,7 +87,7 @@ window.ENDLESS = (() => {
       const clean = k < nClean;
       const remove = clean ? ids.filter((_, j) => j % nClean === k) : [];
       const add = clean ? [] : [0, 1].slice(0, 1 + Math.floor(r() * 2)).map(() => ({ e: pickR(addPool), x: 15 + Math.round(r() * 70), y: 48 + Math.round(r() * 40), s: 5 + Math.round(r() * 3) }));
-      tasks.push({ title: clean ? cleanT[k % cleanT.length] : buildT[k % buildT.length], cost: base0 + (k >> 1), remove, add,
+      tasks.push({ title: clean ? cleanT[k % cleanT.length] : buildT[k % buildT.length], cost: Math.round((base0 + (k >> 1)) * (window.PACE ? PACE.story : 1)), remove, add,
         lines: [[pickR(EL_HOSTS), pickR(EL_LINES)]] });
     }
     return {

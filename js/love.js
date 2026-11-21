@@ -116,7 +116,7 @@ window.LOVE = (() => {
   function tick() {
     if (!S || !S.started || busyUI() || S.sideOn) return;
     const l = st();
-    if (l.stage === 0 && S.level >= 11 && S.ordersDone >= 20) meet();
+    if (l.stage === 0 && S.level >= 15 && S.ordersDone >= 40) meet();
   }
   function card() {
     const l = st(); if (l.stage < 1) return null;
