@@ -37,7 +37,7 @@ const BABY_EVERY_MIN = [25, 45];
 /* вік: 0 — немовля (2 тижні, лише в колисці), 1 — малюк ~1 рік (до 6 тижнів), 2 — дитина ~4 роки */
 const KID_AGE_D = [14, 42];
 const KID_HELP = [null, { min: [25, 45], up: 0.2, up2: 0 }, { min: [15, 30], up: 0.35, up2: 0.05 }];
-const KID_ART = [];   // portraits/kid-girl-1, kid-girl-2, kid-boy-1, kid-boy-2 — коли буде картинка
+const KID_ART = ["kid-girl-1", "kid-girl-2", "kid-boy-1", "kid-boy-2"];   // portraits/kid-girl-1, kid-girl-2, kid-boy-1, kid-boy-2 — коли буде картинка
 
 window.FAM = (() => {
   const now = () => window.DVORYK_NOW || Date.now();
