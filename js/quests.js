@@ -55,6 +55,7 @@ window.QUEST = (() => {
     placeItem({ c: "chest", l: r.chest }); S.coins += r.coins; S.stars += r.stars; regen(); S.energy += r.energy;
     if (window.ALB) ALB.give(5, "За тиждень", 2);
     if (window.PATH) PATH.add(PATH_PTS.week);
+    if (window.CONTEST) CONTEST.give(8, null, 3, "За тиждень");
     save(); renderAll(); renderButton();
     confetti(); sfx.level();
     modal({
@@ -117,6 +118,7 @@ window.QUEST = (() => {
   }
   function track(k, n = 1, who) {
     if (!S || !S.dq) return;
+    if (window.MEDAL) MEDAL.count(k, n);
     trackWeek(k, n);
     if (S.dq.day !== today()) newDay();
     let finished = null;
@@ -144,6 +146,8 @@ window.QUEST = (() => {
     if (big) d.streak = 0;     // після тижня серія починається знову
     if (window.ALB) ALB.give(big ? 4 : 2, "За завдання дня");
     if (window.PATH) PATH.add(PATH_PTS.daily);
+    if (window.TOLOKA) TOLOKA.add(TOL_SPOONS.daily);
+    if (window.CONTEST) CONTEST.give(3, null, 2, "За завдання дня");
     save(); renderAll(); renderButton();
     confetti(); sfx.level();
     modal({

@@ -10,7 +10,7 @@
    PUA_MAP[символ] = { e: емодзі-замінник, img: мальована картинка або null }.
    ============================================================ */
 const SIDE_DUR = 48 * 3600e3, SIDE_GAP = 24 * 3600e3;
-const SIDE_ART = ["side-jam-0", "side-jam-1", "side-jam-2", "side-jam-3", "side-jam-4", "side-shirt-0", "side-shirt-1", "side-shirt-2", "side-shirt-3", "side-shirt-4", "side-fair-0", "side-fair-1", "side-fair-2", "side-fair-3", "side-fair-4", "side-garden-0", "side-garden-1", "side-garden-2", "side-garden-3", "side-garden-4", "side-gen-jam", "side-gen-shirt", "side-gen-fair", "side-gen-garden"];                    // мальовані: "side-jam-0", "side-gen-jam"…
+const SIDE_ART = ["side-jam-0", "side-jam-1", "side-jam-2", "side-jam-3", "side-jam-4", "side-shirt-0", "side-shirt-1", "side-shirt-2", "side-shirt-3", "side-shirt-4", "side-fair-0", "side-fair-1", "side-fair-2", "side-fair-3", "side-fair-4", "side-garden-0", "side-garden-1", "side-garden-2", "side-garden-3", "side-garden-4", "side-gen-jam", "side-gen-shirt", "side-gen-fair", "side-gen-garden", "side-fish-0", "side-fish-1", "side-fish-2", "side-fish-3", "side-fish-4", "side-mush-0", "side-mush-1", "side-mush-2", "side-mush-3", "side-mush-4", "side-gen-fish", "side-gen-mush"];                    // мальовані: "side-jam-0", "side-gen-jam"…
 const SIDE_KINDS = [
   { id: "jam", host: "halya", title: "Вишневе варення", gen: ["🪣", "Відро вишень"],
     items: [["🍒", "Вишенька"], ["🥣", "Миска вишень"], ["🫕", "Казанок варення"], ["🫙", "Банка варення"], ["🥧", "Вишневий пиріг"]],
@@ -140,6 +140,8 @@ window.SIDE = (() => {
       }
       placeItem({ c: "chest", l: r.chest }); S.stars += r.stars; S.coins += r.coins;
       if (window.PATH) PATH.add(PATH_PTS.side);
+      if (window.MEDAL) MEDAL.count("outing");
+      if (window.CONTEST) CONTEST.give(3, k.id === "mush" ? ["veg"] : k.id === "jam" || k.id === "garden" ? ["berry"] : null, 2, "З пригоди");
       if (S.fr && FRIENDS[k.host]) S.fr[k.host] = Math.min(FRIEND_STEPS[2], (S.fr[k.host] || 0) + r.hearts);
       confetti(); sfx.level();
     }

@@ -231,6 +231,7 @@ function openChest(i) {
   window.QUEST && QUEST.track("chest");
   window.QUEST && QUEST.onChest(k, i);
   window.ALB && ALB.onChest(k);
+  if (k >= 1 && window.CONTEST) CONTEST.give(k, null, k, "З подарунка");
   sfx.open();
   sparkle(i, "✨", 8);
   renderBoard(); renderOrders(); save();
@@ -380,6 +381,8 @@ function deliver(id) {
   window.XTRA && XTRA.onDeliver(o, card);
   window.ALB && ALB.onDeliver(o);
   window.PATH && PATH.onDeliver(o);
+  window.TOLOKA && TOLOKA.onDeliver(o);
+  window.CONTEST && CONTEST.onDeliver(o);
   if (o.dish) window.QUEST && QUEST.track("dish");
   if (o.urgent) window.QUEST && QUEST.track("urgent");
   sfx.deliver();
@@ -834,6 +837,7 @@ function renderShop() {
     row.querySelector("button").onclick = () => buy(s.id);
     box.appendChild(row);
   });
+  if (window.DEALS) DEALS.render();
   const pb = $("payBox");
   if (pb && window.PAY && !pb.dataset.ok) { pb.innerHTML = PAY.html(); PAY.bind(pb); pb.dataset.ok = 1; }
   const tb = $("teaBtn");
@@ -1310,6 +1314,7 @@ function init() {
     if (window.PATH) PATH.tick();
     if (window.XTRA) { XTRA.catTick(); XTRA.slotsTick(); }
     if (window.CONTEST) CONTEST.tick();
+    if (window.TOLOKA) TOLOKA.tick();
     if (window.HUB && Date.now() % 5000 < 1000) { HUB.renderDot(); if (!$("tab-hub").hidden) HUB.render(); }
     if (Date.now() % 5000 < 1000) MECH.checkOven();
     if (!$("tab-shop").hidden) renderShop();
