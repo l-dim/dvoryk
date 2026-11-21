@@ -92,7 +92,7 @@ window.UNL = (() => {
     sfx.open();
     modal({
       title: "Нове відкрито! ✨",
-      html: `<div class="big-emoji">${u.icon}</div><p><b>${u.title}</b></p><p>${u.text}</p>`,
+      html: `<div class="big-emoji">${u.id === "cat" ? CAT_ICON : u.icon}</div><p><b>${u.title}</b></p><p>${u.text}</p>`,
       buttons: [{ label: "Чудово! 💛", onClick: () => { if (u.lines) playDialog(u.lines); } }]
     });
   }
@@ -112,6 +112,7 @@ window.UNL = (() => {
 
 /* ============================================================ */
 const CAT_CHEST = { first: 4, max: 7 };
+const CAT_ICON = `<img class="e3d pnt" src="items/ui-catchest.webp" alt="">`;   // мальований «котик на скрині»
 const CAT_VISIT = { firstMin: 5, gapMin: [25, 60], stayH: 3 };     // котик приходить без черги
 const CAT_BONUS = [
   { id: "battery", icon: "🔋", text: "батарейка ⚡" },
@@ -220,7 +221,7 @@ window.XTRA = (() => {
       if (window.ALB) ALB.give(2, "Від котика");
       save(); renderAll(); confetti(); sfx.level();
       modal({ title: "Скриня відкрита! 🧰",
-        html: `<div class="big-emoji">🧰</div><p>Пиріжок наївся й пустив до скрині. А там…</p><p class="rewards">💝 &nbsp; +${coins} 🪙 &nbsp; +${en} ⚡${on("album") ? " &nbsp; 💌💌" : ""}</p>` +
+        html: `<div class="big-emoji">${CAT_ICON}</div><p>Пиріжок наївся й пустив до скрині. А там…</p><p class="rewards">💝 &nbsp; +${coins} 🪙 &nbsp; +${en} ⚡${on("album") ? " &nbsp; 💌💌" : ""}</p>` +
           `<p class="hint-s">Котик уже вмощується назад 🐾 Наступна скриня — за ${S.cat.t} його замовлень.</p>`,
         buttons: [{ label: "Мур! 💛" }] });
     }), 900);

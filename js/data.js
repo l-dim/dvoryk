@@ -1164,7 +1164,7 @@ const DECO_ICONS = { "⛲": "deco-fountain", "⛱️": "deco-umbrella", "🕸️
 const UI_ICONS = { "⭐": "ui-star", "⚙️": "ui-gear", "🏡": "ui-home", "🛍️": "ui-shop", "📖": "ui-book",
   "✅": "ui-check", "🔨": "ui-hammer", "🔒": "ui-lock", "📜": "ui-scroll", "❄️": "ui-snow", "♨️": "st-oven", "🪢": "ui-thread",
   "🎪": "ui-events", "🥄": "ui-spoon", "🏅": "ui-medal", "🥇": "ui-gold", "🥈": "ui-silver", "🥉": "ui-bronze",
-  "✉️": "ui-mail", "📅": "ui-calendar", "🗄️": "ui-cabinet", "💃": "ui-look", "🗳️": "ui-vote", "📷": "ui-album" };
+  "✉️": "ui-mail", "📅": "ui-calendar", "🗄️": "ui-cabinet", "💃": "ui-look", "🗳️": "ui-vote", "📷": "ui-album", "💌": "ui-postcards" };
 
 
 /* ============================================================

@@ -601,7 +601,7 @@ function renderOrders() {
       (ready
         ? `<button class="o-btn">Віддати</button>`
         : `<div class="o-rew">🪙${o.coins} · ${o.ev ? "❄️" + o.pts : o.paw ? "🐾" + XTRA.catProg() : "⭐".repeat(o.stars)}</div>`) +
-      (o.paw ? `<span class="o-paw">🧰</span>` + (o.bonus ? `<span class="o-bonus">+${XTRA.bonusIcon(o)}</span>` : "") : "") +
+      (o.paw ? `<span class="o-paw">${CAT_ICON}</span>` + (o.bonus ? `<span class="o-bonus">+${XTRA.bonusIcon(o)}</span>` : "") : "") +
       (o.until || o.catUntil ? `<span class="o-timer" data-until="${o.until || o.catUntil}">⏰ ${MECH.hhmm((o.until || o.catUntil) - Date.now())}</span>` : "");
     el.addEventListener("click", e => {
       if (ready && e.target.closest(".o-btn")) { deliver(o.id); return; }

@@ -109,8 +109,8 @@ window.HUB = (() => {
     if (on("path")) { const s = PATH.season(); out.push({ icon: s.icon, title: s.name, sub: PATH.ready() ? "Є нагорода — забирай!" : "Кроки за замовлення й завдання", btn: "Відкрити", act: "path", ready: PATH.ready() }); }
     else out.push(lock("🍂", "Сезонна стежка", "path"));
     // котик
-    if (on("cat")) out.push({ icon: "🐱", title: "Котик на скрині", sub: `🐾 ${XTRA.catProg()} до скрині · приходить без черги з рідкісними замовленнями`, act: "", btn: "" });
-    else out.push(lock("🐱", "Котик на скрині", "cat"));
+    if (on("cat")) out.push({ icon: CAT_ICON, title: "Котик на скрині", sub: `🐾 ${XTRA.catProg()} до скрині · приходить без черги з рідкісними замовленнями`, act: "", btn: "" });
+    else out.push(lock(CAT_ICON, "Котик на скрині", "cat"));
     // альбом
     if (on("album")) out.push({ icon: "💌", title: "Альбом листівок", sub: `${ALB.haveN()} з 36 листівок`, btn: "Відкрити", act: "album" });
     else out.push(lock("💌", "Альбом листівок", "album"));

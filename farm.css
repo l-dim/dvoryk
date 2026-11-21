@@ -941,3 +941,6 @@ body.farm .nav .dot { right: 16%; }
 .lk-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
 .lk-opt { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; border-radius: 16px; background: linear-gradient(#fff4f8, #ffe0ea); box-shadow: 0 0 0 2px #f0a6bf, 0 3px 0 #d0789a; }
 .lk-opt b { font-size: 13px; }
+.o-paw .e3d.pnt { width: 1.3em; height: 1.3em; }
+.order.paw .o-paw { top: -5px; left: -4px; }
+.big-emoji .e3d.pnt { width: 1.1em; height: 1.1em; }
