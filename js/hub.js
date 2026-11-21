@@ -74,6 +74,9 @@ window.HUB = (() => {
     // конкурс
     if (on("contest")) { const c = CONTEST.card(); out.push(Object.assign(c, { act: "contest", btn: "Відкрити" })); }
     else out.push(lock("🏆", "Кулінарний конкурс", "contest"));
+    // виклик енергії
+    if (on("ech")) out.push(ECH.card());
+    else out.push(lock("⚡", "Виклик енергії", "ech"));
     // толока
     if (on("toloka")) { const c = TOLOKA.card(); out.push(c); }
     else out.push(lock("🥄", "Толока вихідного дня", "toloka"));
@@ -127,12 +130,13 @@ window.HUB = (() => {
     else if (a === "path") QUEST.panel("path");
     else if (a === "album") ALB.panel();
     else if (a === "toloka") TOLOKA.panel();
+    else if (a === "ech") ECH.panel();
     else if (a === "medals") MEDAL.panel();
   }
   function renderDot() {
     const d = $("navHubDot"); if (!d || !S) return;
     const outReady = on("outing") && !S.side && ["fish", "mush"].some(id => SIDE.canGo(id));
-    d.hidden = !(outReady || (window.PATH && PATH.ready()) || (window.TOLOKA && TOLOKA.ready()) || (window.MEDAL && MEDAL.ready()));
+    d.hidden = !(outReady || (window.PATH && PATH.ready()) || (window.TOLOKA && TOLOKA.ready()) || (window.MEDAL && MEDAL.ready()) || (window.ECH && ECH.ready()));
   }
   return { render, renderDot };
 })();

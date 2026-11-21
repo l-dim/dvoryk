@@ -36,11 +36,12 @@
 <!-- ===== Гра ===== -->
 <div id="app" hidden>
   <header class="top">
-    <div class="lvl-wrap"><div class="xp-ring" id="xpRing"><span id="lvl">1</span></div></div>
+    <button class="lvl-wrap" id="profileBtn" aria-label="Мій профіль"><div class="xp-ring" id="xpRing"><span id="lvl">1</span></div><span class="lvl-ava" id="lvlAva">👩‍🌾</span></button>
     <button class="chip" id="energyChip"><span class="ic">⚡</span><span id="energy">100</span><small id="energyTimer" hidden></small></button>
     <button class="boost-btn" id="boostBtn" hidden>×1</button>
     <div class="chip"><span class="ic">🪙</span><span id="coins">0</span></div>
     <div class="chip"><span class="ic">⭐</span><span id="stars">0</span></div>
+    <button class="gear mail-btn" id="mailBtn" aria-label="Пошта" hidden>✉️<i hidden>0</i></button>
     <button class="gear" id="settingsBtn" aria-label="Налаштування">⚙️</button>
   </header>
 
@@ -148,6 +149,7 @@
 <script src="js/contest.js"></script>
 <script src="js/medals.js"></script>
 <script src="js/toloka.js"></script>
+<script src="js/social.js"></script>
 <script src="js/hub.js"></script>
 <script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
 <script type="module" src="js/yard3d.js"></script>

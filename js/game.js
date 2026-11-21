@@ -446,6 +446,7 @@ function checkDaily() {
   const ys = y.getFullYear() + "-" + (y.getMonth() + 1) + "-" + y.getDate();
   S.streak = S.lastDaily === ys ? S.streak + 1 : 1;
   S.lastDaily = t;
+  if (window.LOGIN) { save(); LOGIN.show(S.streak); return; }
   const big = S.streak % 3 === 0;
   regen(); S.energy += ENERGY_BONUS.daily;
   placeItem({ c: "chest", l: big ? 1 : 0 });
@@ -1238,6 +1239,8 @@ function startGame() {
   if (window.UNL) UNL.init();
   if (window.XTRA) { XTRA.initDisc(); XTRA.renderBoost(); }
   if (window.PATH) PATH.init();
+  if (window.MAIL) MAIL.render();
+  if (window.PROFILE) PROFILE.renderAva();
   MECH.migrate();
   if (window.QUEST) { QUEST.init(); QUEST.renderButton(); }
   fillOrders();
@@ -1291,6 +1294,8 @@ function init() {
 
   document.querySelectorAll(".nav button").forEach(b => b.onclick = () => { audio(); showTab(b.dataset.tab); });
   $("settingsBtn").onclick = openSettings;
+  $("profileBtn").onclick = () => window.PROFILE ? PROFILE.open() : openSettings();
+  $("mailBtn").onclick = () => window.MAIL && MAIL.panel();
   $("inboxBtn").onclick = takeInbox;
   $("evBtn").onclick = () => window.EV && EV.panel();
   $("qBtn").onclick = () => window.QUEST && QUEST.panel();
@@ -1315,6 +1320,8 @@ function init() {
     if (window.XTRA) { XTRA.catTick(); XTRA.slotsTick(); }
     if (window.CONTEST) CONTEST.tick();
     if (window.TOLOKA) TOLOKA.tick();
+    if (window.MAIL) MAIL.tick();
+    if (window.UNL && UNL.on("mail") && $("mailBtn").hidden) MAIL.render();
     if (window.HUB && Date.now() % 5000 < 1000) { HUB.renderDot(); if (!$("tab-hub").hidden) HUB.render(); }
     if (Date.now() % 5000 < 1000) MECH.checkOven();
     if (!$("tab-shop").hidden) renderShop();
