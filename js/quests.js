@@ -120,6 +120,7 @@ window.QUEST = (() => {
   function track(k, n = 1, who) {
     if (!S || !S.dq) return;
     if (window.MEDAL) MEDAL.count(k, n);
+    if (window.RARE) RARE.track(k, n);
     trackWeek(k, n);
     if (S.dq.day !== today()) newDay();
     let finished = null;

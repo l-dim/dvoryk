@@ -194,7 +194,7 @@ window.MECH = (() => {
     const gone = S.orders.filter(o => o.until && now() >= o.until);
     if (!gone.length) return;
     S.orders = S.orders.filter(o => !gone.includes(o));
-    gone.forEach(o => toast(CHARS[o.ch].name + " вже не чекає — термінове замовлення минуло ⏰"));
+    gone.forEach(o => { if (window.RARE) RARE.onExpire(o); toast(CHARS[o.ch].name + (o.rare ? " поїхав далі — скарбу так і не дочекався 🧐" : " вже не чекає — термінове замовлення минуло ⏰")); });
     fillOrders(); renderOrders(); save();
   }
   const hhmm = ms => { const m = Math.max(0, Math.ceil(ms / 60e3)); return Math.floor(m / 60) + ":" + String(m % 60).padStart(2, "0"); };

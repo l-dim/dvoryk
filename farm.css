@@ -989,3 +989,18 @@ body.farm .nav .dot { right: 16%; }
 .pc.art.r3 { box-shadow: 0 0 0 2px #e7a92a, 0 0 8px rgba(255, 190, 40, .7) !important; }
 .pc.art.r2 { box-shadow: 0 0 0 2px #8fb6e6, 0 2px 4px rgba(90, 50, 10, .3) !important; }
 .pc-row { row-gap: 9px; }
+
+/* ---------- Скарби, колекціонер, виклик на час ---------- */
+.order.rare { border-color: #b58ae6 !important; background: linear-gradient(#f7f0ff, #e9dcff) !important; box-shadow: 0 0 0 2px #c9a8f5, 0 0 12px rgba(160, 110, 230, .5) !important; }
+.fl-btn { background: linear-gradient(#ffe1cc, #ffc79e) !important; }
+.fl-btn .ev-bar b { background: linear-gradient(#ff9a5c, #e2562e) !important; }
+.fl-head { display: flex; align-items: center; gap: 10px; text-align: left; }
+.fl-ic { font-size: 38px; font-family: var(--emoji); }
+.fl-ic .e3d { width: 1.1em; height: 1.1em; }
+.fl-head > span:last-child { display: flex; flex-direction: column; gap: 3px; font-size: 15px; }
+.fl-head small { font-size: 12.5px; font-weight: 700; color: var(--ink-soft); }
+.fl-bar { position: relative; height: 22px; margin: 10px 0 6px; border-radius: 11px; background: #e8cf9b; overflow: hidden; box-shadow: inset 0 1px 3px rgba(120, 70, 20, .35); }
+.fl-bar > b { display: block; height: 100%; background: linear-gradient(#ffb36b, #e2562e); }
+.fl-bar i { position: absolute; top: 0; bottom: 0; width: 2px; background: rgba(90, 50, 10, .45); }
+.fl-bar span { position: absolute; inset: 0; display: grid; place-items: center; font: 900 12.5px/1 var(--font); color: #4a2709; }
+.fl-rew { display: flex; flex-direction: column; gap: 3px; font-size: 13px; font-weight: 800; text-align: left; }

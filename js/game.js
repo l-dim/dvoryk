@@ -75,8 +75,8 @@ function itemName(it) {
   return CHAINS[it.c].items[it.l][1];
 }
 function isMax(it) { return it && !it.g && !it.lock && !it.st && (CHAINS[it.c].nomerge || it.l >= CHAINS[it.c].items.length - 1); }
-function sellPrice(it) { return Math.max(1, Math.round(itemValue(it.c, it.l) / 3)); }
-function itemValue(c, l) { return CHAINS[c] && CHAINS[c].value ? CHAINS[c].value : Math.round(4 * Math.pow(1.9, l)); }
+function sellPrice(it) { return Math.max(1, Math.round(itemValue(it.c, it.l) / 5)); }
+function itemValue(c, l) { return CHAINS[c] && CHAINS[c].vals ? CHAINS[c].vals[l] : CHAINS[c] && CHAINS[c].value ? CHAINS[c].value : Math.round(4 * Math.pow(1.9, l)); }
 Object.keys(CHARS).forEach(k => CHARS[k].key = k);
 function face(ch, cls = "") {
   if (!PORTRAITS.includes(ch.key)) return ch.icon;
@@ -212,7 +212,7 @@ function produce(i) {
   let item;
   const roll = Math.random();
   if (roll < 0.01) item = { c: "energy", l: 0 };
-  else if (roll < 0.04) item = { c: "coin", l: 0 };
+  else if (roll < 0.025) item = { c: "coin", l: 0 };
   else {
     // що вищий рівень гравця, то частіше генератор дає одразу кращі предмети
     const r = Math.random(), tb = MECH.tierBonus(gIt), up = Math.min(0.35, 0.15 + S.level * 0.01) + tb;
@@ -222,6 +222,7 @@ function produce(i) {
   const at = placeItem(item, i);
   if (at >= 0) spawnFrom.set(at, i);
   window.QUEST && QUEST.track("tap");
+  window.RARE && RARE.onTap(i);
   sfx.pop();
   bounce(i);
   if (S.tut === 0) setTut(1);
@@ -241,7 +242,7 @@ function openChest(i) {
     const r = Math.random();
     let item;
     if (r < 0.05) item = { c: "energy", l: Math.min(2, rnd(k + 1)) };
-    else if (r < 0.18) item = { c: "coin", l: Math.min(3, rnd(k + 2)) };
+    else if (r < 0.12) item = { c: "coin", l: Math.min(3, rnd(k + 1)) };
     else item = { c: pick(unlocked), l: rnd(maxT + 1) };
     const at = placeItem(item, i);
     if (at >= 0) spawnFrom.set(at, i);
@@ -356,7 +357,7 @@ function newOrder() {
   // для перших замовлень — дуже прості речі
   if (S.ordersDone < 3) { items.length = 1; items[0].l = 1; items[0].c = pick(["veg", "bake"]); }
   let coins = 0, xp = 0, top = 0;
-  items.forEach(it => { coins += Math.round(itemValue(it.c, it.l) * 1.3); xp += (it.l + 1) * 3; top = Math.max(top, it.l); });
+  items.forEach(it => { coins += Math.round(itemValue(it.c, it.l) * 0.9); xp += (it.l + 1) * 3; top = Math.max(top, it.l); });
   const stars = top >= 5 || items.length >= 2 && top >= 4 ? 2 : 1;
   return MECH.maybeUrgent({ id: ++S.orderSeq, ch, items, coins, xp, stars, line: rnd(3) });
 }
@@ -364,7 +365,7 @@ function orderSlots() { return window.XTRA ? XTRA.slots() : 3; }
 function fillOrders() {
   S.orders = S.orders.filter(o => o && CHARS[o.ch]);
   // котик — без черги, тож його замовлення не займає місця
-  const regular = () => S.orders.filter(o => !o.paw).length;
+  const regular = () => S.orders.filter(o => !o.paw && !o.rare).length;
   while (regular() < orderSlots()) { const o = newOrder(); if (!o) break; S.orders.push(o); }
 }
 function matchOrder(o) {
@@ -403,6 +404,7 @@ function deliver(id) {
   window.PATH && PATH.onDeliver(o);
   window.TOLOKA && TOLOKA.onDeliver(o);
   window.CONTEST && CONTEST.onDeliver(o);
+  window.RARE && RARE.onDeliver(o);
   window.FASH && FASH.onDeliver(o);
   if (o.dish) window.QUEST && QUEST.track("dish");
   if (o.urgent) window.QUEST && QUEST.track("urgent");
@@ -610,7 +612,7 @@ function renderOrders() {
     const ch = CHARS[o.ch];
     const el = document.createElement("div");
     const pic = FARM && PORTRAITS.includes(ch.key);
-    el.className = "order" + (ready ? " ready" : "") + (pic ? " pic" : "") + (o.ev ? " ev" : "") + (o.paw ? " paw" : "") + (o.urgent ? " urgent" : "") + (o.dish ? " dish" : "");
+    el.className = "order" + (ready ? " ready" : "") + (pic ? " pic" : "") + (o.ev ? " ev" : "") + (o.paw ? " paw" : "") + (o.rare ? " rare" : "") + (o.urgent ? " urgent" : "") + (o.dish ? " dish" : "");
     el.dataset.id = o.id;
     const itemsHtml = `<div class="o-items">${o.items.map((it, k) => `<span class="o-item${found[k] >= 0 ? " have" : ""}">${itemIcon(it)}</span>`).join("")}</div>`;
     el.innerHTML = (pic
@@ -1327,6 +1329,7 @@ function init() {
   $("evBtn").onclick = () => window.EV && EV.panel();
   $("qBtn").onclick = () => window.QUEST && QUEST.panel();
   $("sideBtn").onclick = () => window.SIDE && SIDE.toggle();
+  $("flashBtn").onclick = () => window.RARE && RARE.panel();
   $("boostBtn").onclick = () => window.XTRA && XTRA.toggleBoost();
   $("teaBtn").onclick = () => { takeTea(); renderShop(); };
   $("energyChip").onclick = () => { showNoEnergyInfo(); };
@@ -1345,6 +1348,7 @@ function init() {
     if (window.ALB) ALB.tick();
     if (window.PATH) PATH.tick();
     if (window.XTRA) { XTRA.catTick(); XTRA.slotsTick(); }
+    if (window.RARE) RARE.tick();
     if (window.CONTEST) CONTEST.tick();
     if (window.TOLOKA) TOLOKA.tick();
     if (window.MAIL) MAIL.tick();
