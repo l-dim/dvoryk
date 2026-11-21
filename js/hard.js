@@ -76,7 +76,7 @@ window.HARD = (() => {
   function shutHtml(i) { return isNextLabel(i) ? `<span class="shut-lbl">🔒<small>${nextStrip().stars}⭐</small></span>` : ""; }
 
   /* ---------- 2. знос генераторів ---------- */
-  const wears = it => it && it.g && GENS[it.g] && !GENS[it.g].side && !GENS[it.g].animal && it.g !== (window.EVENT && EVENT.gen);
+  const wears = it => it && it.g && GENS[it.g] && !GENS[it.g].side && !GENS[it.g].animal && !GENS[it.g].holiday;
   const broken = it => on("wear") && wears(it) && !!it.broken;
   function wear(it, n = 1) {
     if (!on("wear") || !wears(it)) return;

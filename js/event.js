@@ -7,8 +7,9 @@
 window.EV = (() => {
   const now = () => window.DVORYK_NOW || Date.now();
   const year = () => new Date(now()).getFullYear();
-  const win = () => EVENT.window(year());
-  const curId = () => EVENT.key + "-" + year();
+  const win = () => (window.HOL ? HOL.win() : EVENT.window(year()));
+  const curId = () => EVENT.key + "-" + (win().y || year());
+  const PT = () => EVENT.pt || "❄️";
   const inWindow = () => now() >= win().start && now() < win().end;
   const st = () => (S.ev && S.ev.id === curId() ? S.ev : null);
   const active = () => !!st() && st().intro && !st().ended && inWindow();
@@ -24,6 +25,7 @@ window.EV = (() => {
 
   /* ---------- старт і завершення ---------- */
   function tick() {
+    if (window.HOL) HOL.pick();
     if (!ready() || busyUI()) return;
     // торішнє свято, яке не встигло завершитися (гру не відкривали) — спершу підсумуємо його
     if (S.ev && !S.ev.ended && S.ev.intro && (S.ev.id !== curId() || !inWindow())) { finish(); return; }
@@ -37,7 +39,7 @@ window.EV = (() => {
       placeItem({ g: EVENT.gen });
       save(); renderAll(); renderButton();
       playDialog(EVENT.story.intro, () => {
-        modal({ title: EVENT.title + " 🎁", html: panelHtml(), buttons: [{ label: "Почнімо! ❄️" }] });
+        modal({ title: EVENT.title + " 🎁", html: panelHtml(), buttons: [{ label: "Почнімо! " + PT() }] });
       });
       return;
     }
@@ -46,7 +48,7 @@ window.EV = (() => {
 
   function finish() {
     const e = S.ev;
-    e.ended = true;
+    e.ended = true; if (window.HOL) HOL.finished(e.id);
     let coins = 0, n = 0;
     S.board.forEach((it, i) => {
       if (!it) return;
@@ -62,8 +64,8 @@ window.EV = (() => {
     S.coins += coins;
     fillOrders(); save(); renderAll(); renderButton();
     modal({
-      title: "Свято минуло ❄️",
-      html: `<div class="big-emoji">🎁</div><p>Ти зібрала <b>${e.pts} ❄️</b> і отримала ${e.got} з ${EVENT.milestones.length} нагород.</p>` +
+      title: "Свято минуло " + PT(),
+      html: `<div class="big-emoji">🎁</div><p>Зібрано <b>${e.pts} ${PT()}</b> і отримано ${e.got} з ${EVENT.milestones.length} нагород.</p>` +
         (n ? `<p class="hint-s">Залишки подарунків (${n} шт.) обміняно на ${coins} 🪙</p>` : ""),
       buttons: [{ label: "Дякую 💛", onClick: () => playDialog(EVENT.story.ending) }]
     });
@@ -92,7 +94,7 @@ window.EV = (() => {
     window.QUEST && QUEST.track("snow", o.pts || 0);
     if (card && typeof flyIcon === "function") {
       const from = card.getBoundingClientRect(), to = $("evBtn").getBoundingClientRect();
-      for (let k = 0; k < 4; k++) flyIcon("❄️", from, to, { delay: 300 + k * 80, size: 22, dur: 650, end: 0.6, lift: 50 });
+      for (let k = 0; k < 4; k++) flyIcon(PT(), from, to, { delay: 300 + k * 80, size: 22, dur: 650, end: 0.6, lift: 50 });
     }
     setTimeout(() => { renderButton(); grantMilestones(); }, 900);
   }
@@ -118,8 +120,8 @@ window.EV = (() => {
     save(); renderAll(); renderButton();
     confetti(); sfx.level();
     modal({
-      title: e.got === EVENT.milestones.length ? "Свято зібрано! 🎉" : "Нагорода свята! ❄️",
-      html: `<div class="big-emoji">🎁</div><p>Ти зібрала ${m.pts} ❄️ — тримай:</p><p class="rewards">${rewardText(r)}</p>`,
+      title: e.got === EVENT.milestones.length ? "Свято зібрано! 🎉" : "Нагорода свята! " + PT(),
+      html: `<div class="big-emoji">🎁</div><p>Зібрано ${m.pts} ${PT()} — тримай:</p><p class="rewards">${rewardText(r)}</p>`,
       buttons: [{ label: "Дякую! 💛", onClick: () => {
         const next = () => setTimeout(grantMilestones, 300);
         if (m.story) playDialog(EVENT.story[m.story], next); else next();
@@ -133,6 +135,8 @@ window.EV = (() => {
     const on = active();
     b.hidden = !on;
     if (!on) return;
+    const ic = b.querySelector(".ev-ic"), gi = GENS[EVENT.gen] && GENS[EVENT.gen].icon;
+    if (ic && gi && ic.dataset.g !== EVENT.gen) { ic.dataset.g = EVENT.gen; ic.textContent = gi; }
     const e = st(), m = nextMilestone(), prev = e.got ? EVENT.milestones[e.got - 1].pts : 0;
     $("evTime").textContent = daysLeft();
     $("evBar").style.width = (m ? Math.min(100, (e.pts - prev) / (m.pts - prev) * 100) : 100) + "%";
@@ -142,12 +146,12 @@ window.EV = (() => {
     const e = st();
     const rows = EVENT.milestones.map((m, k) => {
       const got = e && k < e.got;
-      return `<div class="ev-ms${got ? " got" : e && e.pts >= m.pts ? " ready" : ""}"><span class="ev-pts">${m.pts} ❄️</span>` +
+      return `<div class="ev-ms${got ? " got" : e && e.pts >= m.pts ? " ready" : ""}"><span class="ev-pts">${m.pts} ${PT()}</span>` +
         `<span class="ev-rw">${rewardText(m.reward)}</span><span class="ev-ok">${got ? "✅" : "🔒"}</span></div>`;
     }).join("");
     const m = e && nextMilestone();
-    return `<p>Допоможи Ірині й Марічці зібрати подарунки для сільських дітей! Тапай скриньку 📮, об'єднуй подарунки й віддавай їм.</p>
-      <p class="ev-sum"><b>${e ? e.pts : 0} ❄️</b>${m ? ` · до наступної нагороди ще ${m.pts - e.pts} ❄️` : " · усі нагороди зібрано! 🎉"}<br><small>До свята: ${daysLeft()}</small></p>
+    return `<p>${EVENT.desc || "Допоможи Ірині й Марічці зібрати подарунки для сільських дітей! Тапай скриньку, об'єднуй подарунки й віддавай їм."}</p>
+      <p class="ev-sum"><b>${e ? e.pts : 0} ${PT()}</b>${m ? ` · до наступної нагороди ще ${m.pts - e.pts} ${PT()}` : " · усі нагороди зібрано! 🎉"}<br><small>До кінця свята: ${daysLeft()}</small></p>
       <div class="ev-list">${rows}</div>`;
   }
   function panel() {

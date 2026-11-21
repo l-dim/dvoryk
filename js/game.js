@@ -866,7 +866,8 @@ function renderStory(animateLast) {
     // котик у светрику, якщо йому видали светрик і зараз зима
     if (winterLook("cat", ch)) all.forEach(d => { if (d.e === "🐱") { d.catPic = "cat-winter"; d.key += "-w"; } });
     if (window.DECOR) all.push(...DECOR.yard(ch));
-    if (window.FAM) all.push(...FAM.yard(ch));                // прикраси, які поставила сама
+    if (window.FAM) all.push(...FAM.yard(ch));
+    if (window.HOL) all.push(...HOL.yard(ch));                // прикраси, які поставила сама
     if (window.HERO) all.push(...HERO.yard(ch, all));          // героїня — попереду, сусіди стають довкола
     all.push(...yardPeople(ch, all));
     if (window.QUEST && !ch.loc) all.push(...QUEST.yardGifts(ch, all));
