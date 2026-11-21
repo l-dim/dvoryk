@@ -82,7 +82,7 @@ window.MECH = (() => {
   }
   function addLocks(n) {
     const free = [];
-    for (let i = N - 1; i >= COLS * (ROWS - 3); i--) if (!S.board[i]) free.push(i);
+    for (let i = N - 1; i >= COLS * (ROWS - 4); i--) if (!S.board[i] && (typeof cellOpen !== "function" || cellOpen(i))) free.push(i);
     free.sort(() => Math.random() - 0.5).slice(0, n).forEach(i => { S.board[i] = { lock: 1 + rnd(2), hide: lockReward() }; });
   }
   function openLock(i, viaCoins) {
@@ -203,13 +203,18 @@ window.MECH = (() => {
   function tileKey(it) {
     if (it.lock) return "lk:" + it.lock;
     if (it.st) return "st:" + ovenState(it) + ":" + (it.r ?? "");
-    if (it.g) return "g:" + it.g + ":" + gl(it) + ":" + (resting(it) ? "z" : "a");
+    if (it.g) return "g:" + it.g + ":" + gl(it) + ":" + (resting(it) ? "z" : "a") + (it.broken ? ":b" : "");
     return null;
   }
   function decorate(t, it) {
     if (!t || !it) return;
     if (it.g) {
       refresh(it);
+      const br = !!(window.HARD && HARD.broken(it));
+      t.classList.toggle("broken", br);
+      let fx = t.querySelector(".gen-fix");
+      if (br && !fx) { fx = document.createElement("span"); fx.className = "gen-fix"; fx.textContent = "🔧"; t.appendChild(fx); }
+      else if (!br && fx) fx.remove();
       let bar = t.querySelector(".gen-bar"), z = t.querySelector(".gen-z"), lv = t.querySelector(".gen-lv");
       if (gl(it) > 1 && !lv) { lv = document.createElement("span"); lv.className = "gen-lv"; lv.textContent = gl(it); t.appendChild(lv); }
       if (resting(it)) {

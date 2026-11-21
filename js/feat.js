@@ -17,6 +17,12 @@ const UNLOCKS = [
   { id: "mail",     lvl: 3, icon: "📮", title: "Пошта",
     text: "Тепер щодня листоноша Іван приносить лист від когось із сусідів — і в кожному конверті маленький подарунок. Кнопка ✉️ угорі. Налаштування тепер у твоєму профілі — тапни на рівень ліворуч угорі.",
     lines: [["ivan", "{name}, тепер я й до тебе заходитиму щодня! 📮 Сусіди тобі пишуть — а в листах часом і гостинці 😉"]] },
+  { id: "wear",     lvl: 5, icon: "🔧", title: "Генератори зношуються",
+    text: "Після ~90 тапів генератор ламається. Дід Степан полагодить, якщо принесеш два предмети, — або заплати майстрові. Два однакові генератори, злиті разом, дають новенький.",
+    lines: [["stepan", "{name}, техніка не вічна 🔧 Як щось зламається — клич мене, полагоджу. Тільки матеріал принеси!"]] },
+  { id: "spoil",    lvl: 6, icon: "🥀", title: "Свіжі продукти",
+    text: "Молочне, фрукти й випічка, що лежать на дошці понад добу, черствіють і коштують удвічі менше. Віддавай свіжим! У сховку 🗄️ продукти не псуються.",
+    lines: [["halya", "Молоко скисає, хліб черствіє, {name}… Не тримай довго — неси сусідам, поки свіже 🥛"]] },
   { id: "rest",     lvl: 3, icon: "💤", title: "Генератори втомлюються",
     text: "Після кількох тапів генератор відпочиває. Два однакові генератори зливаються в кращий — з більшим зарядом.",
     lines: [["stepan", "Земля теж має відпочивати, {name} 🌱 Потапала — дай грядці перепочити."]] },
@@ -251,6 +257,7 @@ window.XTRA = (() => {
     const cell = document.querySelector(`.cell[data-i="${i}"]`);
     const btn = $("storeBtn");
     if (cell && btn) flyIcon(itemIcon(it), cell.getBoundingClientRect(), btn.getBoundingClientRect(), { size: 34, end: 0.5 });
+    if (it.t) it.age = Date.now() - it.t;          // у сховку продукти не черствіють
     s.items.push(it);
     S.board[i] = null; if (selected === i) selected = -1;
     sfx.pop(); toast(`🗄️ ${itemName(it)} — у сховку`);
@@ -262,6 +269,7 @@ window.XTRA = (() => {
     const i = emptyNear(Math.floor(N / 2));
     if (i < 0) { sfx.nope(); toast("Звільни місце на дошці 🙂"); return; }
     S.board[i] = s.items.splice(k, 1)[0]; popIdx.add(i);
+    if (S.board[i].age !== undefined) { S.board[i].t = Date.now() - S.board[i].age; delete S.board[i].age; }
     sfx.pop();
     renderBoard(); renderOrders(); renderInfo(); save();
     openStore();

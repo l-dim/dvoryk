@@ -75,7 +75,7 @@ function itemName(it) {
   return CHAINS[it.c].items[it.l][1];
 }
 function isMax(it) { return it && !it.g && !it.lock && !it.st && (CHAINS[it.c].nomerge || it.l >= CHAINS[it.c].items.length - 1); }
-function sellPrice(it) { return Math.max(1, Math.round(itemValue(it.c, it.l) / 5)); }
+function sellPrice(it) { return Math.max(1, Math.round(itemValue(it.c, it.l) / 5 / (window.HARD && HARD.stale(it) ? 2 : 1))); }
 function itemValue(c, l) { return CHAINS[c] && CHAINS[c].vals ? CHAINS[c].vals[l] : CHAINS[c] && CHAINS[c].value ? CHAINS[c].value : Math.round(4 * Math.pow(1.9, l)); }
 Object.keys(CHARS).forEach(k => CHARS[k].key = k);
 function face(ch, cls = "") {
@@ -167,7 +167,7 @@ function emptyNear(from) {
   let best = -1, bd = 1e9;
   const fr = Math.floor(from / COLS), fc = from % COLS;
   for (let i = 0; i < N; i++) {
-    if (S.board[i]) continue;
+    if (S.board[i] || (typeof cellOpen === "function" && !cellOpen(i))) continue;
     const r = Math.floor(i / COLS), c = i % COLS;
     const d = (r - fr) ** 2 + (c - fc) ** 2 + Math.random() * 0.1;
     if (d < bd) { bd = d; best = i; }
@@ -176,6 +176,7 @@ function emptyNear(from) {
 }
 function placeItem(item, near = Math.floor(N / 2)) {
   // на дошці пригоди — лише її предмети; подарунки й нагороди чекають у 📥
+  if (window.HARD) HARD.stamp(item);
   if (window.SIDE && SIDE.guardPlace(item)) { S.inbox.push(item); renderInbox(); return -1; }
   const i = emptyNear(near);
   if (i < 0) { S.inbox.push(item); renderInbox(); return -1; }
@@ -202,6 +203,7 @@ function produce(i) {
   const gIt = S.board[i];
   MECH.refresh(gIt);
   if (MECH.resting(gIt)) { MECH.restModal(i); return; }
+  if (window.HARD && HARD.broken(gIt)) { HARD.repairModal(i); return; }
   if (emptyNear(i) < 0) { sfx.nope(); toast("Немає місця 🙈 Об'єднай або продай щось"); return; }
   // сила ×2: 2 ⚡ і 2 заряди — зате предмет одразу на рівень вищий
   const x2 = window.XTRA && XTRA.boosted() && S.energy >= 2;
@@ -209,6 +211,7 @@ function produce(i) {
   const rest = !window.UNL || UNL.on("rest");
   let tired = rest ? MECH.useCharge(gIt) : false;
   if (x2 && rest && !tired) tired = MECH.useCharge(gIt);
+  if (window.HARD) HARD.wear(gIt, x2 ? 2 : 1);
   let item;
   const roll = Math.random();
   if (roll < 0.01) item = { c: "energy", l: 0 };
@@ -276,6 +279,7 @@ function handleDrop(a, b) {
   const A = S.board[a], B = S.board[b];
   if (!A) return;
   if (A.lock || (B && B.lock)) { renderBoard(); return; }   // павутиння не рухається
+  if (typeof cellOpen === "function" && !cellOpen(b)) { renderBoard(); return; }   // закрита клітинка
   if (MECH.canMergeGens(A, B)) { MECH.mergeGens(a, b); renderBoard(); renderOrders(); renderInfo(); save(); return; }
   if (!B) {
     S.board[b] = A; S.board[a] = null;
@@ -283,6 +287,7 @@ function handleDrop(a, b) {
   } else if (!A.g && !B.g && A.c === B.c && A.l === B.l && !isMax(A)) {
     const nl = A.l + 1;
     S.board[b] = { c: A.c, l: nl };
+    if (window.HARD && HARD.perish(A)) { S.board[b].t = HARD.mergedT(A, B); if (A.old || B.old) S.board[b].old = 1; }
     S.board[a] = null;
     S.merges++;
     discover(S.board[b]);
@@ -348,10 +353,11 @@ function newOrder() {
   for (let n = 0; n < count; n++) {
     const c = pick(chains), len = CHAINS[c].items.length;
     // стеля складності: не більше рів. 6 (до 15-го рівня гравця — рів. 5), щоб не було виснажливого гринду
-    const cap = S.level < 15 ? 4 : 5;
+    // дорожчі замовлення: стеля вища, а рівень частіше ближче до стелі
+    const cap = S.level < 8 ? 4 : S.level < 15 ? 5 : 6;
     const maxT = Math.min(len - 1, cap, 2 + Math.floor(S.level / 2));
-    const minT = S.level >= 4 ? 2 : 1;
-    const l = Math.max(minT, Math.min(maxT, minT + rnd(maxT - minT + 1)));
+    const minT = S.level >= 10 ? 3 : S.level >= 4 ? 2 : 1;
+    const l = Math.max(minT, Math.min(maxT, maxT - Math.floor(Math.pow(Math.random(), 1.8) * (maxT - minT + 1))));
     items.push({ c, l: Math.min(l, len - 1) });
   }
   // для перших замовлень — дуже прості речі
@@ -374,7 +380,7 @@ function matchOrder(o) {
     let hit = -1;
     for (let i = 0; i < N; i++) {
       const it = S.board[i];
-      if (it && !it.g && !used.has(i) && it.c === need.c && it.l === need.l) { hit = i; break; }
+      if (it && !it.g && !used.has(i) && it.c === need.c && it.l === need.l) { if (hit < 0 || (it && !it.old && S.board[hit].old)) hit = i; if (!it.old) break; }
     }
     found.push(hit);
     if (hit >= 0) used.add(hit);
@@ -387,12 +393,14 @@ function deliver(id) {
   const found = matchOrder(o);
   if (found.some(i => i < 0)) { sfx.nope(); return; }
   const card = document.querySelector(`.order[data-id="${id}"]`);
+  const stalePen = window.HARD ? HARD.stalePenalty(found) : 0;
   found.forEach((i, k) => { flyFrom(i, card, k * 70); S.board[i] = null; if (selected === i) selected = -1; });
+  if (stalePen) setTimeout(() => toast(`🥀 Частина продуктів зачерствіла — −${stalePen} 🪙`), 1200);
   if (card && FARM) {
     const cr = card.getBoundingClientRect();
     setTimeout(() => { flyMany(cr, "🪙", "coins", 4); if (o.stars) flyMany(cr, "⭐", "stars", o.stars + 1, 120); }, 380);
   }
-  S.coins += o.coins;
+  S.coins += Math.max(1, o.coins - stalePen);
   S.stars += o.stars;
   S.ordersDone++;
   if (o.ev && window.EV) EV.onDeliver(o, card);
@@ -648,7 +656,10 @@ function renderBoard() {
   for (let i = 0; i < N; i++) {
     const cell = board.children[i], it = S.board[i];
     cell.classList.toggle("sel", i === selected);
-    const key = it ? (MECH.tileKey(it) || it.c + ":" + it.l) : "";
+    const shut = window.HARD ? HARD.shutKey(i) : null;
+    cell.classList.toggle("shut", !!shut); cell.classList.toggle("shut-next", !!shut && shut !== "shut");
+    if (shut) { if (cell.dataset.key !== shut) { cell.dataset.key = shut; cell.innerHTML = HARD.shutHtml(i); } continue; }
+    const key = it ? (MECH.tileKey(it) || it.c + ":" + it.l + (it.old ? ":o" : "")) : "";
     if (cell.dataset.key === key && !popIdx.has(i) && !spawnFrom.has(i) && !mergedIdx.has(i)) { cell.firstChild && cell.firstChild.classList.toggle("needed", neededIdx.has(i)); MECH.decorate(cell.firstChild, it); continue; }
     cell.dataset.key = key;
     cell.innerHTML = "";
@@ -657,7 +668,7 @@ function renderBoard() {
     const from = spawnFrom.has(i) && FARM ? cellRect(spawnFrom.get(i)) : null, to = from && cellRect(i);
     const anim = from && to ? " spawn" : mergedIdx.has(i) && FARM ? " merged" : popIdx.has(i) ? " pop" : "";
     t.className = "tile" + (it.g ? " gen" : "") + (it.c && CHAINS[it.c].open ? " chest" : "") + (it.c === "dish" ? " dish" : "") +
-      (it.c && CHAINS[it.c].collect ? " collect" : "") + (isMax(it) && PRODUCT_CHAINS.includes(it.c) ? " max" : "") +
+      (it.c && CHAINS[it.c].collect ? " collect" : "") + (isMax(it) && PRODUCT_CHAINS.includes(it.c) ? " max" : "") + (window.HARD && HARD.stale(it) ? " stale" : "") +
       anim + (neededIdx.has(i) ? " needed" : "");
     if (from && to) { t.style.setProperty("--fx", (from.left - to.left) + "px"); t.style.setProperty("--fy", (from.top - to.top) + "px"); }
     t.dataset.i = i;
@@ -689,7 +700,7 @@ function renderInfo() {
     const lv = MECH.gl(it) > 1 ? ` <span class="lvl-tag">рів. ${MECH.gl(it)}</span>` : "";
     text = MECH.resting(it)
       ? `<b>${GENS[it.g].name}</b>${lv}<small>💤 Відпочиває ще ${Math.ceil((it.rest - Date.now()) / 60e3)} хв</small>`
-      : `<b>${GENS[it.g].name}</b>${lv}<small>Заряд ${it.ch}/${MECH.cap(it)} · тапай, щоб отримати ${ch.items[0][0]} (−1 ⚡)</small>`;
+      : `<b>${GENS[it.g].name}</b>${lv}<small>Заряд ${it.ch}/${MECH.cap(it)}${window.HARD ? HARD.genInfo(it) : ""} · тапай, щоб отримати ${ch.items[0][0]} (−1 ⚡)</small>`;
   } else if (it.c === "dish") {
     text = `<b>${itemName(it)}</b><small>Страву просять сусіди за ⭐⭐</small>`;
     btn = `<button class="sell" id="sellBtn"><small>продати</small><span>+${sellPrice(it)}🪙</span></button>`;
@@ -699,7 +710,7 @@ function renderInfo() {
     text = `<b>${itemName(it)}</b><small>Тапни ще раз, щоб забрати +${CHAINS[it.c].values[it.l]} ${it.c === "coin" ? "🪙" : "⚡"}</small>`;
   } else {
     const ch = CHAINS[it.c];
-    const next = isMax(it) ? "Найвищий рівень! 🏆" : `Два таких → ${ch.items[it.l + 1][0]} ${ch.items[it.l + 1][1]}`;
+    const next = (isMax(it) ? "Найвищий рівень! 🏆" : `Два таких → ${ch.items[it.l + 1][0]} ${ch.items[it.l + 1][1]}`) + (window.HARD ? HARD.freshInfo(it) : "");
     text = `<b>${itemName(it)} <span class="lvl-tag">рів. ${it.l + 1}</span></b><small>${next}</small>`;
     btn = `<button class="sell" id="sellBtn"><small>продати</small><span>+${sellPrice(it)}🪙</span></button>`;
   }
@@ -1183,7 +1194,11 @@ function openSettings() {
 let drag = null;
 function onDown(e) {
   const tile = e.target.closest(".tile");
-  if (!tile) { if (e.target.closest(".cell")) { selected = -1; renderBoard(); renderInfo(); } return; }
+  if (!tile) {
+    const sc = e.target.closest(".cell.shut");
+    if (sc && window.HARD) { HARD.expandModal(); return; }
+    if (e.target.closest(".cell")) { selected = -1; renderBoard(); renderInfo(); } return;
+  }
   e.preventDefault();
   audio();
   const i = +tile.dataset.i;
@@ -1265,6 +1280,7 @@ function startGame() {
   $("app").hidden = false;
   if (window.SIDE) SIDE.onStart();
   if (window.UNL) UNL.init();
+  if (window.HARD) HARD.init();
   if (window.XTRA) { XTRA.initDisc(); XTRA.renderBoost(); }
   if (window.PATH) PATH.init();
   if (window.MAIL) MAIL.render();
@@ -1349,6 +1365,7 @@ function init() {
     if (window.PATH) PATH.tick();
     if (window.XTRA) { XTRA.catTick(); XTRA.slotsTick(); }
     if (window.RARE) RARE.tick();
+    if (window.HARD) HARD.tick();
     if (window.CONTEST) CONTEST.tick();
     if (window.TOLOKA) TOLOKA.tick();
     if (window.MAIL) MAIL.tick();
