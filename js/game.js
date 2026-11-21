@@ -724,7 +724,7 @@ function yardPeople(ch, all) {
   all.forEach(d => { if (d.pic) delete count[d.pic.split("-")[0]]; });
   const who = Object.keys(count).sort((a, b) => count[b] - count[a]).slice(0, 3);
   const slots = [[27, 72], [73, 72], [36, 87], [64, 87], [17, 60], [83, 60], [40, 76], [60, 76], [12, 74], [88, 74], [24, 86], [76, 86], [50, 64], [8, 66], [92, 66], [30, 94], [70, 94], [50, 92]];
-  const taken = all.filter(d => d.y >= 34 && !d.who).map(d => [d.x, d.y, d.s]);
+  const taken = all.filter(d => d.y >= 34 && (!d.who || d.hero)).map(d => [d.x, d.y, d.s, !!d.hero]);
   const out = [];
   for (const w of who) {
     const s = 10;
@@ -783,6 +783,7 @@ function renderStory(animateLast) {
   if (window.Yard3D) {
     // котик у светрику, якщо йому видали светрик і зараз зима
     if (winterLook("cat", ch)) all.forEach(d => { if (d.e === "🐱") { d.catPic = "cat-winter"; d.key += "-w"; } });
+    if (window.HERO) all.push(...HERO.yard(ch));          // героїня — попереду, сусіди стають довкола
     all.push(...yardPeople(ch, all));
     if (window.QUEST && !ch.loc) all.push(...QUEST.yardGifts(ch, all));
     // справжній 3D-дворик
@@ -1283,6 +1284,7 @@ function init() {
     S.lastDaily = todayStr(); S.streak = 1;
     $("start").classList.add("show");
     $("installHint").hidden = !(isIOS() && !isStandalone());
+    if (window.HERO) HERO.startRow();
     $("startBtn").onclick = () => {
       audio();
       S.name = $("nameInput").value.trim();
@@ -1327,6 +1329,7 @@ function init() {
     if (window.CONTEST) CONTEST.tick();
     if (window.TOLOKA) TOLOKA.tick();
     if (window.MAIL) MAIL.tick();
+    if (window.HERO) HERO.tick();
     if (window.UNL && UNL.on("mail") && $("mailBtn").hidden) MAIL.render();
     if (window.HUB && Date.now() % 5000 < 1000) { HUB.renderDot(); if (!$("tab-hub").hidden) HUB.render(); }
     if (Date.now() % 5000 < 1000) MECH.checkOven();

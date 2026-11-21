@@ -70,7 +70,7 @@ window.LOOK = (() => {
     return LOOK_RIVALS.map(([e, name]) => ({ e, name, pts: Math.round(base * (0.55 + r() * 0.95)) }));
   }
   function table(myPts) {
-    const list = rivals().concat([{ me: true, e: window.PROFILE ? PROFILE.avatar() : "🏡", name: S.name || "Ти", pts: myPts }]);
+    const list = rivals().concat([{ me: true, e: window.HERO ? HERO.faceHtml(null, "mini") : "🏡", name: S.name || "Ти", pts: myPts }]);
     list.sort((a, b) => b.pts - a.pts || (a.me ? -1 : 1));
     return list;
   }

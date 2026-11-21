@@ -944,3 +944,27 @@ body.farm .nav .dot { right: 16%; }
 .o-paw .e3d.pnt { width: 1.3em; height: 1.3em; }
 .order.paw .o-paw { top: -5px; left: -4px; }
 .big-emoji .e3d.pnt { width: 1.1em; height: 1.1em; }
+
+/* ---------- Героїня ---------- */
+.hero-face { display: inline-block; position: relative; width: 1.25em; height: 1.25em; border-radius: 50%; overflow: hidden; vertical-align: middle;
+  background: radial-gradient(circle at 50% 35%, #fff6dc, #f2cf8a); box-shadow: 0 0 0 1.5px #fff; }
+.hero-face img { position: absolute; left: 50%; top: -6%; width: 250%; transform: translateX(-50%); }
+.hero-face.big { width: 100%; height: 100%; box-shadow: none; }
+.pf-ava .hero-face.big img { top: -4%; width: 230%; }
+.lvl-ava .hero-face { width: 22px; height: 22px; }
+.ct-ava .hero-face, .ct-row .hero-face { width: 26px; height: 26px; }
+.hr-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 8px 0; }
+.hr-card { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 3px; padding: 6px 4px 7px; min-height: 120px; border-radius: 16px; min-width: 0;
+  background: radial-gradient(circle at 50% 30%, #fff8e6, #f2d9a6); box-shadow: 0 0 0 2px #e3c38a, 0 3px 0 #c9a46a; }
+.hr-card.on { box-shadow: 0 0 0 3px #5bb02a, 0 3px 0 #3d7a14; background: radial-gradient(circle at 50% 30%, #f4ffe9, #d9f0c2); }
+.hr-card img { height: 96px; width: auto; max-width: 100%; object-fit: contain; }
+.hr-e { font-size: 50px; line-height: 1; font-family: var(--emoji); margin: auto 0; }
+.hr-e .e3d { width: 1.05em; height: 1.05em; }
+.hr-card b { font-size: 11.5px; line-height: 1.1; text-align: center; }
+.hr-look { margin: 2px 0 4px; font-size: 13px; font-weight: 700; color: var(--ink-soft); }
+.hr-row { display: flex; justify-content: center; gap: 5px; flex-wrap: wrap; margin: 4px 0 12px; }
+.hr-mini { width: 40px; height: 40px; border-radius: 50%; font-size: 25px; font-family: var(--emoji); display: grid; place-items: center;
+  background: rgba(255, 255, 255, .7); box-shadow: 0 0 0 2px #e3c38a; }
+.hr-mini.on { box-shadow: 0 0 0 3px #5bb02a; background: #eef9e3; }
+.hr-mini .e3d { width: 1.05em; height: 1.05em; }
+.hr-mini .hero-face { width: 37px; height: 37px; }

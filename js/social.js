@@ -10,7 +10,7 @@ const AVATARS = ["👩‍🌾", "🧑‍🌾", "👩", "👩‍🦰", "👱‍�
 
 window.PROFILE = (() => {
   const stat = k => (S.stat && S.stat[k]) || 0;
-  function avatar() { return S.ava || "👩‍🌾"; }
+  function avatar() { return window.HERO ? HERO.emoji() : S.ava || "👩‍🌾"; }
   function open() {
     const need = xpNeed(S.level), days = Math.max(1, Math.ceil((Date.now() - (S.created || Date.now())) / 864e5));
     const cards = window.ALB ? ALB.haveN() : 0, medals = window.MEDAL ? MEDAL.total() : 0;
@@ -20,7 +20,7 @@ window.PROFILE = (() => {
       ["💌", "Листівок", cards], ["🏆", "Призових місць", (wins[1] || 0) + (wins[2] || 0) + (wins[3] || 0)], ["📅", "Днів у грі", days]
     ].map(([i, n, v]) => `<div class="pf-st"><span>${i}</span><b>${v}</b><small>${n}</small></div>`).join("");
     modal({ title: "Мій профіль",
-      html: `<div class="pf-top"><button class="pf-ava" id="pfAva">${avatar()}<i>змінити</i></button>` +
+      html: `<div class="pf-top"><button class="pf-ava" id="pfAva">${window.HERO ? HERO.faceHtml(null, "big") : avatar()}<i>змінити</i></button>` +
         `<div class="pf-mid"><input id="pfName" value="${(S.name || "").replace(/"/g, "&quot;")}" maxlength="20" placeholder="Твоє ім'я">` +
         `<div class="pf-lvl"><span>${S.level}</span><i class="dq-bar"><b style="width:${S.xp / need * 100}%"></b></i><small>${S.xp}/${need}</small></div></div></div>` +
         `<div class="pf-stats">${stats}</div>` +
@@ -28,7 +28,7 @@ window.PROFILE = (() => {
         (window.PHOTO ? `<button class="pf-album" id="pfAlbum"><span>📷</span><span class="pfa-t"><b>Фотоальбом дворика</b><small>${PHOTO.count()} фото${PHOTO.missing() ? " · ще " + PHOTO.missing() + " розділів можна сфотографувати" : ""}</small></span><i>›</i></button>` : "") +
         `<div class="pf-btns"><button class="btn small ghost" id="pfSet">⚙️ Налаштування</button><button class="btn small ghost" id="pfSave">💾 Зберегти прогрес</button></div>`,
       buttons: [{ label: "Готово", onClick: saveName }] });
-    $("pfAva").onclick = () => { saveName(); pickAvatar(); };
+    $("pfAva").onclick = () => { saveName(); window.HERO ? HERO.picker(open) : pickAvatar(); };
     $("pfSet").onclick = () => { saveName(); openSettings(); };
     $("pfSave").onclick = () => { saveName(); showExport(); };
     const al = $("pfAlbum"); if (al) al.onclick = () => { saveName(); PHOTO.album(); };
@@ -39,7 +39,7 @@ window.PROFILE = (() => {
       buttons: [{ label: "Назад", cls: "ghost", onClick: open }] });
     document.querySelectorAll(".pf-a").forEach((b, k) => b.onclick = () => { S.ava = AVATARS[k]; save(); renderAva(); sfx.pop(); open(); });
   }
-  function renderAva() { const el = $("lvlAva"); if (el) el.textContent = avatar(); }
+  function renderAva() { if (window.HERO) { HERO.render(); return; } const el = $("lvlAva"); if (el) el.textContent = avatar(); }
   return { open, renderAva, avatar };
 })();
 

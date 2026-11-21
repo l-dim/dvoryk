@@ -227,7 +227,7 @@ window.CONTEST = (() => {
   function tableHtml(p) {
     const list = table(p.id, p.pts, frac(p.id)), w = S.ctWins || {};
     return `<div class="ct-table">${list.map((x, k) => `<div class="ct-row${x.me ? " me" : ""}"><span class="ct-pl">${CT_MEDAL[k] || k + 1}</span>` +
-      `<span class="ct-ava">${x.me ? "🏡" : x.e}</span><span class="ct-name"><b>${x.me ? "Ти — " + (S.name || "господиня") : x.name}</b><small>${x.from}</small></span><span class="ct-pts">${x.pts}</span></div>`).join("")}</div>` +
+      `<span class="ct-ava">${x.me ? (window.HERO ? HERO.faceHtml(null, "mini") : "🏡") : x.e}</span><span class="ct-name"><b>${x.me ? "Ти — " + (S.name || "господиня") : x.name}</b><small>${x.from}</small></span><span class="ct-pts">${x.pts}</span></div>`).join("")}</div>` +
       `<p class="hint-s">🥇 💝 +300 🪙 +5 ⭐ · 🥈 📦 +200 🪙 · 🥉 📦 +120 🪙 · до 6-го місця 🎁${(w[1] || w[2] || w[3]) ? `<br>Твої медалі: 🥇${w[1] || 0} 🥈${w[2] || 0} 🥉${w[3] || 0}` : ""}</p>`;
   }
   function show(t) {
