@@ -118,9 +118,9 @@ window.HUB = (() => {
   }
   function render() {
     const box = $("hubList"); if (!box) return;
-    box.innerHTML = cards().map((c, i) => `<div class="hub-card${c.locked ? " locked" : ""}${c.ready ? " ready" : ""}"><span class="hub-ic">${c.icon}</span>` +
+    box.innerHTML = gx(cards().map((c, i) => `<div class="hub-card${c.locked ? " locked" : ""}${c.ready ? " ready" : ""}"><span class="hub-ic">${c.icon}</span>` +
       `<span class="hub-mid"><b>${c.title}</b><small>${c.sub}</small></span>` +
-      (c.btn ? `<button class="s-btn hub-go${c.btn === "⏳" || c.btn === "—" || c.btn === "Ти тут" ? " dim" : ""}" data-act="${c.act}">${c.btn}</button>` : "") + `</div>`).join("");
+      (c.btn ? `<button class="s-btn hub-go${c.btn === "⏳" || c.btn === "—" || c.btn === "Ти тут" ? " dim" : ""}" data-act="${c.act}">${c.btn}</button>` : "") + `</div>`).join(""));
     box.querySelectorAll(".hub-go").forEach(b => b.onclick = () => act(b.dataset.act));
     renderDot();
   }

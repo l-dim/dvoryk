@@ -105,7 +105,7 @@ window.UNL = (() => {
     const rows = UNLOCKS.map(u => `<div class="unl-row${on(u.id) ? " ok" : ""}"><span class="unl-ic">${on(u.id) ? u.icon : "🔒"}</span>` +
       `<span class="unl-t"><b>${u.title}</b><small>${on(u.id) ? "відкрито" : "рівень " + u.lvl}</small></span></div>`).join("");
     const n = UNLOCKS.filter(u => on(u.id)).length;
-    return `<div class="coll-sec"><div class="coll-h">Шлях господині 🌱 <small>${n} з ${UNLOCKS.length}</small></div><div class="unl-list">${rows}</div></div>`;
+    return gx(`<div class="coll-sec"><div class="coll-h">Шлях господині 🌱 <small>${n} з ${UNLOCKS.length}</small></div><div class="unl-list">${rows}</div></div>`);
   }
   return { on, init, tick, nextHtml, roadHtml, next };
 })();
