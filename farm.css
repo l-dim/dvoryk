@@ -950,7 +950,7 @@ body.farm .nav .dot { right: 16%; }
   background: radial-gradient(circle at 50% 35%, #fff6dc, #f2cf8a); box-shadow: 0 0 0 1.5px #fff; }
 .hero-face img { position: absolute; left: 50%; top: -6%; width: 250%; transform: translateX(-50%); }
 .hero-face.big { width: 100%; height: 100%; box-shadow: none; }
-.pf-ava .hero-face.big img { top: -4%; width: 230%; }
+
 .lvl-ava .hero-face { width: 22px; height: 22px; }
 .ct-ava .hero-face, .ct-row .hero-face { width: 26px; height: 26px; }
 .hr-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 8px 0; }

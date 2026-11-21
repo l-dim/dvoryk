@@ -23,7 +23,9 @@ const HEROES = [
   { id: "man5", sex: "m", e: "👨‍🌾", title: "Кашкет",      look: "кашкет, картата сорочка й комбінезон" },
   { id: "man6", sex: "m", e: "🧑‍🦱", title: "Бриль",       look: "солом'яний бриль, лляна сорочка з закатаними рукавами" }
 ];
-const HERO_ART = [];          // які героїні вже намальовані (portraits/<id>-full.webp)
+const HERO_ART = ["hero1", "hero2", "hero3", "hero4", "hero5", "hero6", "man1", "man2", "man3", "man4", "man5", "man6"];   // намальовані (portraits/<id>-full.webp)
+/* де обличчя на картинці (знайдено Apple Vision): центр x, центр y (% від ширини/висоти), ширина лиця (%), пропорції картинки */
+const HERO_FACE = { hero1: [52.6, 11.0, 30.4, 0.373], hero2: [52.6, 11.3, 30.2, 0.380], hero3: [46.9, 12.4, 29.7, 0.406], hero4: [51.4, 13.5, 28.6, 0.456], hero5: [51.0, 13.4, 29.8, 0.422], hero6: [54.4, 14.0, 27.3, 0.452], man1: [48.8, 12.1, 25.5, 0.466], man2: [47.6, 11.1, 24.3, 0.473], man3: [43.7, 11.5, 27.6, 0.412], man4: [43.1, 11.0, 25.8, 0.450], man5: [41.9, 11.3, 28.7, 0.434], man6: [50.7, 12.9, 26.2, 0.459] };
 
 window.HERO = (() => {
   const cur = () => HEROES.find(h => h.id === (S && S.hero)) || null;
@@ -31,8 +33,14 @@ window.HERO = (() => {
   /* обличчя: мальоване (обрізане з фігури) або емодзі */
   function faceHtml(h, cls = "") {
     h = h || cur();
-    if (has(h)) return `<span class="hero-face ${cls}"><img src="portraits/${h.id}-full.webp" alt=""></span>`;
+    if (has(h)) return `<span class="hero-face ${cls}"><img src="portraits/${h.id}-full.webp" alt="" style="${faceStyle(h)}"></span>`;
     return h ? h.e : (S && S.ava) || "👩‍🌾";
+  }
+  /* обличчя по центру кружечка: лице займає ~58% ширини */
+  function faceStyle(h) {
+    const f = HERO_FACE[h.id]; if (!f) return "";
+    const [cx, cy, w, asp] = f, W = 58 / (w / 100), H = W / asp;
+    return `width:${W.toFixed(1)}%;left:${(50 - cx / 100 * W).toFixed(1)}%;top:${(50 - cy / 100 * H).toFixed(1)}%;transform:none`;
   }
   function emoji() { const h = cur(); return h ? h.e : (S && S.ava) || "👩‍🌾"; }
   const sex = () => (S && S.sex) || "f";
@@ -69,8 +77,9 @@ window.HERO = (() => {
   const sexHtml = () => `<div class="hr-sexes"><button class="hr-sex${sex() === "f" ? " on" : ""}" data-s="f">👩 Жінка</button><button class="hr-sex${sex() === "m" ? " on" : ""}" data-s="m">👨 Чоловік</button></div>`;
   function startRow() {
     const box = $("heroPick"); if (!box) return;
+    S.heroAsked = true;          // нова гра: героя обирають тут, окремо питати не треба
     if (!S.hero || !cur() || cur().sex !== sex()) S.hero = list()[0].id;
-    box.innerHTML = sexHtml() + `<div class="hr-row">${list().map(h => `<button class="hr-mini${h.id === S.hero ? " on" : ""}" data-id="${h.id}" title="${h.title}">${has(h) ? `<span class="hero-face"><img src="portraits/${h.id}-full.webp" alt=""></span>` : h.e}</button>`).join("")}</div>`;
+    box.innerHTML = sexHtml() + `<div class="hr-row">${list().map(h => `<button class="hr-mini${h.id === S.hero ? " on" : ""}" data-id="${h.id}" title="${h.title}">${has(h) ? `<span class="hero-face"><img src="portraits/${h.id}-full.webp" alt="" style="${faceStyle(h)}"></span>` : h.e}</button>`).join("")}</div>`;
     box.querySelectorAll(".hr-mini").forEach(b => b.onclick = () => { S.hero = b.dataset.id; S.ava = cur().e; startRow(); });
     box.querySelectorAll(".hr-sex").forEach(b => b.onclick = () => { S.sex = b.dataset.s; S.hero = list()[0].id; S.ava = cur().e; startRow(); });
   }
