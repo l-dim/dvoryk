@@ -41,3 +41,25 @@ Game UI icon sheet for a cozy mobile farm game, in the same hand-painted cartoon
 art/slice.sh art/src/sheet-ui3.webp 2 1 ui-catchest ui-postcards
 ```
 ui-catchest — картинкою в картці «Котик на скрині» і значку на замовленні котика; ui-postcards — замість 💌 по всій грі.
+
+---
+
+# Дрібні значки інтерфейсу — аркуш 3×4 (sheet-ui4)
+
+Той самий загальний опис, що й для першого аркуша значків (вище), зі списком:
+```
+1 a clipboard with a checklist of three ticked lines and a pencil clipped on top,
+2 a small wooden gift crate with a slot on top and a ribbon, like a parcel inbox,
+3 a round red alarm clock with two bells on top,
+4 three puffy blue "Z" letters floating above a small fluffy cloud (sleep symbol),
+5 a torn piece of an old treasure map with a dotted path and a red X,
+6 a single orange cat paw print with pink toe beans,
+7 a glossy plump golden-yellow heart,
+8 a small weekly planner calendar with seven little colored squares,
+9 two curved green arrows forming a circle (refresh / swap),
+10 a big glossy question mark made of wood on a small round wooden stand,
+11 a glossy plump pink heart with a small sparkle,
+12 a small festive wheel of fortune with colored segments and a red pointer on top.
+```
+Ріжемо: `art/slice.sh art/src/sheet-ui4.webp 3 4 ui-quests ui-inbox ui-timer ui-sleep ui-map ui-paw ui-friend ui-week ui-swap ui-unknown ui-heart ui-wheel`
+Мапа: 📋 ui-quests · 📥 ui-inbox · ⏰ ui-timer · 💤 ui-sleep · 🗺️ ui-map · 🐾 ui-paw · 💛 ui-friend · 🗓️ ui-week · 🔄 ui-swap · ❔ ui-unknown · 💗 ui-heart · 🎡 ui-wheel
