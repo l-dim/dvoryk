@@ -232,6 +232,7 @@ function openChest(i) {
   window.QUEST && QUEST.onChest(k, i);
   window.ALB && ALB.onChest(k);
   if (k >= 1 && window.CONTEST) CONTEST.give(k, null, k, "З подарунка");
+  if (k >= 1 && window.FASH) FASH.add(k * 2, "з подарунка");
   sfx.open();
   sparkle(i, "✨", 8);
   renderBoard(); renderOrders(); save();
@@ -383,6 +384,7 @@ function deliver(id) {
   window.PATH && PATH.onDeliver(o);
   window.TOLOKA && TOLOKA.onDeliver(o);
   window.CONTEST && CONTEST.onDeliver(o);
+  window.FASH && FASH.onDeliver(o);
   if (o.dish) window.QUEST && QUEST.track("dish");
   if (o.urgent) window.QUEST && QUEST.track("urgent");
   sfx.deliver();
@@ -734,7 +736,8 @@ function yardPeople(ch, all) {
     if (!free) break;
     taken.push([free[0], free[1], s, true]); // сусіди не стають один за одним
     const wl = winterLook(w, ch);
-    out.push({ key: "p-" + w + (wl ? "-w" : ""), who: wl ? w + "-winter" : w, x: free[0], y: free[1], s });
+    const fl = !wl && window.FASH && FASH.look(w);      // стрій з гардероба (взимку — тепле вбрання важливіше)
+    out.push({ key: "p-" + w + (wl ? "-w" : fl ? "-" + fl : ""), who: wl ? w + "-winter" : fl || w, x: free[0], y: free[1], s });
   }
   return out;
 }

@@ -141,6 +141,7 @@ window.SIDE = (() => {
       placeItem({ c: "chest", l: r.chest }); S.stars += r.stars; S.coins += r.coins;
       if (window.PATH) PATH.add(PATH_PTS.side);
       if (window.MEDAL) MEDAL.count("outing");
+      if (window.FASH) FASH.add(5, "з пригоди");
       if (window.CONTEST) CONTEST.give(3, k.id === "mush" ? ["veg"] : k.id === "jam" || k.id === "garden" ? ["berry"] : null, 2, "З пригоди");
       if (S.fr && FRIENDS[k.host]) S.fr[k.host] = Math.min(FRIEND_STEPS[2], (S.fr[k.host] || 0) + r.hearts);
       confetti(); sfx.level();

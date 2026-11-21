@@ -61,7 +61,7 @@ const MAIL_LETTERS = [
   ["olya", "Квіточки 🌷", "Розсадила тюльпани й лишилося кілька цибулинок — бери, посадиш біля ґанку."],
   ["andriy", "Смаколик ☕", "Заходь на каву, як буде хвилинка. А поки — ось тобі гостинчик."]
 ];
-const MAIL_GIFTS = [{ chest: 0 }, { energy: 10 }, { coins: 60 }, { ing: 2 }, { cards: 1 }, { stars: 1 }, { energy: 15 }, { coins: 100 }];
+const MAIL_GIFTS = [{ chest: 0 }, { energy: 10 }, { coins: 60 }, { ing: 2 }, { cards: 1 }, { stars: 1 }, { energy: 15 }, { coins: 100 }, { thread: 5 }];
 
 window.MAIL = (() => {
   const on = () => window.UNL && UNL.on("mail");
@@ -78,10 +78,10 @@ window.MAIL = (() => {
     const p = [];
     if (g.chest !== undefined) p.push(CHAINS.chest.items[g.chest][0]);
     if (g.energy) p.push("+" + g.energy + " ⚡"); if (g.coins) p.push("+" + g.coins + " 🪙"); if (g.stars) p.push("+" + g.stars + " ⭐");
-    if (g.ing) p.push(g.ing + " 🧺"); if (g.cards) p.push(g.cards + " 💌");
+    if (g.ing) p.push(g.ing + " 🧺"); if (g.cards) p.push(g.cards + " 💌"); if (g.thread) p.push(g.thread + " 🧵");
     return p.join(" ");
   }
-  function giftOk(g) { return !((g.ing && !(window.UNL && UNL.on("contest"))) || (g.cards && !(window.UNL && UNL.on("album")))); }
+  function giftOk(g) { return !((g.ing && !(window.UNL && UNL.on("contest"))) || (g.cards && !(window.UNL && UNL.on("album"))) || (g.thread && !(window.UNL && UNL.on("fashion")))); }
   function take(id, quiet) {
     const m = list().find(x => x.id === id); if (!m || m.got) return;
     m.got = true;
@@ -91,6 +91,7 @@ window.MAIL = (() => {
     if (g.coins) S.coins += g.coins; if (g.stars) S.stars += g.stars;
     if (g.ing && window.CONTEST) CONTEST.give(g.ing, null, 1, "З листа");
     if (g.cards && window.ALB) ALB.give(g.cards);
+    if (g.thread && window.FASH) FASH.add(g.thread);
     save(); if (quiet) return giftText(g);
     renderAll(); render(); sfx.coin();
     if (giftText(g)) toast("📮 " + giftText(g));

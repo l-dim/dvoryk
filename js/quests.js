@@ -56,6 +56,7 @@ window.QUEST = (() => {
     if (window.ALB) ALB.give(5, "За тиждень", 2);
     if (window.PATH) PATH.add(PATH_PTS.week);
     if (window.CONTEST) CONTEST.give(8, null, 3, "За тиждень");
+    if (window.FASH) FASH.add(15, "за тиждень");
     save(); renderAll(); renderButton();
     confetti(); sfx.level();
     modal({
@@ -148,6 +149,7 @@ window.QUEST = (() => {
     if (window.PATH) PATH.add(PATH_PTS.daily);
     if (window.TOLOKA) TOLOKA.add(TOL_SPOONS.daily);
     if (window.CONTEST) CONTEST.give(3, null, 2, "За завдання дня");
+    if (window.FASH) FASH.add(5, "за завдання дня");
     save(); renderAll(); renderButton();
     confetti(); sfx.level();
     modal({
