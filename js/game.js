@@ -134,6 +134,7 @@ function regen() {
 }
 function spendEnergy(n = 1) {
   regen();
+  if (window.PAY && PAY.unlimLeft()) return true;      // «година без меж»
   if (S.energy < n) { showNoEnergy(); return false; }
   if (S.energy >= ENERGY_MAX) S.energyAt = Date.now();
   S.energy -= n;
@@ -310,8 +311,6 @@ function newOrder() {
   // святкова подія іноді підкидає своє замовлення
   const evo = window.EV && EV.maybeOrder();
   if (evo) return evo;
-  const cato = window.XTRA && XTRA.catOrder();
-  if (cato) return cato;
   const spo = MECH.specialOrder();
   if (spo) return spo;
   const busy = S.orders.map(o => o.ch);
@@ -340,9 +339,12 @@ function newOrder() {
   const stars = top >= 5 || items.length >= 2 && top >= 4 ? 2 : 1;
   return MECH.maybeUrgent({ id: ++S.orderSeq, ch, items, coins, xp, stars, line: rnd(3) });
 }
+function orderSlots() { return window.XTRA ? XTRA.slots() : 3; }
 function fillOrders() {
   S.orders = S.orders.filter(o => o && CHARS[o.ch]);
-  while (S.orders.length < 3) { const o = newOrder(); if (!o) break; S.orders.push(o); }
+  // котик — без черги, тож його замовлення не займає місця
+  const regular = () => S.orders.filter(o => !o.paw).length;
+  while (regular() < orderSlots()) { const o = newOrder(); if (!o) break; S.orders.push(o); }
 }
 function matchOrder(o) {
   const used = new Set(), found = [];
@@ -559,7 +561,9 @@ function renderTop() {
   $("xpRing").style.setProperty("--p", Math.min(100, S.xp / xpNeed(S.level) * 100));
   $("energy").textContent = S.energy;
   const t = $("energyTimer");
-  if (S.energy < ENERGY_MAX) {
+  const ul = window.PAY ? PAY.unlimLeft() : 0;
+  if (ul) { t.textContent = "∞ " + mmss(ul); t.hidden = false; }
+  else if (S.energy < ENERGY_MAX) {
     t.textContent = mmss(ENERGY_REGEN_MS - (Date.now() - S.energyAt));
     t.hidden = false;
   } else t.hidden = true;
@@ -589,14 +593,19 @@ function renderOrders() {
       (ready
         ? `<button class="o-btn">Віддати</button>`
         : `<div class="o-rew">🪙${o.coins} · ${o.ev ? "❄️" + o.pts : o.paw ? "🐾" + XTRA.catProg() : "⭐".repeat(o.stars)}</div>`) +
-      (o.paw ? `<span class="o-paw">🧰</span>` : "") +
-      (o.until ? `<span class="o-timer" data-until="${o.until}">⏰ ${MECH.hhmm(o.until - Date.now())}</span>` : "");
+      (o.paw ? `<span class="o-paw">🧰</span>` + (o.bonus ? `<span class="o-bonus">+${XTRA.bonusIcon(o)}</span>` : "") : "") +
+      (o.until || o.catUntil ? `<span class="o-timer" data-until="${o.until || o.catUntil}">⏰ ${MECH.hhmm((o.until || o.catUntil) - Date.now())}</span>` : "");
     el.addEventListener("click", e => {
       if (ready && e.target.closest(".o-btn")) { deliver(o.id); return; }
-      bubble(ch, ch.ask[o.line] + "  " + o.items.map(it => itemIcon(it) + " " + itemName(it)).join(", "), el);
+      bubble(ch, ch.ask[o.line] + "  " + o.items.map(it => itemIcon(it) + " " + itemName(it)).join(", ") + (o.paw && o.bonus ? " · бонус: " + XTRA.bonusIcon(o) : ""), el);
     });
     box.appendChild(el);
   });
+  if (window.XTRA) {
+    box.insertAdjacentHTML("beforeend", XTRA.slotCardHtml());
+    const sl = box.querySelector(".slot-lock"); if (sl) sl.onclick = () => XTRA.buyQueue();
+  }
+  box.classList.toggle("more", box.children.length > 3);
   // підсвітити потрібні предмети на дошці
   document.querySelectorAll(".tile").forEach(t => t.classList.toggle("needed", neededIdx.has(+t.dataset.i)));
 }
@@ -825,6 +834,8 @@ function renderShop() {
     row.querySelector("button").onclick = () => buy(s.id);
     box.appendChild(row);
   });
+  const pb = $("payBox");
+  if (pb && window.PAY && !pb.dataset.ok) { pb.innerHTML = PAY.html(); PAY.bind(pb); pb.dataset.ok = 1; }
   const tb = $("teaBtn");
   if (teaReady()) { tb.textContent = "☕ Перерва на чай: +" + TEA_BREAK_ENERGY + " ⚡ безкоштовно"; tb.classList.remove("dim"); }
   else { tb.textContent = "☕ Наступна перерва на чай за " + hm(TEA_BREAK_MS - (Date.now() - S.teaAt)); tb.classList.add("dim"); }
@@ -1116,7 +1127,7 @@ function openSettings() {
         <button class="btn small" id="setExport">💾 Зберегти прогрес</button>
         <button class="btn ghost small" id="setImport">📥 Відновити прогрес</button>
       </div>
-      <p class="hint-s">Тут немає жодних справжніх покупок — тільки ігрові монетки 💛</p>
+      <p class="hint-s">Справжні покупки поки не підключені — гроші гра не списує 💛</p>
       <button class="btn ghost small" id="setReset">Почати гру спочатку</button>`,
     buttons: [{ label: "Зберегти", onClick: () => {
       S.name = $("setName").value.trim();
@@ -1207,6 +1218,7 @@ function showTab(name) {
   if (name === "story") { viewCh = null; renderStory(); }
   if (name === "shop") renderShop();
   if (name === "coll") renderCollection();
+  if (name === "hub" && window.HUB) HUB.render();
 }
 
 /* ============================================================
@@ -1296,6 +1308,9 @@ function init() {
     if (window.UNL) UNL.tick();
     if (window.ALB) ALB.tick();
     if (window.PATH) PATH.tick();
+    if (window.XTRA) { XTRA.catTick(); XTRA.slotsTick(); }
+    if (window.CONTEST) CONTEST.tick();
+    if (window.HUB && Date.now() % 5000 < 1000) { HUB.renderDot(); if (!$("tab-hub").hidden) HUB.render(); }
     if (Date.now() % 5000 < 1000) MECH.checkOven();
     if (!$("tab-shop").hidden) renderShop();
     if (S.energy !== before) save();

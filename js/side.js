@@ -31,8 +31,21 @@ const SIDE_KINDS = [
     items: [["🌱", "Розсада"], ["🌼", "Ромашка"], ["🌷", "Тюльпан"], ["🌹", "Троянда"], ["💐", "Святковий букет"]],
     goals: [{ l: 3, t: 2 }, { l: 4, t: 1 }],
     ask: "{name}, у неділю день села, а клумба біля клубу — суцільний бур'ян 😩 Допоможи виростити квіти й зібрати букет для гостей!",
-    thanks: "Клумба — як із листівки! Голова сільради навіть сфотографувався біля неї 🌹" }
+    thanks: "Клумба — як із листівки! Голова сільради навіть сфотографувався біля неї 🌹" },
+  /* вилазки — на них можна піти самій, коли захочеш (раз на добу кожна) */
+  { id: "fish", host: "stepan", title: "Рибалка на ставку", gen: ["🎣", "Дідова вудка"], outing: true, icon: "🎣",
+    items: [["🪱", "Черв'ячок"], ["🐟", "Карасик"], ["🐠", "Окунь"], ["🐡", "Сом-вусань"], ["🪣", "Відро риби"]],
+    goals: [{ l: 2, t: 2 }, { l: 3, t: 1 }, { l: 4, t: 1 }],
+    ask: "{name}, на ставку кльов — аж вода кипить! 🎣 Ходімо, поки зорі не згасли. Складай рибку до рибки — що більший улов, то смачніша юшка!",
+    thanks: "Оце улов! Такого сома я з молодості не тягав 😄 Юшку зваримо на все село 💛" },
+  { id: "mush", host: "halya", title: "По гриби в ліс", gen: ["🌳", "Лісова галявина"], outing: true, icon: "🍄",
+    items: [["🍂", "Шурхіт листя"], ["🍄‍🟫", "Опеньки"], ["🍄", "Підосичник"], ["🧺", "Кошик грибів"], ["🍲", "Грибна юшка"]],
+    goals: [{ l: 2, t: 2 }, { l: 3, t: 1 }, { l: 4, t: 1 }],
+    ask: "{name}, після дощу гриби лізуть — тільки встигай! 🍄 Бери кошика. Під кожним листочком щось ховається — складай докупи, назбираємо повний кошик!",
+    thanks: "Повнісінький кошик! Насушу на зиму, а юшку — зараз, поки гаряча 🍲💛" }
 ];
+const OUT_DUR = 24 * 3600e3, OUT_GAP = 20 * 3600e3;
+const OUT_REWARD = { chest: 0, stars: 2, coins: 90, hearts: 1, bonus: 25 };   // bonus — 🪙 за кожен зайвий найбільший улов
 const SIDE_REWARD = { chest: 1, stars: 4, coins: 150, hearts: 2 };
 
 /* реєструємо ланцюжки й генератори пригод */
@@ -56,7 +69,7 @@ window.SIDE = (() => {
   const chainId = () => "side_" + S.side.kind;
   const isSideItem = it => !!it && (it.g ? !!(GENS[it.g] && GENS[it.g].side) : !!(CHAINS[it.c] && (CHAINS[it.c].side || CHAINS[it.c].collect)));
   const left = () => Math.max(0, S.side.until - now());
-  const hm = ms => { const h = Math.floor(ms / 36e5), m = Math.ceil(ms % 36e5 / 6e4); return h >= 24 ? Math.floor(h / 24) + "д " + (h % 24) + "г" : h ? h + "г " + m + "хв" : m + "хв"; };
+  const hm = ms => { const t = Math.ceil(ms / 6e4), h = Math.floor(t / 60), m = t % 60; return h >= 24 ? Math.floor(h / 24) + "д " + (h % 24) + "г" : h ? h + "г " + m + "хв" : m + "хв"; };
 
   /* ---------- перемикання дошок ---------- */
   function enter() {
@@ -74,8 +87,9 @@ window.SIDE = (() => {
   function guardPlace(item) { return S.sideOn && !isSideItem(item); }
 
   /* ---------- поява, завершення ---------- */
+  const RANDOM = SIDE_KINDS.filter(k => !k.outing);
   function offer() {
-    const idx = (S.sideIdx || 0) % SIDE_KINDS.length, k = SIDE_KINDS[idx];
+    const idx = (S.sideIdx || 0) % RANDOM.length, k = RANDOM[idx];
     if (!CHARS[k.host] || (CHARS[k.host].from || 0) > S.chapter || (window.WD && WD.isSick(k.host))) { S.sideIdx = idx + 1; return; }
     const board = Array(N).fill(null), mid = Math.floor(ROWS / 2) * COLS + Math.floor(COLS / 2);
     board[mid] = { g: "side_" + k.id, gl: 1 };
@@ -83,29 +97,60 @@ window.SIDE = (() => {
     S.side = { kind: k.id, until: now() + SIDE_DUR, board, goals: k.goals.map(g => ({ l: g.l, t: g.t, n: 0 })), done: false };
     S.sideIdx = idx + 1;
     save(); renderButton();
+    intro(k, mid);
+  }
+  function intro(k, mid) {
+    const r = k.outing ? OUT_REWARD : SIDE_REWARD, top = k.goals[k.goals.length - 1].l;
     playDialog([[k.host, k.ask]], () => modal({
       title: "Пригода: " + k.title,
-      html: `<div class="big-emoji">${CHAINS[chainId()].items[k.goals[1].l][0]}</div>` +
+      html: `<div class="big-emoji">${CHAINS[chainId()].items[top][0]}</div>` +
         `<p>Окрема дошка з генератором ${GENS[S.side.board[mid].g].icon}. Зроби: ` +
         k.goals.map(g => `<b>${g.t} × ${CHAINS[chainId()].items[g.l][0]} ${CHAINS[chainId()].items[g.l][1]}</b>`).join(" і ") +
-        `.</p><p>Час: <b>2 дні</b>. Нагорода: 📦 · +${SIDE_REWARD.stars} ⭐ · +${SIDE_REWARD.coins} 🪙 · 💛</p>`,
+        `.</p><p>Час: <b>${k.outing ? "доба" : "2 дні"}</b>. Нагорода: ${CHAINS.chest.items[r.chest][0]} · +${r.stars} ⭐ · +${r.coins} 🪙 · 💛</p>` +
+        (k.outing ? `<p class="hint-s">Що більший улов, то краще: кожен зайвий ${CHAINS[chainId()].items[top][0]} понад ціль — ще +${r.bonus} 🪙.</p>` : ""),
       buttons: [{ label: "До пригоди! ✨", onClick: enter }, { label: "Пізніше", cls: "ghost" }]
     }));
+  }
+  /* вилазка: рибалка чи гриби — коли захочеш, якщо зараз немає іншої пригоди */
+  function canGo(id) { return !S.side && now() >= ((S.outNext || {})[id] || 0); }
+  function goOut(id) {
+    const k = SIDE_KINDS.find(x => x.id === id);
+    if (!k) return;
+    if (S.side) { sfx.nope(); toast(S.side.kind === id ? "Ти вже там — тапни кнопку пригоди під дошкою" : "Спершу заверши поточну пригоду 🙂"); return; }
+    if (!canGo(id)) { sfx.nope(); toast("Сьогодні вже ходили — наступного разу за " + hm(S.outNext[id] - now())); return; }
+    const board = Array(N).fill(null), mid = Math.floor(ROWS / 2) * COLS + Math.floor(COLS / 2);
+    board[mid] = { g: "side_" + k.id, gl: 1 };
+    [mid - 1, mid + 1, mid - COLS, mid + COLS].forEach(i => { board[i] = { c: "side_" + k.id, l: 0 }; });
+    S.side = { kind: k.id, until: now() + OUT_DUR, board, goals: k.goals.map(g => ({ l: g.l, t: g.t, n: 0 })), done: false, extra: 0 };
+    save(); renderButton();
+    intro(k, mid);
   }
   function finish(ok) {
     const k = kind();
     if (S.sideOn) leave();
+    const R = k.outing ? OUT_REWARD : SIDE_REWARD;
+    let bonus = 0;
     if (ok) {
-      const r = SIDE_REWARD;
+      const r = R;
+      // вилазка: зайвий найбільший улов на дошці теж рахується
+      if (k.outing) {
+        const top = k.goals[k.goals.length - 1].l, cid = "side_" + k.id;
+        const extra = S.side.board.filter(x => x && x.c === cid && x.l === top).length;
+        bonus = extra * r.bonus; S.coins += bonus;
+      }
       placeItem({ c: "chest", l: r.chest }); S.stars += r.stars; S.coins += r.coins;
       if (window.PATH) PATH.add(PATH_PTS.side);
       if (S.fr && FRIENDS[k.host]) S.fr[k.host] = Math.min(FRIEND_STEPS[2], (S.fr[k.host] || 0) + r.hearts);
       confetti(); sfx.level();
     }
-    S.side = null; S.sideNext = now() + SIDE_GAP;
+    if (k.outing) { S.outNext = S.outNext || {}; S.outNext[k.id] = now() + OUT_GAP; }
+    else S.sideNext = now() + SIDE_GAP;
+    S.side = null;
     save(); renderAll(); renderButton();
-    if (ok) playDialog([[k.host, k.thanks]], () => modal({ title: "Пригоду завершено! 🎉", html: `<div class="big-emoji">📦</div><p class="rewards">📦 &nbsp; +${SIDE_REWARD.stars} ⭐ &nbsp; +${SIDE_REWARD.coins} 🪙 &nbsp; +${SIDE_REWARD.hearts} 💛</p>`, buttons: [{ label: "Дякую! 💛" }] }));
-    else modal({ title: "Пригода минула ⏰", html: `<div class="big-emoji">${CHARS[k.host].icon}</div><p>«${k.title}» — не встигли цього разу. Нічого, наступна пригода — вже скоро!</p>`, buttons: [{ label: "Добре" }] });
+    const ch0 = CHAINS.chest.items[R.chest][0];
+    if (ok) playDialog([[k.host, k.thanks]], () => modal({ title: k.outing ? "Вилазка вдалася! 🎉" : "Пригоду завершено! 🎉", html: `<div class="big-emoji">${k.outing ? k.icon : "📦"}</div><p class="rewards">${ch0} &nbsp; +${R.stars} ⭐ &nbsp; +${R.coins} 🪙 &nbsp; +${R.hearts} 💛</p>` +
+      (bonus ? `<p class="rewards">Рекордний улов: +${bonus} 🪙</p>` : ""), buttons: [{ label: "Дякую! 💛" }] }));
+    else modal({ title: "Пригода минула ⏰", html: `<div class="big-emoji">${CHARS[k.host].icon}</div><p>«${k.title}» — не встигли цього разу. Нічого, ${k.outing ? "завтра знову можна" : "наступна пригода — вже скоро"}!</p>`, buttons: [{ label: "Добре" }] });
   }
 
   /* ---------- цілі пригоди ---------- */
@@ -120,7 +165,12 @@ window.SIDE = (() => {
     g.n++; sfx.deliver();
     if (window.QUEST) QUEST.track("deliver");
     renderBoard(); renderOrders(); renderInfo(); save();
-    if (S.side.goals.every(x => x.n >= x.t)) setTimeout(() => finish(true), 700);
+    if (!S.side.goals.every(x => x.n >= x.t)) return;
+    if (kind().outing) {        // вилазку можна продовжити — на рекордний улов
+      S.side.done = true; save(); renderOrders();
+      const top = CHAINS[chainId()].items[kind().goals[kind().goals.length - 1].l][0];
+      setTimeout(() => toast(`Ціль є! Лови ще — кожне зайве ${top} +${OUT_REWARD.bonus} 🪙. Або тисни «Додому»`), 600);
+    } else setTimeout(() => finish(true), 700);
   }
   function renderGoals(box) {
     const k = kind(), cid = chainId();
@@ -128,7 +178,10 @@ window.SIDE = (() => {
     host.className = "order side-host pic";
     host.innerHTML = `<div class="o-who"><span class="o-name">${CHARS[k.host].name.split(" ").pop()}</span></div>` +
       `<div class="o-body"><div class="o-pic">${PORTRAITS_FULL.includes(k.host) || PORTRAITS.includes(k.host) ? `<img src="portraits/${k.host}.webp" alt="" style="object-position:${(PORTRAITS_FACE_X(k.host))}% 0">` : CHARS[k.host].icon}</div>` +
-      `<div class="side-info"><b>${k.title}</b><span class="side-time">⏰ ${hm(left())}</span></div></div>`;
+      `<div class="side-info"><b>${k.title}</b><span class="side-time">⏰ ${hm(left())}</span></div></div>` +
+      (k.outing && S.side.done ? `<button class="o-btn side-home">Додому ✓</button>` : "");
+    const hb = host.querySelector(".side-home"); if (hb) hb.onclick = () => finish(true);
+    if (k.outing && S.side.done) host.classList.add("ready");
     box.appendChild(host);
     S.side.goals.forEach((g, i) => {
       const have = findItem(g.l) >= 0, done = g.n >= g.t;
@@ -161,12 +214,12 @@ window.SIDE = (() => {
   /* ---------- щосекунди ---------- */
   function tick() {
     if (!S || !S.started) return;
-    if (S.side && now() >= S.side.until && !busyUI()) { finish(false); return; }
+    if (S.side && now() >= S.side.until && !busyUI()) { finish(!!S.side.done); return; }
     if (!S.side && !busyUI() && (window.UNL ? UNL.on("side") : S.level >= 4) && S.ordersDone >= 8 && now() >= (S.sideNext || 0) && !(S.ev && S.ev.intro === false)) offer();
     const t = document.querySelector(".side-time"); if (t && S.side) t.textContent = "⏰ " + hm(left());
     renderButton();
   }
   function onStart() { if (S.sideOn) leave(); renderButton(); }
 
-  return { enter, leave, toggle, tick, onStart, guardPlace, renderGoals, renderButton, isSideItem, finish };
+  return { enter, leave, toggle, tick, onStart, guardPlace, renderGoals, renderButton, isSideItem, finish, goOut, canGo, kinds: () => SIDE_KINDS };
 })();

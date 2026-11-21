@@ -3,7 +3,7 @@
    ПОСТУПОВЕ ВІДКРИТТЯ МЕХАНІК і нові дрібниці
    • UNL — «Шлях господині»: ускладнення й доповнення відкриваються з рівнями,
      кожне — з коротким знайомством. Стан: S.unl = { id: true }
-   • XTRA — котик на скрині (S.cat), комора (S.store), сила ×2 (S.boost),
+   • XTRA — котик на скрині (S.cat), сховок (S.store), сила ×2 (S.boost),
      нагороди за нові предмети в колекції (S.claimD)
    ============================================================ */
 const UNLOCKS = [
@@ -22,6 +22,9 @@ const UNLOCKS = [
     text: "Іноді сусід дуже поспішає: термінове замовлення має годинник, зате платить більше й дає зайву ⭐." },
   { id: "side",     lvl: 4, icon: "🧭", title: "Пригоди",
     text: "Час від часу сусіди кличуть на окрему маленьку дошку з власними предметами. Встигни за 2 дні!" },
+  { id: "outing",   lvl: 4, icon: "🎣", title: "Рибалка й гриби",
+    text: "У вкладці «Події» 🎪 можна самій піти на рибалку 🎣 або по гриби 🍄 — раз на добу кожне. Окрема дошка: що більший улов, то більша нагорода!",
+    lines: [["stepan", "{name}, бери вудку — ставок чекає! 🎣 А як не клює, то в ліс по гриби 🍄"]] },
   { id: "cat",      lvl: 5, icon: "🐱", title: "Котик на скрині",
     text: "Пиріжок умостився на старій скрині й теж замовляє 🐾 Виконуй його замовлення — і скриня відкриється з розкішною нагородою!",
     lines: [["cat", "Мур-р. (Сідає на скриню й багатозначно дивиться на тебе.) 🐾"], ["halya", "Хитрун! Не злізе, поки не нагодуєш. А в скрині — щось цінне 🧰"]] },
@@ -29,15 +32,18 @@ const UNLOCKS = [
     text: "У подарунках трапляються шматочки старої карти. Збери всі — і знайдеш дідів скарб." },
   { id: "week",     lvl: 6, icon: "🗓️", title: "Завдання тижня",
     text: "Великі завдання на тиждень і велика нагорода 💝 — у 📋, вкладка «Тиждень»." },
-  { id: "store",    lvl: 6, icon: "🗄️", title: "Комора",
-    text: "Тепер зайве можна сховати в комору й дістати потім. Тапни предмет → 🗄️. Місць мало, але можна докупити.",
-    lines: [["stepan", "Я тобі комору прибрав, {name} 🗄️ Що не треба зараз — клади туди, не пропаде."]] },
+  { id: "store",    lvl: 6, icon: "🗄️", title: "Сховок",
+    text: "Тепер зайве можна сховати в сховок і дістати потім. Тапни предмет → 🗄️. Місць мало, але можна докупити.",
+    lines: [["stepan", "Я тобі шафу-сховок змайстрував, {name} 🗄️ Що не треба зараз — клади туди, не пропаде."]] },
   { id: "path",     lvl: 7, icon: "🍂", title: "Сезонна стежка",
     text: "Щомісяця — нова стежка на 30 рівнів. Кроки дають замовлення, завдання й пригоди, а кожен рівень — нагороду. Наприкінці — сезонна прикраса у дворик! У 📋, вкладка «Стежка».",
     lines: [["olya", "{name}, а в нас нова традиція: щомісяця — своя стежка 🍂 Хто пройде до кінця, тому — прикраса на подвір'я!"]] },
   { id: "album",    lvl: 8, icon: "💌", title: "Альбом листівок",
     text: "За замовлення й подарунки тепер дають листівки 💌 Збирай набори в «Колекції» — за кожен повний набір нагорода!",
     lines: [["ivan", "Пошта прийшла! 📮 Цілий стос листівок — і всі різні. Збереш альбом?"]] },
+  { id: "contest",  lvl: 10, icon: "🏆", title: "Кулінарний конкурс",
+    text: "Кожні 3 дні — конкурс кулінарок із сусідніх сіл! Здавай журі випічку, десерти чи страви з печі, набирай бали й борись за 🥇. Вкладка «Події» 🎪.",
+    lines: [["andriy", "{name}, у районі конкурс кулінарок! 🏆 Баба Явдоха з Вишневого вже тісто місить… Покажемо їм, як печуть у нашому дворику?"]] },
   { id: "boost",    lvl: 9, icon: "⚡", title: "Подвійна сила ×2",
     text: "Кнопка ×2 біля енергії: генератор бере 2 ⚡, зате дає одразу предмет на рівень вищий. Менше злиттів — більше місця." }
 ];
@@ -87,7 +93,18 @@ window.UNL = (() => {
 })();
 
 /* ============================================================ */
-const CAT_CHEST = { first: 4, max: 7, chance: 0.4 };
+const CAT_CHEST = { first: 4, max: 7 };
+const CAT_VISIT = { firstMin: 5, gapMin: [25, 60], stayH: 3 };     // котик приходить без черги
+const CAT_BONUS = [
+  { id: "battery", icon: "🔋", text: "батарейка ⚡" },
+  { id: "purse",   icon: "👛", text: "гаманець 🪙" },
+  { id: "gift",    icon: "🎁", text: "подарунок" },
+  { id: "cards",   icon: "💌", text: "2 листівки", need: "album" },
+  { id: "star",    icon: "⭐", text: "зайва зірочка" },
+  { id: "chest",   icon: "📦", text: "посилка", rare: true }
+];
+/* черги замовлень: спершу 3, далі відкриваються з рівнем або купуються раніше */
+const ORDER_SLOTS = [{ lvl: 5, coins: 400 }, { lvl: 8, coins: 700 }, { lvl: 11, coins: 1100 }, { lvl: 14, coins: 1600 }, { lvl: 17, coins: 2200 }, { lvl: 20, coins: 3000 }];
 const STORE_START = 3, STORE_PRICES = [150, 300, 500, 800, 1200];
 const DISC_COINS = l => 2 + l * l;
 
@@ -97,17 +114,83 @@ window.XTRA = (() => {
   /* ---------- котик на скрині ---------- */
   const cat = () => (S.cat || (S.cat = { n: 0, t: CAT_CHEST.first, round: 1 }));
   const catProg = () => cat().n + "/" + cat().t;
+  /* рідкісне замовлення котика: щось високе, або дві різні речі, або страва з печі */
   function catOrder() {
-    if (!on("cat") || S.orders.some(o => o.paw) || Math.random() >= CAT_CHEST.chance) return null;
     if (window.WD && WD.isSick("cat")) return null;
-    const chains = S.gens.map(g => GENS[g].chain);
-    const c = pick(chains), len = CHAINS[c].items.length;
-    const l = Math.min(len - 1, 2 + rnd(Math.min(3, 1 + Math.floor(S.level / 6))));
-    const coins = Math.round(itemValue(c, l) * 1.3);
-    return { id: ++S.orderSeq, ch: "cat", items: [{ c, l }], coins, xp: (l + 1) * 3, stars: 1, paw: true, line: rnd(3) };
+    const chains = S.gens.map(g => GENS[g].chain), items = [];
+    const hiL = c => Math.min(CHAINS[c].items.length - 1, 3 + rnd(2) + (S.level >= 12 ? 1 : 0));
+    const r = Math.random(), hasOven = S.board.some(x => x && x.st === "oven");
+    if (hasOven && r < 0.2) items.push({ c: "dish", l: rnd(Math.min(CHAINS.dish.items.length, 2 + Math.floor(S.level / 10))) });
+    else if (r < 0.55 && chains.length > 1) { const a = pick(chains); let b = pick(chains); while (b === a) b = pick(chains); items.push({ c: a, l: 2 + rnd(2) }, { c: b, l: 2 + rnd(2) }); }
+    else { const c = pick(chains); items.push({ c, l: hiL(c) }); }
+    let coins = 0, xp = 0;
+    items.forEach(it => { coins += Math.round(itemValue(it.c, it.l) * 2); xp += (it.l + 1) * 4; });
+    const pool = CAT_BONUS.filter(b => !b.need || on(b.need)).filter(b => !b.rare || Math.random() < 0.35);
+    return { id: ++S.orderSeq, ch: "cat", items, coins, xp, stars: 1, paw: true, line: rnd(3), bonus: pick(pool).id,
+      catUntil: Date.now() + CAT_VISIT.stayH * 3600e3 };
   }
+  function catTick() {
+    if (!on("cat") || S.sideOn) return;
+    const now = Date.now(), o = S.orders.find(x => x.paw);
+    if (o && o.catUntil && now >= o.catUntil) {
+      S.orders = S.orders.filter(x => x !== o);
+      S.catNext = now + (CAT_VISIT.gapMin[0] + rnd(CAT_VISIT.gapMin[1] - CAT_VISIT.gapMin[0])) * 60e3;
+      toast("🐾 Пиріжок не дочекався й пішов гуляти…"); renderOrders(); save(); return;
+    }
+    if (o) return;
+    if (!S.catNext) { S.catNext = now + CAT_VISIT.firstMin * 60e3; save(); return; }
+    if (now < S.catNext) return;
+    const co = catOrder(); if (!co) { S.catNext = now + 30 * 60e3; return; }
+    S.orders.unshift(co); S.catNext = 0;
+    sfx.pop(); toast("🐾 Пиріжок прийшов без черги — у нього рідкісне замовлення!");
+    renderOrders(); save();
+  }
+  function grantBonus(id, card) {
+    const r = card && card.getBoundingClientRect();
+    if (id === "battery") placeItem({ c: "energy", l: 1 });
+    else if (id === "purse") placeItem({ c: "coin", l: 2 });
+    else if (id === "gift") placeItem({ c: "chest", l: 0 });
+    else if (id === "chest") placeItem({ c: "chest", l: 1 });
+    else if (id === "cards" && window.ALB) ALB.give(2, "Від котика");
+    else if (id === "star") { S.stars += 1; if (r) flyMany(r, "⭐", "stars", 2, 300); }
+    const b = CAT_BONUS.find(x => x.id === id);
+    if (b) setTimeout(() => toast(`🐾 Бонус від котика: ${b.icon} ${b.text}!`), 700);
+  }
+  const bonusIcon = o => { const b = o.bonus && CAT_BONUS.find(x => x.id === o.bonus); return b ? b.icon : ""; };
+
+  /* ---------- черги замовлень ---------- */
+  const people = () => Object.keys(CHARS).filter(c => c !== "cat" && (CHARS[c].from || 0) <= S.chapter && !(window.WD && WD.isSick(c))).length;
+  const extraSlots = () => Math.max(ORDER_SLOTS.filter(s => S.level >= s.lvl).length, S.slotBuy || 0);
+  const slots = () => Math.max(1, Math.min(3 + extraSlots(), people()));
+  function nextSlot() {
+    const k = extraSlots(), s = ORDER_SLOTS[k];
+    return s && 3 + k < people() ? s : null;
+  }
+  function slotCardHtml() {
+    const s = nextSlot(); if (!s || S.sideOn) return "";
+    return `<div class="order slot-lock"><div class="o-who"><span class="o-name">Ще черга</span></div>` +
+      `<div class="sl-body"><span class="sl-ic">🔒</span><small>з рівня ${s.lvl}</small></div><button class="o-btn sl-buy">${s.coins} 🪙</button></div>`;
+  }
+  function buyQueue() {
+    const s = nextSlot(); if (!s) return;
+    modal({ title: "Ще одна черга 🧺", html: `<div class="big-emoji">👥</div><p>Відкрити ще одне місце для замовлень зараз — за <b>${s.coins} 🪙</b>?</p><p class="hint-s">Без монеток воно відкриється само на ${s.lvl}-му рівні. Більше черг — більше замовлень одночасно.</p>`,
+      buttons: [{ label: `Відкрити за ${s.coins} 🪙`, disabled: S.coins < s.coins, onClick: () => {
+        S.coins -= s.coins; S.slotBuy = extraSlots() + 1;
+        fillOrders(); sfx.level(); confetti(); renderTop(); renderOrders(); save();
+        toast("🧺 Ще одна черга відкрита!");
+      } }, { label: "Пізніше", cls: "ghost" }] });
+  }
+  let lastSlots = 0;
+  function slotsTick() {
+    const n = slots();
+    if (lastSlots && n > lastSlots && !S.sideOn) { fillOrders(); renderOrders(); save(); toast("🧺 Відкрилась ще одна черга замовлень!"); }
+    lastSlots = n;
+  }
+
   function onDeliver(o, card) {
     if (!o.paw) return;
+    if (o.bonus) grantBonus(o.bonus, card);
+    S.catNext = Date.now() + (CAT_VISIT.gapMin[0] + rnd(CAT_VISIT.gapMin[1] - CAT_VISIT.gapMin[0])) * 60e3;
     const k = cat();
     k.n++;
     if (k.n < k.t) { setTimeout(() => toast(`🐾 Котик на скрині: ${k.n}/${k.t}`), 900); return; }
@@ -125,12 +208,12 @@ window.XTRA = (() => {
     }), 900);
   }
 
-  /* ---------- комора ---------- */
+  /* ---------- сховок ---------- */
   const store = () => (S.store || (S.store = { slots: STORE_START, items: [] }));
   const canStore = it => it && !it.lock && !it.st && !(window.SIDE && SIDE.isSideItem && SIDE.isSideItem(it));
   function storeBtn(it) {
     if (!on("store") || S.sideOn || !canStore(it)) return "";
-    return `<button class="sell store-b" id="storeBtn"><small>у комору</small><span>🗄️</span></button>`;
+    return `<button class="sell store-b" id="storeBtn"><small>сховати</small><span>🗄️</span></button>`;
   }
   function hintBtn() {
     if (!on("store") || S.sideOn) return "";
@@ -140,13 +223,13 @@ window.XTRA = (() => {
   function stash(i) {
     const s = store(), it = S.board[i];
     if (!canStore(it)) return;
-    if (s.items.length >= s.slots) { sfx.nope(); toast("Комора повна 🗄️ Звільни місце або докупи ще одне"); openStore(); return; }
+    if (s.items.length >= s.slots) { sfx.nope(); toast("Сховок повний 🗄️ Звільни місце або докупи ще одне"); openStore(); return; }
     const cell = document.querySelector(`.cell[data-i="${i}"]`);
     const btn = $("storeBtn");
     if (cell && btn) flyIcon(itemIcon(it), cell.getBoundingClientRect(), btn.getBoundingClientRect(), { size: 34, end: 0.5 });
     s.items.push(it);
     S.board[i] = null; if (selected === i) selected = -1;
-    sfx.pop(); toast(`🗄️ ${itemName(it)} — у коморі`);
+    sfx.pop(); toast(`🗄️ ${itemName(it)} — у сховку`);
     renderBoard(); renderInfo(); renderOrders(); save();
   }
   function take(k) {
@@ -164,7 +247,7 @@ window.XTRA = (() => {
     if (!p) return;
     if (S.coins < p) { sfx.nope(); toast("Не вистачає монеток 🪙"); return; }
     S.coins -= p; s.slots++;
-    sfx.coin(); toast("🗄️ Нова полиця в коморі!");
+    sfx.coin(); toast("🗄️ Нова полиця у сховку!");
     renderTop(); renderInfo(); save(); openStore();
   }
   function openStore() {
@@ -173,7 +256,7 @@ window.XTRA = (() => {
       ? `<button class="st-cell full" data-k="${k}"><span>${itemIcon(s.items[k])}</span><small>${itemName(s.items[k])}</small></button>`
       : `<div class="st-cell"></div>`).join("") +
       (p ? `<button class="st-cell buy" id="stBuy"><span>➕</span><small>${p} 🪙</small></button>` : "");
-    modal({ title: "Комора 🗄️",
+    modal({ title: "Сховок 🗄️",
       html: `<p class="hint-s">Тапни річ, щоб повернути її на дошку. Сховати — тапни предмет на дошці й натисни 🗄️.</p><div class="st-grid">${cells}</div>`,
       buttons: [{ label: "Закрити", cls: "ghost" }] });
     document.querySelectorAll(".st-cell.full").forEach(b => b.onclick = () => take(+b.dataset.k));
@@ -220,6 +303,6 @@ window.XTRA = (() => {
     renderTop(); renderCollection(); renderNavBadge(); save();
   }
 
-  return { catOrder, onDeliver, catProg, storeBtn, hintBtn, stash, openStore, boosted, renderBoost, toggleBoost,
+  return { catOrder, catTick, bonusIcon, slots, slotCardHtml, buyQueue, slotsTick, onDeliver, catProg, storeBtn, hintBtn, stash, openStore, boosted, renderBoost, toggleBoost,
     initDisc, discReady, discCount, claimDisc, claimAll };
 })();
