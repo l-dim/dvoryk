@@ -33,6 +33,14 @@ NEW_GENS.forEach(g => {
   GENS[g.id] = { icon: g.gen[0], name: g.gen[1], chain: g.id };
   if (!PRODUCT_CHAINS.includes(g.id)) PRODUCT_CHAINS.push(g.id);
 });
+/* мальовані нові предмети: emoji → картинка (PAINTED будується раніше, тож додаємо самі) */
+(() => {
+  const key = e => [...e].filter(c => c !== "\uFE0F").map(c => c.codePointAt(0).toString(16)).join("-");
+  const P = window.PAINTED = window.PAINTED || {};
+  Object.entries(MORE_LEVELS).forEach(([c, add]) => add.forEach(([e], k) => { P[key(e)] = `items/${c}-${CHAINS[c].items.length - add.length + k}.webp`; }));
+  // 🟫 і ⛲ уже мальовані для дворика (грядки, фонтан) — їх не перемальовуємо
+  NEW_GENS.forEach(g => { g.items.forEach(([e], l) => { if (!P[key(e)]) P[key(e)] = `items/${g.id}-${l}.webp`; }); P[key(g.gen[0])] = `items/gen-${g.id}.webp`; });
+})();
 if (typeof ING_FROM !== "undefined") Object.assign(ING_FROM, { forest: ["veg", "nuts"], poultry: ["dairy"], pottery: ["sweet", "grain"] });
 
 /* ---------- нескінченна історія ---------- */
