@@ -25,11 +25,13 @@ window.PROFILE = (() => {
         `<div class="pf-lvl"><span>${S.level}</span><i class="dq-bar"><b style="width:${S.xp / need * 100}%"></b></i><small>${S.xp}/${need}</small></div></div></div>` +
         `<div class="pf-stats">${stats}</div>` +
         (troph.length || wins[1] ? `<div class="pf-tr"><small>Трофеї у дворику</small><div>${troph.join(" ")}${wins[1] ? " " + "🥇".repeat(Math.min(5, wins[1])) : ""}</div></div>` : "") +
+        (window.PHOTO ? `<button class="pf-album" id="pfAlbum"><span>📷</span><span class="pfa-t"><b>Фотоальбом дворика</b><small>${PHOTO.count()} фото${PHOTO.missing() ? " · ще " + PHOTO.missing() + " розділів можна сфотографувати" : ""}</small></span><i>›</i></button>` : "") +
         `<div class="pf-btns"><button class="btn small ghost" id="pfSet">⚙️ Налаштування</button><button class="btn small ghost" id="pfSave">💾 Зберегти прогрес</button></div>`,
       buttons: [{ label: "Готово", onClick: saveName }] });
     $("pfAva").onclick = () => { saveName(); pickAvatar(); };
     $("pfSet").onclick = () => { saveName(); openSettings(); };
     $("pfSave").onclick = () => { saveName(); showExport(); };
+    const al = $("pfAlbum"); if (al) al.onclick = () => { saveName(); PHOTO.album(); };
   }
   function saveName() { const i = $("pfName"); if (i) { S.name = i.value.trim(); save(); } }
   function pickAvatar() {

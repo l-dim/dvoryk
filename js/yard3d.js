@@ -532,6 +532,20 @@ async function render(chIndex, ch, list, animate) {
   }
   req(3);
 }
+/* знімок дворика для фотоальбому: небо-градієнт + 3D-сцена, JPEG */
+function snapshot(sky1, sky2, w = 480) {
+  if (!renderer || !host) return null;
+  resize(); controls.update();
+  renderer.render(scene, camera);
+  const src = renderer.domElement, h = Math.round(w * src.height / src.width);
+  const c = document.createElement("canvas"); c.width = w; c.height = h;
+  const g = c.getContext("2d");
+  const grad = g.createLinearGradient(0, 0, 0, h);
+  grad.addColorStop(0, sky1 || "#bfe6ff"); grad.addColorStop(1, sky2 || "#fff3d6");
+  g.fillStyle = grad; g.fillRect(0, 0, w, h);
+  g.drawImage(src, 0, 0, w, h);
+  return c.toDataURL("image/jpeg", 0.72);
+}
 function setActive(on) {
   active = on;
   if (on) { resize(); req(4); }
@@ -549,6 +563,6 @@ function mount(el) {
 try {
   const test = document.createElement("canvas");
   if (!(test.getContext("webgl2") || test.getContext("webgl"))) throw new Error("no webgl");
-  window.Yard3D = { mount, render, setActive };
+  window.Yard3D = { mount, render, setActive, snapshot };
   window.dispatchEvent(new Event("yard3d-ready"));
 } catch (e) { /* без WebGL лишається звичайна 2D-сцена */ }

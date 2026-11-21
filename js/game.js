@@ -414,7 +414,8 @@ function doTask() {
   const finished = S.task >= ch.tasks.length;
   playDialog(t.lines, () => {
     if (!finished) return;
-    // кінець розділу
+    // кінець розділу — знімок готового дворика у фотоальбом
+    if (window.PHOTO) PHOTO.take(Math.min(S.chapter, STORY.length - 1), "chapter", true);
     const r = ch.reward || {};
     confetti(); sfx.level();
     const parts = [];
@@ -427,7 +428,8 @@ function doTask() {
     modal({
       title: "Розділ завершено! 🎉",
       html: `<p class="chapter-done">«${ch.title}»</p><p>Нагорода чекає на дошці:</p><p class="rewards">${parts.join(" &nbsp; ")}</p>` +
-        (r.gen ? `<p class="hint-s">Новий генератор! Тепер сусіди замовлятимуть і ${CHAINS[GENS[r.gen].chain].name.toLowerCase()}.</p>` : ""),
+        (r.gen ? `<p class="hint-s">Новий генератор! Тепер сусіди замовлятимуть і ${CHAINS[GENS[r.gen].chain].name.toLowerCase()}.</p>` : "") +
+        (window.PHOTO && window.Yard3D ? `<p class="hint-s">📷 Дворик сфотографовано — знімок у фотоальбомі (профіль).</p>` : ""),
       buttons: [{ label: S.storyDone ? "Ура! 💛" : "Далі ›", onClick: () => {
         renderAll();
         if (!S.storyDone) playDialog(STORY[S.chapter].intro);
@@ -819,6 +821,7 @@ function renderStory(animateLast) {
   }
   $("storyEnd").hidden = !S.storyDone || idx < curIdx();
   $("replayIntro").onclick = () => playDialog(ch.intro);
+  const sb = $("snapBtn"); if (sb) sb.onclick = () => window.PHOTO && PHOTO.manual();
 }
 
 function renderShop() {
