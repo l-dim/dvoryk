@@ -9,7 +9,14 @@
      4 — малюк є (S.fam.baby = { name, born }): «допомагає» — приносить тріски в майстерню
    Хата: S.fam.house = { slotId: true } — які місця вже обставлені виробами
    ============================================================ */
-const FAM_WED_DAYS = 3, BABY_WAIT_H = 48, BABY_AFTER_WED_D = 2, BABY_NEED_SLOTS = 6;
+const FAM_WED_DAYS = 3, BABY_WAIT_H = 30 * 24, BABY_AFTER_WED_D = 14, BABY_NEED_SLOTS = 10;   // новина — через 2 тижні після весілля; чекаємо місяць
+/* поки чекаємо малюка — щотижня хтось із сусідів навідується з гостинцем */
+const BABY_VISITS = [
+  ["halya", "я вам пелюшок нашила — вишиваних, як годиться 🧵 І ось вам енергії, бережіть себе!", 20, 100],
+  ["olya", "принесла дитячих книжечок і пиріжків — їжте, вам тепер за двох 😄", 25, 150],
+  ["marichka", "сплела маленький віночок-оберіг на колиску 🌼", 30, 200],
+  ["stepan", "колиску вже пробували гойдати? Ото ж! А це від нас із бабою — на дитячу 🪵", 40, 300]
+];
 const WED_NEED = [
   { c: "flower", l: 6, why: "букет нареченої" },
   { c: "bake", l: 8, why: "весільний торт" },
@@ -106,7 +113,7 @@ window.FAM = (() => {
     const f = st(), house = f.house || (f.house = {});
     const rooms = [...new Set(HOUSE_SLOTS.map(s => s[1]))];
     const html = rooms.map(room => {
-      if (room === "Дитяча" && f.st < 4) return `<div class="fm-room"><div class="fm-rh">${room} <small>🔒 колись знадобиться 😉</small></div></div>`;
+      if (room === "Дитяча" && f.st < 3) return `<div class="fm-room"><div class="fm-rh">${room} <small>🔒 колись знадобиться 😉</small></div></div>`;
       const cells = HOUSE_SLOTS.filter(s => s[1] === room).map(([id, , c, l]) => {
         const it = { c, l }, ok = house[id], open = hasChain(c) && CHAINS[c] && l < CHAINS[c].items.length;
         if (!open) return `<div class="fm-slot lock"><span>🔒</span><small>${c === "wool" ? "з хліва" : "нове ремесло"}</small></div>`;
@@ -143,7 +150,7 @@ window.FAM = (() => {
       [who(), `{name}… сядь, ${P("будь ласка", "будь ласка")}. У мене новина 🥹 У нас буде малюк!`],
       ["halya", "Ой, Господи, яка радість! Я вже й пелюшки шию 🧵"],
       ["olya", "А колиску — ну ви ж майстри, самі зробите! 😉"]
-    ], () => { renderHub(); toast("👶 Малюк з'явиться за два дні — готуйте колиску!"); });
+    ], () => { renderHub(); toast("👶 Малюк з'явиться десь за місяць — а поки готуйте дитячу в «Нашій хаті»!"); });
   }
   function born() {
     const f = st();
@@ -192,6 +199,9 @@ window.FAM = (() => {
     if (f.st === 0 && S.wood.done >= 12 && S.level >= 13) { matchmaking(); return; }
     if (f.st === 2 && now() - f.wedAt >= BABY_AFTER_WED_D * 864e5 && filled() >= BABY_NEED_SLOTS) { expecting(); return; }
     if (f.st === 3 && now() >= f.babyAt) { born(); return; }
+    if (f.st === 3) { const wk = Math.floor((now() - (f.babyAt - BABY_WAIT_H * 3600e3)) / (7 * 864e5)), v = BABY_VISITS[wk - 1];
+      if (wk >= 1 && v && (f.visits || 0) < wk) { f.visits = wk; S.energy += v[2]; S.coins += v[3]; save(); renderTop();
+        playDialog([[v[0], `{name}, ${v[1]}`]], () => toast(`🎁 Гостинець для малюка: +${v[2]} ⚡ +${v[3]} 🪙`)); return; } }
     if (f.st === 4 && f.baby && now() >= (f.babyNext || 0)) babyHelp();
     if (wedding() !== lastWed) { lastWed = wedding(); if (typeof renderStory === "function") renderStory(); }
   }
@@ -201,7 +211,8 @@ window.FAM = (() => {
     const f = S.fam; if (!f || !f.st) return null;
     if (f.st === 1) { const d = f.need.filter(n => n.done).length; return { icon: "💍", title: "Готуємось до весілля", sub: `зібрано ${d} з ${f.need.length}: ${f.need.map(n => n.done ? "✅" : itemIcon(n)).join(" ")}`, btn: "Відкрити", act: "fam-prep", ready: f.need.some(n => !n.done && findOn(n.c, n.l) >= 0) }; }
     const n = filled(), gift = n > 0 && f.giftDay !== new Date(now()).toDateString();
-    const sub = f.st === 3 ? `чекаємо малюка 👶 ще ${Math.max(1, Math.ceil((f.babyAt - now()) / 3600e3))} год · затишок ${n}` :
+    const left = f.babyAt - now(), dd = Math.ceil(left / 864e5);
+    const sub = f.st === 3 ? `чекаємо малюка 👶 ще ${left > 2 * 864e5 ? dd + " дн." : Math.max(1, Math.ceil(left / 3600e3)) + " год"} · готуй дитячу · затишок ${n}` :
       f.st === 4 ? `${f.baby.name} підростає 👶 · затишок ${n}${gift ? " · є гостинець!" : ""}` :
       `затишок ${n} з ${HOUSE_SLOTS.length - 4}${gift ? " · є гостинець!" : ""}${wedding() ? " · весільні дні 💒" : ""}`;
     return { icon: "🏡", title: "Наша хата", sub, btn: "Відкрити", act: "fam-house", ready: gift };
@@ -215,5 +226,5 @@ window.HUB_ACTS = Object.assign(window.HUB_ACTS || {}, { "fam-prep": () => FAM.p
 if (typeof GUIDE_WOOD !== "undefined") GUIDE_WOOD.push(
   ["💍", "Сватання й весілля", "Коли майстерня розкрутиться (12 виробів, 13 рівень), прийдуть старости. Для весілля збери букет, торт, тістечка, солодощі й скриню з майстерні — список у «Подіях».", w => S.fam && S.fam.st >= 1],
   ["🏡", "Наша хата", "Після весілля обставляй хату виробами: світлиця, кухня, сіни, скарби, а згодом і дитяча. Кожна річ — +1 ⭐ і більший затишок; щодня в хаті чекає гостинець — монети й енергія.", w => S.fam && S.fam.st >= 2],
-  ["👶", "Малюк", "Коли ти в майстерні, малюк раз на пів години-годину приносить тріску (іноді й брусок). Справжній помічник росте!", w => S.fam && S.fam.st >= 4]
+  ["👶", "Малюк", "Через 2 тижні після весілля, коли в хаті стоятиме 10 речей, — новина про малюка; ще місяць чекання (сусіди щотижня навідуються з гостинцями, а дитячу можна готувати заздалегідь). Коли ти в майстерні, малюк раз на пів години-годину приносить тріску (іноді й брусок). Справжній помічник росте!", w => S.fam && S.fam.st >= 4]
 );
