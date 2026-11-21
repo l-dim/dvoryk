@@ -32,6 +32,7 @@ function rivalFace(name, fallback) {
   const [id, cx, cy, w, asp] = f, W = 58 / (w / 100), H = W / asp;
   return `<span class="hero-face riv"><img src="items/${id}.webp" alt="" style="width:${W.toFixed(1)}%;left:${(50 - cx / 100 * W).toFixed(1)}%;top:${(50 - cy / 100 * H).toFixed(1)}%;transform:none"></span>`;
 }
+const HERO_WED = ["hero1", "hero2", "hero3", "hero4", "hero5", "hero6", "man1", "man2", "man3", "man4", "man5", "man6"];   // весільне вбрання: <id>-wed
 const HERO_LOOKS = ["hero1", "hero2", "hero3", "hero4", "hero5", "hero6", "man1", "man2", "man3", "man4", "man5", "man6"];   // є зимовий і святковий образи: <id>-winter, <id>-fest
 const HERO_FACE = { hero1: [52.6, 11.0, 30.4, 0.373], hero2: [52.6, 11.3, 30.2, 0.380], hero3: [46.9, 12.4, 29.7, 0.406], hero4: [51.4, 13.5, 28.6, 0.456], hero5: [51.0, 13.4, 29.8, 0.422], hero6: [54.4, 14.0, 27.3, 0.452], man1: [48.8, 12.1, 25.5, 0.466], man2: [47.6, 11.1, 24.3, 0.473], man3: [43.7, 11.5, 27.6, 0.412], man4: [43.1, 11.0, 25.8, 0.450], man5: [41.9, 11.3, 28.7, 0.434], man6: [50.7, 12.9, 26.2, 0.459] };
 
@@ -82,7 +83,7 @@ window.HERO = (() => {
      S.heroLook: "auto" (за замовчуванням) або вибраний вручну "day" | "fest" | "winter" */
   const FEST_RE = /Свято|свята|Весілля|Весільне|Сватання|Коровай|Масляна|Великдень|Галинка|вертеп/;
   function lookFor(ch) {
-    if (window.FAM && FAM.festive()) return "fest";   // весільні дні — святкове вбрання
+    if (window.FAM && FAM.festive()) return "wed";   // весільні дні — святкове вбрання
     const m = S.heroLook || "auto";
     if (m !== "auto") return m;
     const s = window.WD && WD.season();
@@ -91,7 +92,7 @@ window.HERO = (() => {
     if (s && s.phase === "winter") return "winter";
     return "day";
   }
-  const fileOf = (h, look) => h.id + (look === "winter" && HERO_LOOKS.includes(h.id) ? "-winter" : look === "fest" && HERO_LOOKS.includes(h.id) ? "-fest" : "-full");
+  const fileOf = (h, look) => h.id + (look === "wed" && HERO_WED.includes(h.id) ? "-wed" : look === "wed" && HERO_LOOKS.includes(h.id) ? "-fest" : look === "winter" && HERO_LOOKS.includes(h.id) ? "-winter" : look === "fest" && HERO_LOOKS.includes(h.id) ? "-fest" : "-full");
   function yard(ch, all = []) {
     const h = cur(); if (!has(h)) return [];
     const f = fileOf(h, lookFor(ch));
@@ -111,10 +112,11 @@ window.HERO = (() => {
     }
     return out;
   }
-  const LOOK_NAMES = [["auto", "✨ Само"], ["day", "👕 Звичайне"], ["fest", "🌻 Святкове"], ["winter", "❄️ Зимове"]];
+  const married = () => !!(S.fam && S.fam.wedAt);
+  const lookNames = () => [["auto", "✨ Само"], ["day", "👕 Звичайне"], ["fest", "🌻 Святкове"], ["winter", "❄️ Зимове"], ...(married() ? [["wed", "💍 Весільне"]] : [])];
   const looksHtml = () => !has(cur()) || !HERO_LOOKS.includes(cur().id) ? "" :
-    `<p class="hr-lbl">Вбрання в дворику</p><div class="hr-looks">${LOOK_NAMES.map(([k, n]) => `<button class="hr-lk${(S.heroLook || "auto") === k ? " on" : ""}" data-k="${k}">${n}</button>`).join("")}</div>` +
-    `<div class="hr-prev">${["full", "fest", "winter"].map(v => `<img src="portraits/${cur().id}-${v}.webp" alt="">`).join("")}</div>` +
+    `<p class="hr-lbl">Вбрання в дворику</p><div class="hr-looks">${lookNames().map(([k, n]) => `<button class="hr-lk${(S.heroLook || "auto") === k ? " on" : ""}" data-k="${k}">${n}</button>`).join("")}</div>` +
+    `<div class="hr-prev">${["full", "fest", "winter", ...(married() && HERO_WED.includes(cur().id) ? ["wed"] : [])].map(v => `<img src="portraits/${cur().id}-${v}.webp" alt="">`).join("")}</div>` +
     `<p class="hint-s">«Само»: узимку — у теплому, на свята — у вишиванці, а в будні — як завжди.</p>`;
   /* стартовий екран */
   const sexHtml = () => `<div class="hr-sexes"><button class="hr-sex${sex() === "f" ? " on" : ""}" data-s="f">👩 Жінка</button><button class="hr-sex${sex() === "m" ? " on" : ""}" data-s="m">👨 Чоловік</button></div>`;
