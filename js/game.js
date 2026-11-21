@@ -98,7 +98,7 @@ const MALE_FORMS = [
   ["вже купила", "вже купив"], ["ти зберігала", "ти зберігав"], ["ти повернула", "ти повернув"], ["донечко", "синку"],
   ["Ти найкраща!", "Ти найкращий!"], ["моя хороша", "мій хороший"], ["самій піти", "самому піти"], ["Ти всіх вдягнула", "Ти всіх вдягнув"],
   ["Моя найкраща сусідка", "Мій найкращий сусід"], ["сама обираєш", "сам обираєш"], ["сама прочитаєш", "сам прочитаєш"],
-  ["кулінарок із сусідніх сіл", "кулінарів із сусідніх сіл"], ["Готова?", "Готовий?"], ["Почни, коли маєш", "Почни, коли маєш"]
+  ["кулінарок із сусідніх сіл", "кулінарів із сусідніх сіл"], ["Готова?", "Готовий?"], ["справжня майстриня села", "справжній майстер села"], ["Почни, коли маєш", "Почни, коли маєш"]
 ];
 function gx(t) {
   if (!t || !S || S.sex !== "m") return t;
@@ -358,7 +358,7 @@ function newOrder() {
     const c = pick(chains), len = CHAINS[c].items.length;
     // стеля складності: не більше рів. 6 (до 15-го рівня гравця — рів. 5), щоб не було виснажливого гринду
     // дорожчі замовлення: стеля вища, а рівень частіше ближче до стелі
-    const cap = S.level < 8 ? 4 : S.level < 15 ? 5 : 6;
+    const cap = S.level < 8 ? 4 : S.level < 15 ? 5 : S.level < 20 ? 6 : S.level < 26 ? 7 : S.level < 32 ? 8 : 9;
     const maxT = Math.min(len - 1, cap, 2 + Math.floor(S.level / 2));
     const minT = S.level >= 10 ? 3 : S.level >= 4 ? 2 : 1;
     const l = Math.max(minT, Math.min(maxT, maxT - Math.floor(Math.pow(Math.random(), 1.8) * (maxT - minT + 1))));
@@ -461,6 +461,7 @@ function doTask() {
     if (r.chest !== undefined) { placeItem({ c: "chest", l: r.chest }); parts.push(CHAINS.chest.items[r.chest][0]); }
     regen(); S.energy += ENERGY_BONUS.chapter; parts.push("+" + ENERGY_BONUS.chapter + " ⚡");
     S.chapter++; S.task = 0;
+    if (window.ENDLESS) ENDLESS.ensure(S.chapter + 5);
     if (S.chapter >= STORY.length) { S.storyDone = true; S.chapter = STORY.length - 1; S.task = STORY[S.chapter].tasks.length; }
     save();
     modal({
@@ -1288,6 +1289,7 @@ function isIOS() { return /iPhone|iPad|iPod/.test(navigator.userAgent) || (navig
 function isStandalone() { return window.navigator.standalone === true || matchMedia("(display-mode: standalone)").matches; }
 
 function startGame() {
+  if (window.ENDLESS) ENDLESS.ensure(S.chapter + 10);     // історія без кінця
   $("start").classList.remove("show");
   $("app").hidden = false;
   if (window.SIDE) SIDE.onStart();
@@ -1382,6 +1384,7 @@ function init() {
     if (window.HARD) HARD.tick();
     if (window.TP) TP.tick();
     if (window.SEAS) SEAS.tick();
+    if (window.ENDLESS) ENDLESS.tick();
     if (window.CONTEST) CONTEST.tick();
     if (window.TOLOKA) TOLOKA.tick();
     if (window.MAIL) MAIL.tick();

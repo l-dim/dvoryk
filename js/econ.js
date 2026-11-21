@@ -36,7 +36,7 @@ window.ECON = (() => {
     if (slot === 2) {
       const chains = S.gens.map(g => GENS[g].chain).filter(c => PRODUCT_CHAINS.includes(c));
       const c = chains[(chIdx * 7 + k) % chains.length];
-      return { item: { c, l: Math.min(CHAINS[c].items.length - 1, 2 + Math.floor(chIdx / 7)) } };
+      return { item: { c, l: Math.min(CHAINS[c].items.length - 3, 2 + Math.floor(Math.min(chIdx, 35) / 7)) } };   // не найвищі рівні
     }
     return null;
   }
