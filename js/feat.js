@@ -48,6 +48,13 @@ const UNLOCKS = [
     lines: [["olya", "{name}, у всіх справи… Добу почекаю, а далі — вибач, піду до інших 😅"]] },
   { id: "bigflash", lvl: 9, icon: "🏆", title: "Великий виклик тижня",
     text: "Раз на тиждень — великий виклик на 3 години: обидва генератори одночасно, дві цілі. Почни, коли маєш час і енергію, — без докупівлі не встигнути. Нагорода — скриня-сюрприз, рідкісний скарб, +10 ⭐ і +300 🪙." },
+  { id: "prices",   lvl: 6, icon: "📈", title: "Ціни ростуть",
+    text: "Кожна платна послуга — розбудити генератор, розчистити павутиння, пришвидшити піч, майстер, полиця у сховку, подарунки в крамничці — після кожної покупки дорожчає на 20% до кінця дня. Опівночі ціни повертаються." },
+  { id: "selllimit", lvl: 4, icon: "🛍️", title: "Ярмарок до вечора",
+    text: "Продавати можна лише 10 предметів на день — на кнопці «продати» видно, скільки лишилось. Думай, що віддати сусідам, а що продати." },
+  { id: "paidtasks", lvl: 7, icon: "🔨", title: "Ремонт коштує",
+    text: "Тепер частина завдань у дворику просить, крім зірочок, ще монети або потрібний предмет із дошки — матеріал для ремонту. На кнопці завдання видно, що треба.",
+    lines: [["stepan", "{name}, на ремонт самих зірочок мало — треба й матеріал, і копійка. Цвяхи самі не забиваються 🔨"]] },
   { id: "cat",      lvl: 5, icon: "🐱", title: "Котик на скрині",
     text: "Пиріжок умостився на старій скрині й теж замовляє 🐾 Виконуй його замовлення — і скриня відкриється з розкішною нагородою!",
     lines: [["cat", "Мур-р. (Сідає на скриню й багатозначно дивиться на тебе.) 🐾"], ["halya", "Хитрун! Не злізе, поки не нагодуєш. А в скрині — щось цінне 🧰"]] },
@@ -279,16 +286,17 @@ window.XTRA = (() => {
     renderBoard(); renderOrders(); renderInfo(); save();
     openStore();
   }
+  const slotPrice = s => { const b = STORE_PRICES[s.slots - STORE_START]; return b && window.ECON ? ECON.price("slot", b) : b; };
   function buySlot() {
-    const s = store(), p = STORE_PRICES[s.slots - STORE_START];
+    const s = store(), p = slotPrice(s);
     if (!p) return;
     if (S.coins < p) { sfx.nope(); toast("Не вистачає монеток 🪙"); return; }
-    S.coins -= p; s.slots++;
+    S.coins -= p; s.slots++; window.ECON && ECON.bought("slot");
     sfx.coin(); toast("🗄️ Нова полиця у сховку!");
     renderTop(); renderInfo(); save(); openStore();
   }
   function openStore() {
-    const s = store(), p = STORE_PRICES[s.slots - STORE_START];
+    const s = store(), p = slotPrice(s);
     const cells = Array.from({ length: s.slots }, (_, k) => s.items[k]
       ? `<button class="st-cell full" data-k="${k}"><span>${itemIcon(s.items[k])}</span><small>${itemName(s.items[k])}</small></button>`
       : `<div class="st-cell"></div>`).join("") +

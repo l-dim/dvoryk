@@ -436,7 +436,9 @@ function curChapter() { return STORY[Math.min(S.chapter, STORY.length - 1)]; }
 function doTask() {
   if (S.storyDone) return;
   const ch = STORY[S.chapter], t = ch.tasks[S.task];
+  if (window.ECON && !ECON.taskReady(S.chapter, S.task)) { sfx.nope(); toast("Бракує: " + ECON.taskMissing(S.chapter, S.task)); return; }
   if (S.stars < t.cost) { sfx.nope(); toast("Потрібно ще " + (t.cost - S.stars) + " ⭐ — виконуй замовлення сусідів"); return; }
+  if (window.ECON) ECON.payTask(S.chapter, S.task);
   S.stars -= t.cost;
   S.task++;
   if (S.tut === 3) setTut(4);
@@ -557,12 +559,13 @@ const SHOP = [
 ];
 function buy(id) {
   const s = SHOP.find(x => x.id === id);
-  const price = id === "energy" ? energyPrice() : s.price;
+  const price = id === "energy" ? energyPrice() : (window.ECON ? ECON.price("shop-" + id, s.price) : s.price);
   if (!price) { sfx.nope(); toast("Енергію на сьогодні вже купила — завтра знову можна 🌙"); return; }
   if (S.coins < price) { sfx.nope(); toast("Не вистачає монеток 🪙"); return; }
   S.coins -= price;
   if (id === "energy") { regen(); S.energy += ENERGY_SHOP.amount; S.energyBuys.n++; }
   else if (id === "star") S.stars += 1;
+  if (id !== "energy" && window.ECON) ECON.bought("shop-" + id);
   else placeItem({ c: "chest", l: +id.slice(-1) });
   sfx.coin();
   toast("Куплено: " + s.icon + " " + s.title);
@@ -573,6 +576,8 @@ function buy(id) {
 function sellSelected() {
   const it = S.board[selected];
   if (!it || it.g) return;
+  if (window.ECON && !ECON.canSell()) { sfx.nope(); toast("Сьогодні вже продано 10 предметів — ярмарок закрився до завтра 🌙"); return; }
+  window.ECON && ECON.onSold();
   const price = sellPrice(it);
   floatAt(selected, "+" + price + " 🪙");
   S.board[selected] = null; selected = -1;
@@ -706,7 +711,7 @@ function renderInfo() {
       : `<b>${GENS[it.g].name}</b>${lv}<small>Заряд ${it.ch}/${MECH.cap(it)}${window.HARD ? HARD.genInfo(it) : ""} · тапай, щоб отримати ${ch.items[0][0]} (−1 ⚡)</small>`;
   } else if (it.c === "dish") {
     text = `<b>${itemName(it)}</b><small>Страву просять сусіди за ⭐⭐</small>`;
-    btn = `<button class="sell" id="sellBtn"><small>продати</small><span>+${sellPrice(it)}🪙</span></button>`;
+    btn = `<button class="sell${window.ECON && !ECON.canSell() ? " dim" : ""}" id="sellBtn"><small>продати${window.ECON && ECON.sellNote() ? " " + ECON.sellNote() : ""}</small><span>+${sellPrice(it)}🪙</span></button>`;
   } else if (CHAINS[it.c].open) {
     text = `<b>${itemName(it)}</b><small>Тапни ще раз, щоб відкрити!${isMax(it) ? "" : " Або об'єднай два однакові"}</small>`;
   } else if (CHAINS[it.c].collect) {
@@ -715,7 +720,7 @@ function renderInfo() {
     const ch = CHAINS[it.c];
     const next = (isMax(it) ? "Найвищий рівень! 🏆" : `Два таких → ${ch.items[it.l + 1][0]} ${ch.items[it.l + 1][1]}`) + (window.HARD ? HARD.freshInfo(it) : "");
     text = `<b>${itemName(it)} <span class="lvl-tag">рів. ${it.l + 1}</span></b><small>${next}</small>`;
-    btn = `<button class="sell" id="sellBtn"><small>продати</small><span>+${sellPrice(it)}🪙</span></button>`;
+    btn = `<button class="sell${window.ECON && !ECON.canSell() ? " dim" : ""}" id="sellBtn"><small>продати${window.ECON && ECON.sellNote() ? " " + ECON.sellNote() : ""}</small><span>+${sellPrice(it)}🪙</span></button>`;
   }
   box.innerHTML = `<span class="info-ic">${itemIcon(it)}</span><span class="info-txt">${text}</span>${window.XTRA ? XTRA.storeBtn(it) : ""}${btn}`;
   const stb = $("storeBtn"); if (stb) stb.onclick = () => XTRA.stash(selected);
@@ -845,8 +850,8 @@ function renderStory(animateLast) {
     row.className = "task " + state;
     row.innerHTML = `<span class="t-ic">${state === "done" ? "✅" : state === "now" ? "🔨" : "🔒"}</span>` +
       `<span class="t-title">${t.title}</span>` +
-      (state === "now" ? `<button class="t-btn${S.stars >= t.cost ? "" : " dim"}">${t.cost} ⭐</button>` :
-        state === "locked" ? `<span class="t-cost">${t.cost} ⭐</span>` : "");
+      (state === "now" ? `<button class="t-btn${(window.ECON ? ECON.taskReady(idx, k) : S.stars >= t.cost) ? "" : " dim"}">${window.ECON ? ECON.taskLabel(idx, k) : t.cost + " ⭐"}</button>` :
+        state === "locked" ? `<span class="t-cost">${window.ECON ? ECON.taskLabel(idx, k) : t.cost + " ⭐"}</span>` : "");
     const btn = row.querySelector(".t-btn");
     if (btn) btn.onclick = doTask;
     list.appendChild(row);
@@ -875,6 +880,7 @@ function renderShop() {
       const left = ENERGY_SHOP.prices.length - energyBuysToday();
       title += `<small class="s-sub">${left ? "сьогодні ще " + left + " з " + ENERGY_SHOP.prices.length : "завтра знову"}</small>`;
     }
+    if (s.id !== "energy" && window.ECON) price = ECON.price("shop-" + s.id, s.price);
     lbl = price ? price + " 🪙" : "🌙";
     row.innerHTML = `<span class="s-ic">${s.icon}</span><span class="s-title">${title}</span><button class="s-btn${price && S.coins >= price ? "" : " dim"}">${lbl}</button>`;
     row.querySelector("button").onclick = () => buy(s.id);
@@ -923,7 +929,7 @@ function renderCollection() {
 
 function renderNavBadge() {
   const ch = STORY[S.chapter];
-  const can = !S.storyDone && ch && ch.tasks[S.task] && S.stars >= ch.tasks[S.task].cost;
+  const can = !S.storyDone && ch && ch.tasks[S.task] && (window.ECON ? ECON.taskReady(S.chapter, S.task) : S.stars >= ch.tasks[S.task].cost);
   $("navStoryDot").hidden = !can;
   const cd = $("navCollDot"); if (cd) cd.hidden = !(window.XTRA && XTRA.discCount());
 }

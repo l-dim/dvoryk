@@ -29,8 +29,9 @@ window.MECH = (() => {
   function wake(i) {
     const it = S.board[i];
     if (!it || !resting(it)) return;
-    if (S.coins < WAKE_COINS) { sfx.nope(); toast("Не вистачає монеток 🪙"); return; }
-    S.coins -= WAKE_COINS; delete it.rest; it.ch = cap(it);
+    const wp = (window.ECON ? ECON.price("wake", WAKE_COINS) : WAKE_COINS);
+    if (S.coins < wp) { sfx.nope(); toast("Не вистачає монеток 🪙"); return; }
+    S.coins -= wp; window.ECON && ECON.bought("wake"); delete it.rest; it.ch = cap(it);
     sfx.coin(); toast(GENS[it.g].icon + " " + GENS[it.g].name + " знову працює!");
     renderBoard(); renderTop(); renderInfo(); save();
   }
@@ -41,7 +42,7 @@ window.MECH = (() => {
       title: "Відпочиває 💤",
       html: `<div class="big-emoji">${GENS[it.g].icon}</div><p><b>${GENS[it.g].name}</b> відпочиває ще <b>${mins(it.rest - now())}</b> і знову буде повний сил.</p>
         <p class="hint-s">Поки що потапай інші генератори або об'єднай те, що вже є. Два однакові генератори зливаються в кращий — з більшим зарядом.</p>`,
-      buttons: [{ label: `Розбудити за ${WAKE_COINS} 🪙`, disabled: S.coins < WAKE_COINS, onClick: () => wake(i) }, { label: "Хай відпочине", cls: "ghost" }]
+      buttons: [{ label: `Розбудити за ${(window.ECON ? ECON.price("wake", WAKE_COINS) : WAKE_COINS)} 🪙`, disabled: S.coins < (window.ECON ? ECON.price("wake", WAKE_COINS) : WAKE_COINS), onClick: () => wake(i) }, { label: "Хай відпочине", cls: "ghost" }]
     });
   }
   function canMergeGens(A, B) { return A && B && A.g && B.g && A.g === B.g && gl(A) === gl(B) && gl(A) < GEN_MAX_LEVEL; }
@@ -111,7 +112,7 @@ window.MECH = (() => {
     modal({
       title: "Павутиння 🕸️",
       html: `<div class="big-emoji">🕸️</div><p>Під павутинням щось є! Об'єднай предмети на сусідній клітинці — і воно зникне${it.lock > 1 ? ` (ще ${it.lock} рази)` : ""}.</p>`,
-      buttons: [{ label: `Розчистити за ${LOCK_COINS} 🪙`, disabled: S.coins < LOCK_COINS, onClick: () => { S.coins -= LOCK_COINS; openLock(i, true); } }, { label: "Добре", cls: "ghost" }]
+      buttons: [{ label: `Розчистити за ${(window.ECON ? ECON.price("lock", LOCK_COINS) : LOCK_COINS)} 🪙`, disabled: S.coins < (window.ECON ? ECON.price("lock", LOCK_COINS) : LOCK_COINS), onClick: () => { S.coins -= (window.ECON ? ECON.price("lock", LOCK_COINS) : LOCK_COINS); window.ECON && ECON.bought("lock"); openLock(i, true); } }, { label: "Добре", cls: "ghost" }]
     });
   }
 
@@ -145,8 +146,8 @@ window.MECH = (() => {
       modal({
         title: "Піч 🔥",
         html: `<div class="big-emoji">${d[0]}</div><p>Готується <b>${d[1]}</b> — ще <b>${mins(it.done - now())}</b>.</p>`,
-        buttons: [{ label: `Пришвидшити за ${OVEN_RUSH_COINS} 🪙`, disabled: S.coins < OVEN_RUSH_COINS,
-          onClick: () => { S.coins -= OVEN_RUSH_COINS; it.done = now(); renderBoard(); renderTop(); save(); } }, { label: "Зачекаю", cls: "ghost" }]
+        buttons: [{ label: `Пришвидшити за ${(window.ECON ? ECON.price("rush", OVEN_RUSH_COINS) : OVEN_RUSH_COINS)} 🪙`, disabled: S.coins < (window.ECON ? ECON.price("rush", OVEN_RUSH_COINS) : OVEN_RUSH_COINS),
+          onClick: () => { S.coins -= (window.ECON ? ECON.price("rush", OVEN_RUSH_COINS) : OVEN_RUSH_COINS); window.ECON && ECON.bought("rush"); it.done = now(); renderBoard(); renderTop(); save(); } }, { label: "Зачекаю", cls: "ghost" }]
       });
       return;
     }

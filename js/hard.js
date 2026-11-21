@@ -83,7 +83,7 @@ window.HARD = (() => {
       setTimeout(() => toast(`🔧 ${GENS[it.g].name} зламалась! Тапни — дід Степан скаже, що треба для ремонту`), 500);
     } else if (it.wr === Math.round(max * 0.8)) setTimeout(() => toast(`🔧 ${GENS[it.g].name} уже скрипить — скоро треба буде лагодити`), 500);
   }
-  const fixCoins = it => 200 + 100 * MECH.gl(it);
+  const fixCoins = it => { const b = 200 + 100 * MECH.gl(it); return window.ECON ? ECON.price("repair", b) : b; };
   function findFix(fix) {
     const used = new Set();
     return fix.map(n => { const i = S.board.findIndex((x, k) => x && !x.g && !x.lock && !x.st && !used.has(k) && x.c === n.c && x.l === n.l); if (i >= 0) used.add(i); return i; });
@@ -98,7 +98,7 @@ window.HARD = (() => {
       buttons: [{ label: ok ? "Полагодити 🔧" : "Бракує предметів", disabled: !ok, onClick: () => {
           f.forEach(j => { S.board[j] = null; if (selected === j) selected = -1; }); fixed(i);
         } },
-        { label: `Майстер за ${price} 🪙`, cls: "ghost", disabled: S.coins < price, onClick: () => { S.coins -= price; fixed(i); } },
+        { label: `Майстер за ${price} 🪙`, cls: "ghost", disabled: S.coins < price, onClick: () => { S.coins -= price; window.ECON && ECON.bought("repair"); fixed(i); } },
         { label: "Пізніше", cls: "ghost" }] });
   }
   function fixed(i) {
