@@ -4,7 +4,7 @@
    • Щодня нова тема. Одягаєш сусіда в речі з гардероба (6 місць).
    • Журі-село голосує: бали за кожну річ, за збіг із темою, рідкісність, повний образ і цілий стрій.
    • Таблиця з 9 суперницями з сусідніх сіл → нагорода за місце. Один виступ на день.
-   • «Голосувати»: тричі на день обираєш кращий з двох чужих образів — +1 🧵 за кожен голос.
+   • «Голосувати»: тричі на день обираєш кращий з двох чужих образів — +1 🪢 за кожен голос.
    Стан: S.look = { day, who, sel: { місце: "колекція:індекс" }, done: { score, place }, votes }
    ============================================================ */
 const LOOK_SLOTS = [["head", "Головний убір", "👒"], ["top", "Сорочка / сукня", "👚"], ["outer", "Верхнє", "🧥"], ["bottom", "Спідниця / штани", "👖"], ["shoes", "Взуття", "👢"], ["acc", "Прикраса", "📿"]];
@@ -122,7 +122,7 @@ window.LOOK = (() => {
     modal({ title: `Голосування ${s.votes + 1}/${LOOK_VOTES} 🗳️`, html: `<p>Тема: <b>${theme().icon} ${theme().name}</b>. Чий образ кращий?</p><div class="lk-pair">${card(A, names[0], 0)}${card(B, names[1], 1)}</div>`,
       buttons: [{ label: "Пізніше", cls: "ghost", onClick: panel }] });
     document.querySelectorAll(".lk-opt").forEach(b => b.onclick = () => {
-      s.votes++; save(); if (window.FASH) FASH.add(1); sfx.coin(); toast("🗳️ Голос зараховано! +1 🧵");
+      s.votes++; save(); if (window.FASH) FASH.add(1); sfx.coin(); toast("🗳️ Голос зараховано! +1 🪢");
       s.votes < LOOK_VOTES ? vote() : panel();
     });
   }
@@ -138,14 +138,14 @@ window.LOOK = (() => {
     const list = mine.filter(k => !pickSlot || pieceOf(k).slot === pickSlot);
     const pieces = list.length ? list.map(k => { const p = pieceOf(k), used = s.sel[p.slot] === k, m = p.tags.filter(t => th.tags.includes(t)).length;
       return `<button class="lk-pc${used ? " used" : ""}${m ? " hot" : ""}" data-k="${k}"><span>${icon(k)}</span><small>${p.c.items[p.i][1]}</small>${m ? `<i>${"♥".repeat(m)}</i>` : ""}</button>`; }).join("")
-      : `<p class="hint-s">${mine.length ? "Для цього місця ще немає речей." : "Гардероб порожній — спершу поший речі у «Гардеробі сусідів» 🧵"}</p>`;
+      : `<p class="hint-s">${mine.length ? "Для цього місця ще немає речей." : "Гардероб порожній — спершу поший речі у «Гардеробі сусідів» 🪢"}</p>`;
     let body;
     if (s.done) {
       const tb = table(s.done.score);
       body = `<div class="lk-res"><div class="lk-model">${face(CHARS[who], "big")}<div class="lk-mini">${Object.values(s.sel).filter(Boolean).map(icon).join("")}</div></div>` +
         `<p>Твій образ: <b>${s.done.score} 💗</b> · <b>${s.done.place}-е місце</b>${s.done.place === 1 ? " — королева дня! 👑" : ""}</p></div>` +
         `<div class="ct-table">${tb.map((x, k) => `<div class="ct-row${x.me ? " me" : ""}"><span class="ct-pl">${["🥇", "🥈", "🥉"][k] || k + 1}</span><span class="ct-ava">${x.e}</span><span class="ct-name"><b>${x.me ? "Ти — " + (S.name || "господиня") : x.name}</b></span><span class="ct-pts">${x.pts} 💗</span></div>`).join("")}</div>` +
-        `<p class="hint-s">Нова тема — завтра. А поки можна проголосувати за чужі образи: ще ${LOOK_VOTES - s.votes} з ${LOOK_VOTES} (+1 🧵 за голос).</p>`;
+        `<p class="hint-s">Нова тема — завтра. А поки можна проголосувати за чужі образи: ще ${LOOK_VOTES - s.votes} з ${LOOK_VOTES} (+1 🪢 за голос).</p>`;
     } else {
       body = `<div class="lk-who-row">${models}</div><div class="lk-board"><div class="lk-model">${face(CHARS[who], "big")}</div><div class="lk-slots">${slots}</div></div>` +
         `<div class="lk-score">Оцінка журі: <b>${sc.total} 💗</b>${sc.parts.length ? `<small>${sc.parts.join(" · ")}</small>` : ""}</div>` +
