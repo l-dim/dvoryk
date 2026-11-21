@@ -26,11 +26,12 @@ window.PROFILE = (() => {
         `<div class="pf-stats">${stats}</div>` +
         (troph.length || wins[1] ? `<div class="pf-tr"><small>Трофеї у дворику</small><div>${troph.join(" ")}${wins[1] ? " " + "🥇".repeat(Math.min(5, wins[1])) : ""}</div></div>` : "") +
         (window.PHOTO ? `<button class="pf-album" id="pfAlbum"><span>📷</span><span class="pfa-t"><b>Фотоальбом дворика</b><small>${PHOTO.count()} фото${PHOTO.missing() ? " · ще " + PHOTO.missing() + " розділів можна сфотографувати" : ""}</small></span><i>›</i></button>` : "") +
-        `<div class="pf-btns"><button class="btn small ghost" id="pfSet">⚙️ Налаштування</button><button class="btn small ghost" id="pfSave">💾 Зберегти прогрес</button></div>`,
+        `<div class="pf-btns"><button class="btn small ghost" id="pfSet">⚙️ Налаштування</button><button class="btn small ghost" id="pfSave">💾 Зберегти прогрес</button><button class="btn small ghost" id="pfGuide">📖 Довідник</button></div>`,
       buttons: [{ label: "Готово", onClick: saveName }] });
     $("pfAva").onclick = () => { saveName(); window.HERO ? HERO.picker(open) : pickAvatar(); };
     $("pfSet").onclick = () => { saveName(); openSettings(); };
     $("pfSave").onclick = () => { saveName(); showExport(); };
+    $("pfGuide").onclick = () => { saveName(); GUIDE.open(); };
     const al = $("pfAlbum"); if (al) al.onclick = () => { saveName(); PHOTO.album(); };
   }
   function saveName() { const i = $("pfName"); if (i) { S.name = i.value.trim(); save(); } }

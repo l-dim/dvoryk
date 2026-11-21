@@ -1156,6 +1156,7 @@ async function readBackup(code) {
 }
 async function showExport() {
   const code = await makeBackup();
+  window.GUIDE && GUIDE.exported();
   modal({
     title: "Зберегти прогрес 💾",
     html: `<p>Це твій код прогресу (рівень ${S.level}, розділ ${Math.min(S.chapter, STORY.length - 1) + 1}). Збережи його в Нотатки або надішли собі в месенджер.</p>
@@ -1209,10 +1210,11 @@ function openSettings() {
       <label class="set-row">🔊 Звук <input type="checkbox" id="setSound" ${S.sound ? "checked" : ""}></label>
       <div class="set-backup">
         <b>Прогрес гри</b>
-        <p class="hint-s">Збережи код прогресу в Нотатки — і зможеш відновити гру на новому телефоні чи після перевстановлення.</p>
+        <p class="hint-s">Збережи код прогресу в Нотатки — і зможеш відновити гру на новому телефоні чи після перевстановлення.${window.GUIDE ? " " + GUIDE.note() : ""}</p>
         <button class="btn small" id="setExport">💾 Зберегти прогрес</button>
         <button class="btn ghost small" id="setImport">📥 Відновити прогрес</button>
       </div>
+      <button class="btn ghost small" id="setGuide">📖 Довідник господині</button>
       <p class="hint-s">Справжні покупки поки не підключені — гроші гра не списує 💛</p>
       <button class="btn ghost small" id="setReset">Почати гру спочатку</button>`,
     buttons: [{ label: "Зберегти", onClick: () => {
@@ -1223,6 +1225,7 @@ function openSettings() {
   });
   $("setExport").onclick = showExport;
   $("setImport").onclick = showImport;
+  $("setGuide").onclick = () => window.GUIDE && GUIDE.open();
   $("setReset").onclick = () => {
     if (!confirm("Точно почати спочатку? Весь прогрес буде видалено.")) return;
     localStorage.removeItem(SAVE_KEY);
@@ -1428,6 +1431,7 @@ function init() {
     if (window.WOOD) WOOD.tick();
     if (window.WH) WH.tick();
     if (window.CRAFT) CRAFT.tick();
+    if (window.GUIDE) GUIDE.tick();
     if (window.CONTEST) CONTEST.tick();
     if (window.TOLOKA) TOLOKA.tick();
     if (window.MAIL) MAIL.tick();

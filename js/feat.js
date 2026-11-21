@@ -118,7 +118,7 @@ window.UNL = (() => {
     sfx.open();
     modal({
       title: "Нове відкрито! ✨",
-      html: `<div class="big-emoji">${u.id === "cat" ? CAT_ICON : u.icon}</div><p><b>${u.title}</b></p><p>${u.text}</p>`,
+      html: `<div class="big-emoji">${u.id === "cat" ? CAT_ICON : u.icon}</div><p><b>${u.title}</b></p><p>${u.text}</p><p class="hint-s">Перечитати можна в Довіднику: Профіль → 📖</p>`,
       buttons: [{ label: "Чудово! 💛", onClick: () => { if (u.lines) playDialog(u.lines); } }]
     });
   }

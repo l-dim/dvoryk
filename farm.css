@@ -1062,3 +1062,20 @@ body.wood-mode .board { background: repeating-linear-gradient(90deg, #8a5a2c 0 2
 .worm-b .e3d, .test-b .e3d { width: 1.1em; height: 1.1em; }
 .tile.worm > .e3d:first-child, .tile.worm > img:first-child { filter: sepia(.6) brightness(.85); }
 body.farm .sell.sharp-b { background: linear-gradient(#d6dde6, #9eaabb 55%, #8794a6); border-color: #5d6878; box-shadow: 0 3px 0 #4a5462; }
+
+/* ---------- довідник господині ---------- */
+.gd-list { max-height: 56vh; overflow-y: auto; text-align: left; margin: 0 -6px; padding: 0 6px 4px; -webkit-overflow-scrolling: touch; }
+.gd-sec { margin-bottom: 10px; }
+.gd-h { font-weight: 800; font-size: 15px; margin: 4px 2px 6px; color: #6b3f1d; }
+.gd-h small { font-weight: 600; opacity: .7; font-size: 12px; }
+.gd-row { background: rgba(255, 255, 255, .65); border-radius: 12px; margin-bottom: 5px; padding: 7px 9px; }
+.gd-row summary { list-style: none; display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; }
+.gd-row summary::-webkit-details-marker { display: none; }
+.gd-row summary::after { content: "›"; margin-left: auto; opacity: .5; font-size: 18px; transition: transform .2s; }
+.gd-row[open] summary::after { transform: rotate(90deg); }
+.gd-row p { margin: 6px 0 2px 32px; font-size: 13.5px; line-height: 1.35; }
+.gd-ic { width: 24px; flex: none; text-align: center; font-size: 19px; font-family: var(--emoji); }
+.gd-ic .e3d { width: 24px; height: 24px; }
+.gd-lock { display: flex; align-items: center; gap: 8px; opacity: .7; font-size: 14px; }
+.gd-lock small { margin-left: auto; font-size: 12px; opacity: .8; text-align: right; }
+.pf-btns { flex-wrap: wrap; }
