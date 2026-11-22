@@ -10,7 +10,7 @@
    Стан: як у вилазок — S.side (поточна), S.outNext[id] (коли знову можна), S.trips = { id: скільки разів }
    ============================================================ */
 const TRIP_DUR = 72 * 3600e3, TRIP_GAP = 7 * 864e5;
-const TRIP_ART = [];                                   // мальовані: side-sea-0…4, side-gen-sea, side-carp-…, side-ski-…, souv-sea, souv-ski, ui-trip
+const TRIP_ART = ["sea", "carp", "ski"].flatMap(k => [0, 1, 2, 3, 4].map(l => `side-${k}-${l}`).concat("side-gen-" + k)).concat("souv-sea", "souv-ski", "ui-trip");   // аркуші T1–T2
 const TRIP_REWARD = { chest: 1, stars: 5, coins: 250, hearts: 2, bonus: 40 };
 const TRIP_GOALS = [{ l: 2, t: 3 }, { l: 3, t: 2 }, { l: 4, t: 1 }];
 const TRIP_KINDS = [
