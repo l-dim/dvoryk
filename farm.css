@@ -1242,3 +1242,11 @@ body.farm .tile.collect { filter: drop-shadow(0 0 5px rgba(255, 220, 110, .9)); 
 .fk-p.on { outline: 3px solid #e08a2a; outline-offset: 2px; transform: scale(1.08); }
 .fk-done { display: flex; justify-content: center; margin: 4px 0; }
 .fk-done > * { max-width: 140px; }
+
+.fk-vinok .fk-sample { flex-basis: 38%; }
+.fk-vinok .fk-sample .fk-fl { font-size: 17px; }
+.fk-rushnyk { flex-direction: column; gap: 6px; }
+.fk-rushnyk .fk-sample { flex: none; width: 100%; }
+.fk-rushnyk .fk-sample .fk-grid { max-width: 190px; gap: 1px; padding: 3px; }
+.fk-rushnyk .fk-work { width: 100%; }
+.fk-rushnyk .fk-work .fk-grid { max-width: none; touch-action: none; }

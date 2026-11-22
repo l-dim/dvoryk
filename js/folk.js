@@ -84,16 +84,25 @@ window.FOLKC = (() => {
     const g = game, F = FOLK[g.id];
     const pal = F.palette.map((p, k) => `<button class="fk-p${g.pick === k ? " on" : ""}" data-p="${k}" ${g.id === "vinok" ? "" : `style="background:${p}"`}>${g.id === "vinok" ? p : ""}</button>`).join("");
     modal({ title: F.title + " " + F.icon,
-      html: `<div class="fk-wrap"><div class="fk-sample"><small>Зразок</small>${draw(g.id, g.target, false)}</div><div class="fk-work">${draw(g.id, g.cur, true)}</div></div>` +
-        `<div class="fk-pal">${pal}</div><p class="hint-s" id="fkMsg">${g.msg || (g.id === "vinok" ? "Обери квітку й тапай місце у вінку" : g.id === "pysanka" ? "Обери фарбу й тапай поясок" : "Обери нитку й тапай клітинки")}</p>`,
+      html: `<div class="fk-wrap fk-${g.id}"><div class="fk-sample"><small>Зразок</small>${draw(g.id, g.target, false)}</div><div class="fk-work">${draw(g.id, g.cur, true)}</div></div>` +
+        `<div class="fk-pal">${pal}</div><p class="hint-s" id="fkMsg">${g.msg || (g.id === "vinok" ? "Обери квітку й тапай місце у вінку" : g.id === "pysanka" ? "Обери фарбу й тапай поясок" : "Обери нитку й веди пальцем по клітинках (ще раз — розпороти)")}</p>`,
       buttons: [{ label: "Готово ✓", onClick: check }, { label: "Пізніше", cls: "ghost", onClick: () => { game = null; } }] });
     // натискання на модалку не закриваємо, а оновлюємо
     document.querySelectorAll(".fk-p").forEach(b => b.onclick = () => { g.pick = +b.dataset.p; document.querySelectorAll(".fk-p").forEach(x => x.classList.toggle("on", x === b)); sfx.pop(); });
-    document.querySelectorAll(".fk-work .fk-z").forEach(z => z.onclick = () => {
-      const k = +z.dataset.z, v = F.palette[g.pick];
+    const paint = (z, toggle) => {
+      const k = +z.dataset.z; let v = F.palette[g.pick];
+      if (g.id === "rushnyk" && toggle && g.cur[k] === v) v = F.palette[2];        // повторний тап тим самим кольором — розпороти
+      if (g.cur[k] === v) return;
       g.cur[k] = v; sfx.pop();
       if (g.id === "vinok") z.textContent = v; else if (g.id === "rushnyk") z.style.background = v; else z.setAttribute("fill", v);
-    });
+    };
+    if (g.id === "rushnyk") {                       // рушник вишиваємо, ведучи пальцем по клітинках
+      const gr = document.querySelector(".fk-work .fk-grid"); let on = false;
+      const at = e => { const el = document.elementFromPoint(e.clientX, e.clientY); return el && el.closest && el.closest(".fk-work .fk-z"); };
+      gr.addEventListener("pointerdown", e => { e.preventDefault(); on = true; const z = at(e); if (z) paint(z, true); });
+      gr.addEventListener("pointermove", e => { if (!on) return; const z = at(e); if (z) paint(z, false); });
+      ["pointerup", "pointercancel", "pointerleave"].forEach(t => gr.addEventListener(t, () => { on = false; }));
+    } else document.querySelectorAll(".fk-work .fk-z").forEach(z => z.onclick = () => paint(z, false));
   }
   function start(id) {
     if (!ready(id)) { sfx.nope(); toast("Цей майстер-клас уже був сьогодні — приходь завтра 🌙"); return; }
