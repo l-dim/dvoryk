@@ -55,7 +55,7 @@ if (typeof UNLOCKS !== "undefined") UNLOCKS.push({ id: "guests", lvl: 10, icon: 
   text: "Раз на кілька днів до села хтось приїздить: коваль, фельдшерка, вівчар із гір, хлопець із міста, торговка з ярмарку чи онук баби Галі. Гість побуде 2–3 дні — виконай три його замовлення, і на прощання він щось подарує.",
   lines: [["halya", "{name}, у нас село гостинне — до нас частенько хтось заїжджає 🧳 Пригостиш — і людям приємно, і тобі віддячать!"]] });
 if (typeof GUIDE_BASICS !== "undefined") GUIDE_BASICS.push(["🧳", "Гості села",
-  "Раз на 3–7 днів приїздить гість на 2–3 дні. Він стоїть у дворику й робить свої замовлення — виконай три, і на прощання отримаєш подарунок (у кожного гостя свій). Взимку гості в теплому, а на свята — у святковому."]);
+  "Раз на 3–7 днів приїздить гість на 2–3 дні. Він стоїть у дворику й робить свої замовлення — виконай три, і на прощання отримаєш подарунок (у кожного гостя свій). У засніженому дворику гості в теплому, а на свята — у святковому."]);
 
 window.GUESTS = (() => {
   const on = () => window.UNL && UNL.on("guests");
@@ -66,10 +66,10 @@ window.GUESTS = (() => {
   const hm = ms => { const t = Math.max(0, Math.ceil(ms / 6e4)), h = Math.floor(t / 60); return h >= 24 ? Math.floor(h / 24) + " д " + (h % 24) + " год" : h ? h + " год " + (t % 60) + " хв" : (t % 60) + " хв"; };
 
   /* який вигляд зараз: свято → святковий, зима → тепле, інакше звичайний */
-  function look(id) {
+  function look(id, ch) {
+    if (typeof sceneWinter === "function" ? sceneWinter(ch || (typeof curChapter === "function" ? curChapter() : null)) : false) return id + "-winter";   // сніг — тепле
     if (window.EV && EV.active && EV.active()) return id + "-fest";
-    const m = new Date(now()).getMonth();
-    return m === 11 || m <= 1 ? id + "-winter" : id;
+    return id;
   }
 
   /* замовлення гостя — як звичайне, тільки щедріше */
@@ -147,7 +147,7 @@ window.GUESTS = (() => {
     const g = cur(); if (!g) return [];
     const slots = [[84, 68], [16, 68], [88, 82], [12, 82], [70, 90], [30, 90]];
     const free = slots.find(([x, y]) => all.every(d => Math.hypot((d.x || 0) - x, ((d.y || 0) - y) * 1.4) > 14)) || slots[0];
-    const w = look(g.id);
+    const w = look(g.id, ch);
     return [{ key: "guest-" + w, who: w, x: free[0], y: free[1], s: g.id === "petryk" ? 8 : 10 }];
   }
 

@@ -801,11 +801,13 @@ function takeInbox() {
 
 /* Хто з сусідів стоїть у дворику: ті, хто найбільше говорить у розділі (до трьох) */
 /* Зимове вбрання: сусід отримав теплу річ і зараз зима (зимовий розділ або справжні морози) */
-function winterLook(who, ch) {
-  if (!PORTRAITS_WINTER.includes(who) || !window.WD || !WD.isDressed(who)) return false;
-  const s = WD.season();
-  return !!(ch.winter || /Зимов/.test(ch.title) || (s && s.phase === "winter"));
+/* зимова сцена: сніжний розділ або справжні морози (15 грудня — 1 березня) */
+function sceneWinter(ch) {
+  const s = window.WD && WD.season();
+  return !!(ch && (ch.winter || /Зимов/.test(ch.title))) || !!(s && s.phase === "winter");
 }
+/* узимку в дворику всі, хто має зимове вбрання, — у ньому (хто змерз без теплої речі, той на лікарняному й не виходить) */
+function winterLook(who, ch) { return PORTRAITS_WINTER.includes(who) && sceneWinter(ch); }
 function yardPeople(ch, all) {
   const count = {};
   [ch.intro || [], ...ch.tasks.map(t => t.lines || [])].forEach(lines => lines.forEach(([who]) => {

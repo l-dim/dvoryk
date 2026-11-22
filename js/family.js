@@ -216,7 +216,8 @@ window.FAM = (() => {
       { key: "wd-notes", e: "🎶", x: 66, y: 30, s: 5 }, { key: "wd-hearts", e: "💕", x: 40, y: 30, s: 5 }, { key: "wd-cake", e: "🎂", x: 30, y: 54, s: 5 });
     if (f.baby) {
       const a = age(), id = `kid-${kidSex()}-${a}`;
-      if (a > 0 && KID_ART.includes(id)) out.push({ key: "kid-" + id, who: id, x: 58, y: 90, s: a === 1 ? 3.5 : 5 });
+      const wid = typeof sceneWinter === "function" && sceneWinter(ch) && KID_ART.includes(id + "-winter") ? id + "-winter" : id;   // у снігу — тепле
+      if (a > 0 && KID_ART.includes(id)) out.push({ key: "kid-" + wid, who: wid, x: 58, y: 90, s: a === 1 ? 3.5 : 5 });
       else out.push({ key: "kid-" + a, e: a === 0 ? "👶" : kidSex() === "girl" ? "👧" : "👦", x: 58, y: 90, s: a === 0 ? 5 : 6 });
     }
     return out;
