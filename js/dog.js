@@ -11,7 +11,7 @@
    ============================================================ */
 const DOG_MAX = 6, DOG_BONE = 3, DOG_CROW_MIN = [40, 90], DOG_STEAL_MS = 2 * 60e3, DOG_FIND_H = [3, 5];
 const DOG_BONE_PRICE = [40, 80, 160];                  // за день — тричі, щоразу дорожче
-const DOG_ART = [];                                     // мальовані: gen-dog, bone, ui-crow — коли буде аркуш
+const DOG_ART = ["gen-dog", "bone", "ui-crow"];          // аркуш sheet-dog
 window.PUA_MAP = window.PUA_MAP || {};
 PUA_MAP[String.fromCharCode(0xE548)] = { e: "🦴", img: DOG_ART.includes("bone") ? "items/bone.webp" : null };
 PUA_MAP[String.fromCharCode(0xE549)] = { e: "🐕", img: DOG_ART.includes("gen-dog") ? "items/gen-dog.webp" : "items/animal-dog.webp" };
@@ -122,7 +122,7 @@ window.DOG = (() => {
   function decorate(t, it) {
     if (!t) return;
     let b = t.querySelector(".crow-b");
-    if (it && it.crow) { if (!b) { b = document.createElement("span"); b.className = "crow-b"; b.textContent = "🐦"; t.appendChild(b); } }
+    if (it && it.crow) { if (!b) { b = document.createElement("span"); b.className = "crow-b"; b.innerHTML = DOG_ART.includes("ui-crow") ? `<img class="e3d pnt" src="items/ui-crow.webp" alt="">` : "🐦"; t.appendChild(b); } }
     else if (b) b.remove();
   }
   function info() {

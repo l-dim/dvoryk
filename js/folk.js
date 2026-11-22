@@ -9,13 +9,13 @@
    Стан: S.folk = { <id>: { day, n } }
    ============================================================ */
 const FOLK = {
-  pysanka: { title: "Писанка", icon: "🥚", host: "halya", hol: ["velykden"], decor: ["🥚", "Писанка", 5],
+  pysanka: { title: "Писанка", icon: "🥚", host: "halya", hol: ["velykden"], decor: ["🪬", "Писанка", 5],
     intro: "Сідай поруч, {name}. Писанку пишуть із молитвою й тишею в душі. Дивись на зразок — і фарбуй пояски так само 🥚",
     palette: ["#c62828", "#f9a825", "#1b1b1b", "#2e7d32", "#1565c0", "#fafafa"] },
-  vinok: { title: "Купальський вінок", icon: "🌼", host: "liza", hol: ["kupala", "triytsia"], decor: ["🏵️", "Купальський вінок", 6],
+  vinok: { title: "Купальський вінок", icon: "🌼", host: "liza", hol: ["kupala", "triytsia"], decor: ["💮", "Купальський вінок", 6],
     intro: "Вінок плетуть по колу, квітка до квітки 🌼 Подивись, як на зразку, — і вплітай у тому ж порядку!",
     palette: ["🌼", "🌸", "🌻", "🪻", "🌿", "🌺"] },
-  rushnyk: { title: "Вишитий рушник", icon: "🧵", host: "olya", hol: ["pokrova", "rizdvo", "nezalezhnist"], decor: ["📜", "Вишитий рушник", 6],
+  rushnyk: { title: "Вишитий рушник", icon: "🧵", host: "olya", hol: ["pokrova", "rizdvo", "nezalezhnist"], decor: ["🎏", "Вишитий рушник", 6],
     intro: "Рушник вишивають хрестиком — червоним і чорним, як бабусі вчили 🧵 Повтори орнамент зі зразка клітинка в клітинку.",
     palette: ["#c62828", "#1b1b1b", "#fffaf0"] }
 };
