@@ -1168,3 +1168,16 @@ body.farm .orders.side > .side-host { flex: 1.55 1 0; }
 .tractor .e3d { width: 1em; height: 1em; }
 body.plowing .board { pointer-events: none; }
 .cell.plowed { background: linear-gradient(#a8784a, #7d5430) !important; transition: background .6s; }
+
+/* лічильник продажів — кружечком у куті кнопки, щоб кнопка не розпиралась */
+body.farm .sell { position: relative; }
+.sell-n { position: absolute; top: -9px; right: -6px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 9px; background: #fff; color: #b9771a;
+  border: 2px solid #e6a22e; font: 900 10px/14px var(--font); font-style: normal; text-align: center; box-sizing: border-box; }
+.info { overflow: visible; container-type: inline-size; }
+.info-txt { overflow: hidden; }
+/* вузька панель (поруч кілька кнопок) — лишаємо значок і кнопки, без тексту, що стискається до літери */
+@container (max-width: 200px) {
+  .info-txt { display: none; }
+  .info:has(.sell + .sell) .info-ic, .info:has(.sell ~ .sell) .info-ic { display: none; }
+  body.farm .info .sell { min-width: 50px; padding: 4px 6px 5px; }
+}

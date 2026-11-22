@@ -756,7 +756,7 @@ function renderInfo() {
       : `<b>${GENS[it.g].name}</b>${lv}<small>Заряд ${it.ch}/${MECH.cap(it)}${window.HARD ? HARD.genInfo(it) : ""}${window.WH ? WH.genInfo(it) : ""}${window.CRAFT ? CRAFT.genInfo(it) : ""}${window.FARM2 ? FARM2.genInfo(it) : ""}${window.SOIL ? SOIL.genInfo(it) : ""} · тапай, щоб отримати ${ch.items[0][0]} (−1 ⚡)</small>`;
   } else if (it.c === "dish") {
     text = `<b>${itemName(it)}</b><small>Страву просять сусіди за ⭐⭐</small>`;
-    btn = `<button class="sell${window.ECON && !ECON.canSell() ? " dim" : ""}" id="sellBtn"><small>продати${window.ECON && ECON.sellNote() ? " " + ECON.sellNote() : ""}</small><span>+${sellPrice(it)}🪙</span></button>`;
+    btn = `<button class="sell${window.ECON && !ECON.canSell() ? " dim" : ""}" id="sellBtn"><small>продати</small><span>+${sellPrice(it)}🪙</span>${window.ECON && ECON.sellNote() ? `<i class="sell-n">${ECON.sellNote().split("/")[0]}</i>` : ""}</button>`;
   } else if (CHAINS[it.c].open) {
     text = `<b>${itemName(it)}</b><small>Тапни ще раз, щоб відкрити!${isMax(it) ? "" : " Або об'єднай два однакові"}</small>`;
   } else if (CHAINS[it.c].trash) {
@@ -768,7 +768,7 @@ function renderInfo() {
     const ch = CHAINS[it.c];
     const next = (isMax(it) ? "Найвищий рівень! 🏆" : `Два таких → ${ch.items[it.l + 1][0]} ${ch.items[it.l + 1][1]}`) + (window.HARD ? HARD.freshInfo(it) : "");
     text = `<b>${itemName(it)} <span class="lvl-tag">рів. ${it.l + 1}</span></b><small>${next}</small>`;
-    btn = `<button class="sell${window.ECON && !ECON.canSell() ? " dim" : ""}" id="sellBtn"><small>продати${window.ECON && ECON.sellNote() ? " " + ECON.sellNote() : ""}</small><span>+${sellPrice(it)}🪙</span></button>`;
+    btn = `<button class="sell${window.ECON && !ECON.canSell() ? " dim" : ""}" id="sellBtn"><small>продати</small><span>+${sellPrice(it)}🪙</span>${window.ECON && ECON.sellNote() ? `<i class="sell-n">${ECON.sellNote().split("/")[0]}</i>` : ""}</button>`;
   }
   box.innerHTML = `<span class="info-ic">${itemIcon(it)}</span><span class="info-txt">${text}</span>${window.XTRA ? XTRA.storeBtn(it) : ""}${window.WH && it.g ? WH.genButton(it) : ""}${btn}`;
   const shb = $("sharpBtn"); if (shb) shb.onclick = () => WH.sharpenModal(selected);
