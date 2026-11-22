@@ -1257,3 +1257,18 @@ body.farm .tile.collect { filter: drop-shadow(0 0 5px rgba(255, 220, 110, .9)); 
 .fk-rushnyk .fk-sample .fk-grid { max-width: 190px; gap: 1px; padding: 3px; }
 .fk-rushnyk .fk-work { width: 100%; }
 .fk-rushnyk .fk-work .fk-grid { max-width: none; touch-action: none; }
+
+/* ---------- більші клітинки на телефоні: та сама дошка 7×9, без прокрутки — менше «повітря» довкола ---------- */
+@media (max-width: 560px) {
+  #tab-board { padding-left: 3px; padding-right: 3px; padding-bottom: 3px; }
+  body.farm .board { padding: 3px; gap: 2px; border-width: 2px; border-radius: 16px; }
+  body.farm .cell, .tile { border-radius: 9px; }
+  body.farm .orders { padding: 12px 4px 3px; margin: -8px 0 0; gap: 6px; }
+  body.farm .order { padding: 3px 4px 4px; }
+  body.farm .order.pic .o-body { min-height: 50px; margin-bottom: 1px; }
+  body.farm .o-pic { width: 44px; }
+  .tut { margin-left: 3px; margin-right: 3px; margin-bottom: 4px; padding: 5px 10px; }
+  .info-row { height: 48px; margin-top: 4px; padding: 0 3px; }
+}
+/* привид без тіні — легший для телефону під час перетягування */
+.drag-ghost, body.td .drag-ghost .e3d, .drag-ghost .e3d { filter: none !important; }
