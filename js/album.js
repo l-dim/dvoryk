@@ -136,11 +136,11 @@ window.ALB = (() => {
   function onDeliver(o) {
     if (!on()) return;
     const sure = o.paw || o.urgent || o.dish || o.ev;
-    if (sure || Math.random() < 0.35) give(1);
+    if (sure || Math.random() < 0.12) give(1);
   }
   function onChest(level) {
     if (!on()) return;
-    const n = [Math.random() < 0.3 ? 1 : 0, 1, 2][level] || 0;
+    const n = [Math.random() < 0.15 ? 1 : 0, 1, 2][level] || 0;
     if (n) give(n, n > 1 ? "Зі скрині" : "");
   }
 

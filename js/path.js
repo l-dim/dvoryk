@@ -38,7 +38,7 @@ window.PATH = (() => {
     if (n % 5 === 0) return { chest: 1 };
     switch ((n - 1) % 4) {
       case 0: return { coins: 40 + 5 * n };
-      case 1: return { energy: 8 + 2 * Math.floor(n / 5) };
+      case 1: return { energy: 4 + Math.floor(n / 5) };
       case 2: return { cards: 2 };
       default: return { stars: n >= 16 ? 2 : 1 };
     }

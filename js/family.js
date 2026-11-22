@@ -143,7 +143,7 @@ window.FAM = (() => {
   }
   function houseGift() {
     const f = st(), n = filled(); f.giftDay = new Date(now()).toDateString();
-    S.coins += n * 8; S.energy += Math.min(20, n); sfx.coin(); renderTop(); save();
+    S.coins += n * 8; S.energy += Math.min(8, n); sfx.coin(); renderTop(); save();
     toast(`🏡 Гостинець із хати: +${n * 8} 🪙 +${Math.min(20, n)} ⚡`);
   }
 

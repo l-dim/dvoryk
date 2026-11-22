@@ -10,8 +10,8 @@ const ENERGY_MAX = 50;
 const ENERGY_REGEN_MS = 3 * 60 * 1000;  // +1⚡ кожні 3 хвилини (повна шкала ≈ 2,5 год)
 const TEA_BREAK_MS = 6 * 60 * 60 * 1000; // безкоштовна перерва на чай раз на 6 год
 const TEA_BREAK_ENERGY = 10;
-const ENERGY_BONUS = { level: 10, chapter: 15, daily: 15 };
-const ENERGY_SHOP = { amount: 15, prices: [200, 400, 800] }; // за день можна купити 3 рази, щоразу дорожче
+const ENERGY_BONUS = { level: 10, chapter: 12, daily: 8 };
+const ENERGY_SHOP = { amount: 10, prices: [300, 600] };      // за день можна купити 2 рази, щоразу дорожче
 
 /* Ланцюжки: два однакові предмети → наступний у списку */
 const CHAINS = {
@@ -1254,7 +1254,7 @@ const DAILY = {
   snow:    { icon: "❄️", text: "Збери сніжинки на свято" }
 };
 /* Завдання тижня: з понеділка до неділі, нагорода — скриня-сюрприз, монетки й зірочки */
-const WEEKLY_REWARD = { chest: 2, coins: 200, stars: 5, energy: 20 };
+const WEEKLY_REWARD = { chest: 2, coins: 200, stars: 5, energy: 10 };
 const FRIEND_STEPS = [3, 6, 10];
 const FRIEND_REWARD = [{ coins: 60 }, { chest: 1 }, { stars: 5, gift: true }];
 /* Подарунок сусіда для дворика (на 10 сердечках) і три маленькі історії */

@@ -18,6 +18,7 @@ const PAY_OFFERS = [
   { id: "co5000", icon: "👛", title: "Скриня монет",      sub: "+5000 🪙",                   price: 129, give: { coins: 5000 }, tag: "вигідно" },
   { id: "st10",   icon: "⭐", title: "Зірочки для ремонту", sub: "+10 ⭐",                   price: 59,  give: { stars: 10 } },
   { id: "store3", icon: "🗄️", title: "Три полиці у сховок", sub: "+3 місця назавжди",        price: 49,  give: { store: 3 } },
+  { id: "rest60", icon: "☕", title: "Друге дихання",     sub: "+1 година гри без перепочинку", price: 49, give: { rest: 60 } },
   { id: "pack",   icon: "💝", title: "Набір господині",   sub: "100 ⚡ · 2000 🪙 · 💝 · 5 ⭐",  price: 149, give: { energy: 100, coins: 2000, chest: 2, stars: 5 }, tag: "хіт" }
 ];
 
@@ -30,6 +31,7 @@ window.PAY = (() => {
     if (g.stars) { S.stars += g.stars; p.push("+" + g.stars + " ⭐"); }
     if (g.chest !== undefined) { placeItem({ c: "chest", l: g.chest }); p.push(CHAINS.chest.items[g.chest][0]); }
     if (g.unlim) { S.unlimUntil = Math.max(Date.now(), S.unlimUntil || 0) + g.unlim * 60e3; p.push("☀️ " + g.unlim + " хв без меж"); }
+    if (g.rest && window.REST) { REST.refill(g.rest); p.push("☕ +" + g.rest + " хв гри"); }
     if (g.store) { S.store = S.store || { slots: 3, items: [] }; S.store.slots += g.store; p.push("+" + g.store + " 🗄️"); }
     save(); renderAll(); confetti(); sfx.level();
     return p.join(" &nbsp; ");
@@ -60,7 +62,16 @@ window.PAY = (() => {
   }
   function bind(root) { root.querySelectorAll(".pay-card").forEach(b => b.onclick = () => buy(b.dataset.id)); }
   const unlimLeft = () => Math.max(0, (S.unlimUntil || 0) - Date.now());
-  return { html, bind, buy, unlimLeft, grant };
+  /* вікно з кількома пропозиціями (коли скінчилась енергія чи сили) */
+  function offers(ids, title, lead = "") {
+    const list = PAY_OFFERS.filter(o => ids.includes(o.id));
+    modal({ title, html: (lead ? `<p>${lead}</p>` : "") + `<div class="pay-grid">${list.map(o => `<button class="pay-card" data-id="${o.id}">${o.tag ? `<i class="pay-tag">${o.tag}</i>` : ""}<span class="pay-ic">${o.icon}</span>` +
+      `<b>${o.title}</b><small>${o.sub}</small><span class="pay-price">${fmt(o.price)}</span></button>`).join("")}</div>` +
+      (PAY_MODE === "live" ? "" : `<p class="hint-s">Справжні покупки ще не підключені — гроші ніде не списуються.</p>`),
+      buttons: [{ label: "Не зараз", cls: "ghost" }] });
+    bind($("modal"));
+  }
+  return { html, bind, buy, unlimLeft, grant, offers };
 })();
 
 /* ============================================================ */

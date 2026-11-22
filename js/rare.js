@@ -1,7 +1,7 @@
 "use strict";
 /* ============================================================
    РІДКІСНІ ЗНАХІДКИ 💎 · КОЛЕКЦІОНЕР 🧐 · ВИКЛИКИ НА ЧАС ⏳
-   • Тап по генератору іноді дає «Бабусин скарб»: рів.1 — раз на ~50 тапів, рів.2 — раз на ~100.
+   • Тап по генератору зрідка дає «Бабусин скарб»: рів.1 — раз на ~700 тапів (кілька днів), рів.2 — раз на ~3000 (тиждень-два).
      Два однакові скарби → вищий; верхні рівні — тільки злиттям.
    • Колекціонер Орест приходить без черги по рідкісний скарб і чекає 3 доби. Платить щедро.
    • Виклик на час: 90 хвилин, ціль, яку майже не можна виконати без докупівлі енергії
@@ -15,14 +15,14 @@ CHAINS.rare = { name: "Бабусині скарби", rare: true, vals: [15, 35
 window.PUA_MAP = window.PUA_MAP || {};
 CHAINS.rare.items = CHAINS.rare.items.map(([e, name], l) => { const c = String.fromCharCode(0xE200 + l); PUA_MAP[c] = { e, img: "items/rare-" + l + ".webp" }; return [c, name]; });
 const RARE_ICON = `<img class="e3d pnt" src="items/ui-rare.webp" alt="">`;
-const RARE_DROP = [0.02, 0.01];                         // рів.1 ≈ 1/50, рів.2 ≈ 1/100 тапів
+const RARE_DROP = [1 / 700, 1 / 3000];                  // рів.1 ≈ раз на кілька днів, рів.2 ≈ раз на тиждень-два
 CHARS.collector = { key: "collector", icon: "🧐", name: "Колекціонер Орест", from: 999,
   ask: ["Шукаю одну річ для колекції… Заплачу, як ніхто в окрузі 🧐", "Кажуть, у вашому дворику бувають справжні скарби?", "Я терплячий. Але така річ — на вагу золота!"],
   thanks: ["Неймовірно! Саме такої бракувало моїй колекції 🧐✨", "Оце знахідка! Тримайте — заслужили сповна", "Ваш дворик — справжня скарбниця!"] };
 PORTRAITS.push("collector");                            // мальований портрет portraits/collector.webp
 PORTRAIT_FACE.collector = [35.5, 23.1, 205];
-const COLLECTOR = { waitH: 72, gapH: [16, 28], firstMin: 10 };
-const FLASH_DUR = 90 * 60e3, FLASH_GAP = [4, 8];        // год між викликами
+const COLLECTOR = { waitH: 168, gapH: [72, 144], firstMin: 10 };   // чекає тиждень, приходить раз на 3–6 днів
+const FLASH_DUR = 90 * 60e3, FLASH_GAP = [24, 48];      // год між викликами
 const FLASH_KINDS = [
   { k: "tap",     icon: "🪴", text: "Тапни генератори",          t: lvl => 130 + lvl * 2 },
   { k: "merge",   icon: "✨", text: "Зроби злиттів",              t: lvl => 120 + lvl * 2 },
@@ -59,7 +59,7 @@ window.RARE = (() => {
       let l2 = Math.max(1, Math.min(5, l + (Math.random() < 0.5 ? -1 : 1))); if (l2 === l) l2 = l > 1 ? l - 1 : l + 1;
       const v = CHAINS.rare.vals[l] + CHAINS.rare.vals[l2];
       return { id: ++S.orderSeq, ch: "collector", items: [{ c: "rare", l }, { c: "rare", l: l2 }], coins: Math.round(v * 3.6), xp: 60 + (l + l2) * 15,
-        stars: 4 + l + l2, rare: true, pair: true, line: rnd(3), until: now() + 5 * 24 * 3600e3, rchest: 2 };
+        stars: 4 + l + l2, rare: true, pair: true, line: rnd(3), until: now() + 10 * 24 * 3600e3, rchest: 2 };
     }
     const v = CHAINS.rare.vals[l];
     return { id: ++S.orderSeq, ch: "collector", items: [{ c: "rare", l }], coins: Math.round(v * 3), xp: 30 + l * 15,
@@ -73,8 +73,8 @@ window.RARE = (() => {
     const o = rareOrder(); S.orders.unshift(o); S.rareNext = 0;
     renderOrders(); save();
     const want = o.items.map(it => `${CHAINS.rare.items[it.l][0]} «${CHAINS.rare.items[it.l][1]}»`).join(" і ");
-    playDialog([["collector", o.pair ? `Добридень! Цього разу мені потрібна пара для вітрини 🧐 ${want} — разом! Чекатиму п'ять діб і заплачу по-царськи.`
-      : `Добридень! Я — Орест, збираю старовину 🧐 Мені б ${want}. Чекатиму три доби — і заплачу щедро!`]]);
+    playDialog([["collector", o.pair ? `Добридень! Цього разу мені потрібна пара для вітрини 🧐 ${want} — разом! Чекатиму десять днів і заплачу по-царськи.`
+      : `Добридень! Я — Орест, збираю старовину 🧐 Мені б ${want}. Чекатиму тиждень — і заплачу щедро!`]]);
   }
   function onDeliver(o) {
     if (!o.rare) return;

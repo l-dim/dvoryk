@@ -223,8 +223,8 @@ function produce(i) {
   if (window.HARD) HARD.wear(gIt, x2 ? 2 : 1);
   let item;
   const roll = Math.random();
-  if (roll < 0.01) item = { c: "energy", l: 0 };
-  else if (roll < 0.025) item = { c: "coin", l: 0 };
+  if (roll < 0.003) item = { c: "energy", l: 0 };          // батарейка з генератора — зрідка
+  else if (roll < 0.013) item = { c: "coin", l: 0 };
   else {
     // що вищий рівень гравця, то частіше генератор дає одразу кращі предмети
     const r = Math.random(), tb = MECH.tierBonus(gIt), up = Math.min(0.35, 0.15 + S.level * 0.01) + tb;
@@ -258,8 +258,8 @@ function openChest(i) {
   for (let n = 0; n < count; n++) {
     const r = Math.random();
     let item;
-    if (r < 0.05) item = { c: "energy", l: Math.min(2, rnd(k + 1)) };
-    else if (r < 0.12) item = { c: "coin", l: Math.min(3, rnd(k + 1)) };
+    if (r < 0.02) item = { c: "energy", l: Math.min(2, rnd(k + 1)) };
+    else if (r < 0.08) item = { c: "coin", l: Math.min(3, rnd(k + 1)) };
     else item = { c: pick(unlocked), l: rnd(maxT + 1) };
     const at = placeItem(item, i);
     if (at >= 0) spawnFrom.set(at, i);
@@ -334,7 +334,10 @@ function handleDrop(a, b) {
 }
 
 /* ---------------- Досвід і рівні ---------------- */
-function xpNeed(l) { return 45 + 32 * (l - 1) + (l - 1) * (l - 1); }   // повільніше, ніж було (35 + 24·(l−1))
+/* скільки досвіду до наступного рівня. Перші рівні — за перший день, далі рівень ≈ 1 день (5–9),
+   ≈ 3 дні (10–14), ≈ 5 днів (15–19), від 20-го — тиждень і більше (якщо грати щодня до години) */
+const XP_TABLE = [0, 30, 50, 80, 120, 300, 450, 600, 750, 900, 1200, 1500, 1800, 2100, 2400, 2800, 3000, 3200, 3400, 3600, 4200];
+function xpNeed(l) { return l < XP_TABLE.length ? XP_TABLE[l] : 4200 + 250 * (l - 20); }
 function gainXp(n) {
   S.xp += n;
   let ups = 0;
@@ -454,7 +457,7 @@ function deliver(id) {
   sfx.deliver();
   bubble(CHARS[o.ch], pick(CHARS[o.ch].thanks), card);
   setOL(OL().filter(x => x.id !== id));
-  if (S.ordersDone % 4 === 0) placeItem({ c: "chest", l: 0 });
+  if (S.ordersDone % 7 === 0) placeItem({ c: "chest", l: 0 });          // подарунок — за кожне 7-ме замовлення
   gainXp(o.xp);
   if (S.tut === 2) setTut(3);
   renderBoard(); renderTop(); renderInfo();
@@ -560,6 +563,7 @@ function energyButtons(withWait) {
   else btns.push({ label: "☕ Чай буде за " + hm(TEA_BREAK_MS - (Date.now() - S.teaAt)), disabled: true });
   const p = energyPrice();
   if (p) btns.push({ label: "Купити " + ENERGY_SHOP.amount + " ⚡ за " + p + " 🪙", cls: "ghost", disabled: S.coins < p, onClick: () => buy("energy") });
+  if (window.PAY) btns.push({ label: "💎 Більше енергії · від 39 ₴", cls: "ghost", onClick: () => PAY.offers(["en60", "en160", "unlim", "pack"], "Більше енергії ⚡") });
   if (withWait) btns.push({ label: "Зачекаю 💤", cls: "ghost" });
   return btns;
 }
@@ -1472,7 +1476,7 @@ function showNoEnergyInfo() {
   modal({
     title: "Енергія ⚡",
     html: `<p>+1 ⚡ кожні ${ENERGY_REGEN_MS / 60000} хвилини, до ${ENERGY_MAX} ⚡.<br>${full ? "Повна шкала за <b>" + hm(full) + "</b>." : "Шкала повна — саме час садити! 🌱"}</p>
-      <p class="hint-s">Ще трохи енергії дають ⚡🔋☀️ на дошці, нові рівні, щоденний подарунок і перерва на чай (раз на ${TEA_BREAK_MS / 3600000} год).</p>`,
+      <p class="hint-s">Ще трохи енергії дають ⚡🔋☀️ на дошці (зрідка), нові рівні, щоденний подарунок і перерва на чай (раз на ${TEA_BREAK_MS / 3600000} год).</p>` + (window.REST ? REST.line() : ""),
     buttons: [...energyButtons(false), { label: "Зрозуміло", cls: "ghost" }]
   });
 }

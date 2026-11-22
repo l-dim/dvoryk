@@ -62,7 +62,7 @@ const MAIL_LETTERS = [
   ["olya", "Квіточки 🌷", "Розсадила тюльпани й лишилося кілька цибулинок — бери, посадиш біля ґанку."],
   ["andriy", "Смаколик ☕", "Заходь на каву, як буде хвилинка. А поки — ось тобі гостинчик."]
 ];
-const MAIL_GIFTS = [{ chest: 0 }, { energy: 10 }, { coins: 60 }, { ing: 2 }, { cards: 1 }, { stars: 1 }, { energy: 15 }, { coins: 100 }, { thread: 5 }];
+const MAIL_GIFTS = [{ chest: 0 }, { energy: 5 }, { coins: 60 }, { ing: 2 }, { cards: 1 }, { stars: 1 }, { energy: 8 }, { coins: 100 }, { thread: 5 }];
 
 window.MAIL = (() => {
   const on = () => window.UNL && UNL.on("mail");
@@ -144,8 +144,8 @@ window.MAIL = (() => {
 /* ============================================================ */
 /* КАЛЕНДАР ВХОДІВ: 7 днів поспіль — щодня подарунок, 7-й — найбільший */
 const LOGIN_REWARDS = [
-  { energy: 15 }, { chest: 0, energy: 10 }, { coins: 80, energy: 10 }, { energy: 20 },
-  { chest: 1, energy: 10 }, { stars: 2, energy: 10 }, { chest: 2, energy: 20, coins: 150 }
+  { energy: 8 }, { chest: 0, energy: 5 }, { coins: 80, energy: 5 }, { energy: 10 },
+  { chest: 1, energy: 5 }, { stars: 2, energy: 5 }, { chest: 2, energy: 12, coins: 150 }
 ];
 window.LOGIN = (() => {
   const rText = r => [r.chest !== undefined ? CHAINS.chest.items[r.chest][0] : "", r.energy ? "+" + r.energy + "⚡" : "", r.coins ? "+" + r.coins + "🪙" : "", r.stars ? "+" + r.stars + "⭐" : ""].filter(Boolean).join(" ");
@@ -170,10 +170,10 @@ window.LOGIN = (() => {
 /* ВИКЛИК ЕНЕРГІЇ: кожні 3 дні — 4 завдання, за кожне — енергія (як «Вызов энергии», тільки безкоштовно) */
 const ECH_ROUND = 3 * 864e5, ECH_EPOCH = new Date(2026, 0, 3, 6).getTime();
 const ECH_TASKS = [
-  { k: "deliver", icon: "🧺", text: "Віддай замовлень", base: 15, energy: 20 },
-  { k: "merge",   icon: "✨", text: "Зроби злиттів",     base: 120, energy: 20 },
-  { k: "chest",   icon: "🎁", text: "Відкрий подарунків", base: 10, energy: 25 },
-  { k: "tap",     icon: "🪴", text: "Тапни генератори",  base: 200, energy: 35 }
+  { k: "deliver", icon: "🧺", text: "Віддай замовлень", base: 15, energy: 10 },
+  { k: "merge",   icon: "✨", text: "Зроби злиттів",     base: 120, energy: 10 },
+  { k: "chest",   icon: "🎁", text: "Відкрий подарунків", base: 10, energy: 12 },
+  { k: "tap",     icon: "🪴", text: "Тапни генератори",  base: 200, energy: 15 }
 ];
 window.ECH = (() => {
   const on = () => window.UNL && UNL.on("ech");
