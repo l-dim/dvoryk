@@ -804,7 +804,8 @@ function takeInbox() {
 /* зимова сцена: сніжний розділ або справжні морози (15 грудня — 1 березня) */
 function sceneWinter(ch) {
   const s = window.WD && WD.season();
-  return !!(ch && (ch.winter || /Зимов/.test(ch.title))) || !!(s && s.phase === "winter");
+  return !!(ch && (ch.winter || /Зимов/.test(ch.title))) || !!(s && s.phase === "winter") ||
+    !!(ch && !ch.indoor && window.ENV && ENV.season() === "winter");            // з грудня по лютий — сніг на всіх вуличних локаціях
 }
 /* узимку в дворику всі, хто має зимове вбрання, — у ньому (хто змерз без теплої речі, той на лікарняному й не виходить) */
 function winterLook(who, ch) { return PORTRAITS_WINTER.includes(who) && sceneWinter(ch); }
@@ -861,8 +862,9 @@ function renderStory(animateLast) {
   const doneN = idx < curIdx() ? ch.tasks.length : S.task;
   renderLocBar();
   const scene = $("scene");
-  scene.style.setProperty("--sky1", ch.sky[0]);
-  scene.style.setProperty("--sky2", ch.sky[1]);
+  const sky = window.ENV ? ENV.sky(ch) : ch.sky;          // небо за порою доби
+  scene.style.setProperty("--sky1", sky[0]);
+  scene.style.setProperty("--sky2", sky[1]);
   scene.style.setProperty("--ground", ch.ground);
   const removed = new Set();
   const added = [];
@@ -880,7 +882,8 @@ function renderStory(animateLast) {
     if (winterLook("cat", ch)) all.forEach(d => { if (d.e === "🐱") { d.catPic = "cat-winter"; d.key += "-w"; } });
     if (window.DECOR) all.push(...DECOR.yard(ch));
     if (window.FAM) all.push(...FAM.yard(ch));
-    if (window.HOL) all.push(...HOL.yard(ch));                // прикраси, які поставила сама
+    if (window.HOL) all.push(...HOL.yard(ch));
+    if (window.ENV) all.push(...ENV.yard(ch, all));            // місяць, ліхтарики, сезонні дрібниці                // прикраси, які поставила сама
     if (window.HERO) all.push(...HERO.yard(ch, all));          // героїня — попереду, сусіди стають довкола
     all.push(...yardPeople(ch, all));
     if (window.GUESTS) all.push(...GUESTS.yard(ch, all));       // гість села
@@ -890,6 +893,7 @@ function renderStory(animateLast) {
     if (!scene.querySelector("canvas")) scene.innerHTML = "";
     Yard3D.mount(scene);
     Yard3D.render(idx, ch, all, !!animateLast);
+    if (window.ENV) ENV.fx(scene, ch);
     Yard3D.setActive(!$("tab-story").hidden);
   } else {
     const deco = d => `<span class="deco${d.fresh ? " fresh" : ""}" style="left:${d.x}%;top:${d.y}%;font-size:${d.s}cqw">${d.e}</span>`;
@@ -1264,7 +1268,7 @@ function openSettings() {
 /* ============================================================
    ВЗАЄМОДІЯ З ДОШКОЮ (тап і перетягування)
    ============================================================ */
-let drag = null, dragAnim = false, dragGhost = null;
+let drag = null, dragAnim = false, dragGhost = null, envKeyShown = "";
 /* привид створюється один раз і живе весь час (новий шар на кожен дотик змушував дошку блимати) */
 function ghostEl() {
   if (!dragGhost) { dragGhost = document.createElement("div"); dragGhost.className = "tile drag-ghost idle"; dragGhost.innerHTML = '<div class="dg-in"></div>'; document.body.appendChild(dragGhost); }
@@ -1506,6 +1510,7 @@ function init() {
     if (window.GUESTS) GUESTS.tick();
     if (window.POST) POST.tick();
     if (window.REB) REB.tick();
+    if (window.ENV && ENV.key() !== envKeyShown) { envKeyShown = ENV.key(); renderStory(); if (window.Yard3D && Yard3D.refreshEnv) Yard3D.refreshEnv(); }   // світанок/вечір/ніч — перемальовуємо дворик
     if (window.WH) WH.tick();
     if (window.CRAFT) CRAFT.tick();
     if (window.GUIDE) GUIDE.tick();

@@ -385,7 +385,7 @@ async function scatter(on) {
   for (let i = 0; i < 34; i++) {
     const a = rand() * Math.PI * 2, r = 1.2 + Math.sqrt(rand()) * (R - 1.6);
     const kind = i % kinds.length;
-    const o = kinds[kind].includes("flower") ? srcs[kind].clone(true) : paint(srcs[kind].clone(true), rand() < 0.5 ? 0x4e9e2b : 0x66b83a);
+    const o = kinds[kind].includes("flower") && !autumnNow ? srcs[kind].clone(true) : paint(srcs[kind].clone(true), autumnNow ? (rand() < 0.5 ? 0xc99a32 : 0xd98a2b) : rand() < 0.5 ? 0x4e9e2b : 0x66b83a);
     normalize(o, 0.35 + rand() * 0.25);
     const h = new THREE.Group(); h.add(o);
     h.position.set(Math.cos(a) * r, 0, Math.sin(a) * r); h.rotation.y = rand() * 6.28;
@@ -396,7 +396,21 @@ async function scatter(on) {
 }
 
 /* ---------- огорожа, стежка з каменів і кущі ---------- */
-let decoGroup = null, hemi = null, waterMesh = null, waterBand = null;
+let decoGroup = null, hemi = null, waterMesh = null, waterBand = null, winterNow = false, autumnNow = false, chNow = null;
+/* світло за порою доби (js/env.js): світанок, день, вечір, ніч */
+const ENV_LIGHT = { day: [1.6, 2.2, 0xfff1d6, [6, 12, 7], 1.0], dawn: [1.3, 1.6, 0xffbf96, [10, 5, 6], 1.0],
+  dusk: [1.15, 1.4, 0xff9a66, [-10, 5, 6], 0.97], night: [1.05, 0.8, 0xc4d2ff, [-4, 10, 5], 1.0] };
+function applyEnv() {
+  if (!hemi || !sun) return;
+  const ph = chNow && !chNow.indoor && window.ENV ? ENV.phase() : "day", L = ENV_LIGHT[ph];
+  hemi.intensity = L[0]; sun.intensity = L[1];
+  hemi.color.set(ph === "night" ? 0x9fb2ff : ph === "dusk" ? 0xffd0b0 : ph === "dawn" ? 0xffe0cc : winterNow ? 0xe8f0ff : 0xfff4e0);
+  sun.color.set(ph === "day" && winterNow ? 0xf4f8ff : L[2]);
+  sun.position.set(...L[3]);
+  renderer.toneMappingExposure = L[4];
+  req(3);
+}
+function refreshEnv() { applyEnv(); }
 /* річка/ставок поперек острівця: ch.river = { y, h } у координатах 2D-сцени (%) */
 const zOf = y => ((Math.max(26, y) - 26) / 66) * 2 * R - R;
 function setWater(ch) {
@@ -482,7 +496,7 @@ async function decorate(ch, outdoor, winter) {
       if (decoGroup !== g) return;
       for (let k = 0; k < 9; k++) {
         const ang = Math.PI * (0.72 + k * 0.07) + (rand() - 0.5) * 0.05;
-        const o = (k % 2 ? bush2 : bush).clone(true);
+        const o = autumnNow ? paint((k % 2 ? bush2 : bush).clone(true), [0xd9822b, 0xc9a03a, 0xb8562a][k % 3]) : (k % 2 ? bush2 : bush).clone(true);
         normalize(o, 0.75 + rand() * 0.35);
         const h = new THREE.Group(); h.add(o);
         const rr = R - 0.75;
@@ -504,9 +518,11 @@ async function render(chIndex, ch, list, animate) {
     for (const [, it] of items) if (it.obj) { scene.remove(it.obj); it.obj.traverse(o => billboards.delete(o)); }
     items.clear();
     chapterShown = chIndex;
-    const winter = !!ch.winter || /Зимов/.test(ch.title);
-    hemi.color.set(winter ? 0xe8f0ff : 0xfff4e0); sun.color.set(winter ? 0xf4f8ff : 0xfff1d6);
-    islandTop.color.copy(ch.indoor ? new THREE.Color(ch.ground).lerp(new THREE.Color(0xe8d2b0), 0.35) : winter ? new THREE.Color(0xeef4ff) : juicy(ch.ground));
+    const winter = typeof sceneWinter === "function" ? sceneWinter(ch) && !ch.indoor || (!!ch.winter && !!ch.indoor) : !!ch.winter || /Зимов/.test(ch.title);
+    const autumn = !winter && !ch.indoor && window.ENV && ENV.season() === "autumn";
+    winterNow = winter; autumnNow = autumn; chNow = ch;
+    islandTop.color.copy(ch.indoor ? new THREE.Color(ch.ground).lerp(new THREE.Color(0xe8d2b0), 0.35) : winter ? new THREE.Color(0xeef4ff) : autumn ? juicy(ch.ground).lerp(new THREE.Color(0xd9b46a), 0.4) : juicy(ch.ground));
+    applyEnv();
     island.userData.rim.material.color.copy(islandTop.color).multiplyScalar(0.8);
     backWall.visible = indoorNow = !!ch.indoor;
     controls.reset && controls.reset();
@@ -574,6 +590,6 @@ function mount(el) {
 try {
   const test = document.createElement("canvas");
   if (!(test.getContext("webgl2") || test.getContext("webgl"))) throw new Error("no webgl");
-  window.Yard3D = { mount, render, setActive, snapshot, pick };
+  window.Yard3D = { mount, render, setActive, snapshot, pick, refreshEnv };
   window.dispatchEvent(new Event("yard3d-ready"));
 } catch (e) { /* без WebGL лишається звичайна 2D-сцена */ }

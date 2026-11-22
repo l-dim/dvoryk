@@ -90,6 +90,7 @@ window.HERO = (() => {
     if (ch && (ch.winter || /Зимов/.test(ch.title))) return "winter";
     if (ch && FEST_RE.test(ch.title)) return "fest";
     if (s && s.phase === "winter") return "winter";
+    if (typeof sceneWinter === "function" && sceneWinter(ch)) return "winter";   // зима за календарем на вулиці
     return "day";
   }
   const fileOf = (h, look) => h.id + (look === "wed" && HERO_WED.includes(h.id) ? "-wed" : look === "wed" && HERO_LOOKS.includes(h.id) ? "-fest" : look === "winter" && HERO_LOOKS.includes(h.id) ? "-winter" : look === "fest" && HERO_LOOKS.includes(h.id) ? "-fest" : "-full");

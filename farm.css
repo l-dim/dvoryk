@@ -1196,3 +1196,12 @@ body.farm .tile.collect { filter: drop-shadow(0 0 5px rgba(255, 220, 110, .9)); 
 /* ---------- Відбудова села ---------- */
 .reb-bar { height: 10px; border-radius: 6px; background: rgba(120, 80, 40, .15); overflow: hidden; margin: 2px 0 8px; }
 .reb-bar b { display: block; height: 100%; border-radius: 6px; background: linear-gradient(90deg, #f2b84b, #e08a2a); }
+
+/* ---------- День і ніч, пори року: частинки над двориком ---------- */
+.env-fx { position: absolute; inset: 0; pointer-events: none; overflow: hidden; border-radius: inherit; z-index: 2; }
+.env-fx i { position: absolute; display: block; will-change: transform, opacity; }
+.env-fx.flies i { width: 5px; height: 5px; border-radius: 50%; background: #fff7a8; box-shadow: 0 0 8px 3px rgba(255, 240, 120, .75); animation: envFly 6s ease-in-out infinite alternate; }
+.env-fx.leaves i { width: 10px; height: 6px; border-radius: 60% 0 60% 0; background: linear-gradient(135deg, #f0a43a, #c8562a); animation: envFall 9s linear infinite; }
+.env-fx.snow i { width: 5px; height: 5px; border-radius: 50%; background: #fff; box-shadow: 0 0 3px rgba(255, 255, 255, .9); animation: envFall 8s linear infinite; }
+@keyframes envFly { 0% { transform: translate(0, 0); opacity: .15; } 40% { opacity: 1; } 100% { transform: translate(24px, -18px); opacity: .3; } }
+@keyframes envFall { 0% { transform: translate(0, 0) rotate(0); opacity: 0; } 10% { opacity: .95; } 100% { transform: translate(28px, 420px) rotate(320deg); opacity: .6; } }
