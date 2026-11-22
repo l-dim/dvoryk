@@ -1190,6 +1190,13 @@ body.farm .sell { position: relative; }
 .board.dragging .tile, .board.dragging .tile * { animation-play-state: paused !important; }
 .drag-ghost .dg-in { width: 100%; height: 100%; display: grid; place-items: center; transform: scale(1.14); transition: transform .14s ease-out; }
 .drag-ghost .dg-in.big { transform: scale(1.26); }
+.drag-ghost .dg-in { will-change: transform; transition-duration: .1s; }
+/* рамка цілі — окремий шар, ковзає між клітинками (дошка не перемальовується) */
+.drag-hl { position: fixed; left: 0; top: 0; z-index: 49; pointer-events: none; border-radius: 10px; opacity: 0; will-change: transform, opacity;
+  box-shadow: inset 0 0 0 3px rgba(255, 196, 60, .95), 0 0 10px rgba(255, 210, 90, .55); background: rgba(255, 240, 170, .22);
+  transition: transform .07s ease-out, opacity .08s linear; }
+.drag-hl.show { opacity: 1; }
+.drag-hl.can { box-shadow: inset 0 0 0 3px #5bb52a, 0 0 14px rgba(140, 230, 80, .85); background: rgba(200, 240, 160, .28); }
 @keyframes shine { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
 body.farm .tile.collect { filter: drop-shadow(0 0 5px rgba(255, 220, 110, .9)); }
 
