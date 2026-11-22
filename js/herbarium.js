@@ -22,7 +22,8 @@ const HERB_SEASONS = {
 const HERB_ORDER = ["spring", "summer", "autumn", "winter"];
 const HERB_REWARD = { chest: 2, stars: 10, coins: 300 };
 const HERB_PRIZE = ["🎐", "Метеликова альтанка", 10];
-const HERB_ART = [];                                     // мальовані: herb-<id> — коли будуть аркуші
+const HERB_ART = ["proliska", "sontrava", "konvalia", "lymonnytsia", "kropyvianka", "avrora", "voloshka", "dzvinochok", "mak", "makhaon", "syniavets", "pavychevo",
+  "veres", "aistra", "shafran", "admiral", "zhalibnytsia", "sovka", "moroznyk", "omela", "yalivets", "snihur", "synychka", "piadun"].map(id => "herb-" + id);   // аркуші B1–B2
 
 /* знахідки — окремий ланцюжок (кожна — свій «рівень», не об'єднуються) */
 window.PUA_MAP = window.PUA_MAP || {};
