@@ -9,7 +9,7 @@ const COLS = 7, ROWS = 9;
 const ENERGY_MAX = 50;
 const ENERGY_REGEN_MS = 3 * 60 * 1000;  // +1⚡ кожні 3 хвилини (повна шкала ≈ 2,5 год)
 const TEA_BREAK_MS = 6 * 60 * 60 * 1000; // безкоштовна перерва на чай раз на 6 год
-const TEA_BREAK_ENERGY = 10;
+const TEA_BREAK_ENERGY = 5; 
 const ENERGY_BONUS = { level: 10, chapter: 12, daily: 8 };
 const ENERGY_SHOP = { amount: 10, prices: [300, 600] };      // за день можна купити 2 рази, щоразу дорожче
 
