@@ -1266,7 +1266,7 @@ function openSettings() {
 let drag = null, dragAnim = false, dragGhost = null;
 /* привид створюється один раз і живе весь час (новий шар на кожен дотик змушував дошку блимати) */
 function ghostEl() {
-  if (!dragGhost) { dragGhost = document.createElement("div"); dragGhost.className = "tile drag-ghost idle"; document.body.appendChild(dragGhost); }
+  if (!dragGhost) { dragGhost = document.createElement("div"); dragGhost.className = "tile drag-ghost idle"; dragGhost.innerHTML = '<div class="dg-in"></div>'; document.body.appendChild(dragGhost); }
   return dragGhost;
 }
 /* привид предмета трохи над пальцем (на дотик), щоб палець його не закривав;
@@ -1306,7 +1306,8 @@ function dragFrame() {
   const d = drag; if (!d || !d.ghost) return;
   d.raf = 0;
   const t = dragTarget(d, d.lx, d.ly), cell = t ? t.el : null, can = !!(t && canMergeAt(d.i, t.i));
-  d.ghost.style.transform = `translate3d(${d.lx - d.w / 2}px, ${d.ly - d.h / 2 - d.lift}px, 0) scale(${can ? 1.24 : 1.14})`;
+  d.ghost.style.transform = `translate3d(${d.lx - d.w / 2}px, ${d.ly - d.h / 2 - d.lift}px, 0)`;
+  d.ghost.firstChild.classList.toggle("big", can);          // над парою — плавно більшає
   if (d.over !== cell) {
     if (d.over) d.over.classList.remove("over", "can-merge");
     if (cell) { cell.classList.add("over"); cell.classList.toggle("can-merge", can); }
@@ -1324,10 +1325,10 @@ function onMove(e) {
     if (S.board[d.i] && S.board[d.i].lock) return;
     const r = d.tile.getBoundingClientRect();
     const g = ghostEl();
-    g.innerHTML = d.tile.innerHTML; g.style.transition = "none";
+    g.firstChild.innerHTML = d.tile.innerHTML; g.firstChild.classList.remove("big"); g.style.transition = "none";
     g.style.width = r.width + "px"; g.style.height = r.height + "px";
-    g.style.transform = `translate3d(${d.lx - r.width / 2}px, ${d.ly - r.height / 2 - (d.touch ? r.height * DRAG_LIFT : 0)}px, 0) scale(1.14)`;
-    g.classList.remove("idle"); document.body.classList.add("dragging");
+    g.style.transform = `translate3d(${d.lx - r.width / 2}px, ${d.ly - r.height / 2 - (d.touch ? r.height * DRAG_LIFT : 0)}px, 0)`;
+    g.classList.remove("idle"); $("board").classList.add("dragging");
     Object.assign(d, { ghost: g, w: r.width, h: r.height, lift: d.touch ? r.height * DRAG_LIFT : 0 });
     d.cells = [...$("board").children].map(c => { const q = c.getBoundingClientRect(); return { el: c, i: +c.dataset.i, x: q.left + q.width / 2, y: q.top + q.height / 2, w: q.width }; });
     d.tile.classList.add("lifted");
@@ -1341,8 +1342,9 @@ function settleGhost(d, x, y, scale, ms, done) {
   dragAnim = true;
   const g = d.ghost;
   g.style.transition = `transform ${ms}ms cubic-bezier(.2, .8, .3, 1)`;
-  g.style.transform = `translate3d(${x - d.w / 2}px, ${y - d.h / 2}px, 0) scale(${scale})`;
-  setTimeout(() => { g.classList.add("idle"); g.style.transition = "none"; g.innerHTML = ""; d.tile.classList.remove("lifted"); document.body.classList.remove("dragging"); dragAnim = false; done(); }, ms);
+  g.style.transform = `translate3d(${x - d.w / 2}px, ${y - d.h / 2}px, 0)`;
+  g.firstChild.classList.remove("big"); g.firstChild.style.transform = `scale(${scale})`;
+  setTimeout(() => { g.classList.add("idle"); g.style.transition = "none"; g.firstChild.innerHTML = ""; g.firstChild.style.transform = ""; d.tile.classList.remove("lifted"); $("board").classList.remove("dragging"); dragAnim = false; done(); }, ms);
 }
 function onUp(e) {
   const d = drag;
@@ -1459,6 +1461,9 @@ function init() {
   window.addEventListener("pointermove", onMove, { passive: false });
   window.addEventListener("pointerup", onUp);
   window.addEventListener("pointercancel", onUp);
+  // iPhone: дотик до предмета не повинен ні прокручувати, ні «пружинити» сторінку, ні вмикати лупу
+  board.addEventListener("touchstart", e => { if (e.target.closest(".tile")) e.preventDefault(); }, { passive: false });
+  window.addEventListener("touchmove", e => { if (drag) e.preventDefault(); }, { passive: false });
 
   document.querySelectorAll(".nav button").forEach(b => b.onclick = () => { audio(); showTab(b.dataset.tab); });
   $("settingsBtn").onclick = openSettings;
