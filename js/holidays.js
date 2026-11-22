@@ -8,7 +8,7 @@
    ============================================================ */
 const HOL_KEYS = ["rizdvo", "maslyana", "velykden", "triytsia", "kupala", "spas", "nezalezhnist", "pokrova"];
 const HOL_ART = HOL_KEYS.flatMap(k => [0, 1, 2, 3, 4, 5].map(l => `hol-${k}-${l}`).concat("gen-hol-" + k, "yard-" + k));   // аркуші H1–H4
-HOL_ART.push("hol-maty-3", "hol-maty-4", "hol-maty-5", "gen-hol-maty", ...[0, 1, 2, 3, 4, 5].map(l => "hol-vyshyvanka-" + l), "gen-hol-vyshyvanka");   // аркуш N3
+HOL_ART.push(...["novyirik", "stritennia", "blahovishchennia", "maty", "vyshyvanka"].flatMap(k => [0, 1, 2, 3, 4, 5].map(l => `hol-${k}-${l}`).concat("gen-hol-" + k)));   // аркуші N1–N3
 /* де в дворику стоїть велика мальована прикраса свята: x, y, розмір */
 const HOL_YARD = { rizdvo: [22, 58, 17], maslyana: [26, 62, 17], velykden: [22, 58, 17], triytsia: [24, 62, 17],
   kupala: [50, 60, 17], spas: [24, 62, 16], nezalezhnist: [24, 60, 17], pokrova: [24, 60, 16] };
