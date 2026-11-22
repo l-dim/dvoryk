@@ -268,6 +268,7 @@ function openChest(i) {
   if (k >= 1) MECH.maybeGenCopy(k === 1 ? 0.12 : 0.25, i);
   window.QUEST && QUEST.track("chest");
   window.QUEST && QUEST.onChest(k, i);
+  window.DOG && DOG.onChest(i);
   window.ALB && ALB.onChest(k);
   if (k >= 1 && window.CONTEST) CONTEST.give(k, null, k, "З подарунка");
   if (k >= 1 && window.FASH) FASH.add(k * 2, "з подарунка");
@@ -297,6 +298,7 @@ function handleDrop(a, b) {
   if (typeof cellOpen === "function" && !cellOpen(b)) { renderBoard(); return; }   // закрита клітинка
   if (window.CRAFT && CRAFT.feed(a, b)) return;
   if (window.FARM2 && FARM2.drop(a, b)) return;
+  if (window.DOG && DOG.drop(a, b)) return;                    // кісточка — Бровкові
   if (MECH.canMergeGens(A, B)) { MECH.mergeGens(a, b); renderBoard(); renderOrders(); renderInfo(); save(); return; }
   if (B && !A.g && !B.g && A.c === B.c && A.l === B.l && window.WH && (!WH.usable(A) || !WH.usable(B))) {
     sfx.nope(); toast(A.worm || B.worm ? "🐛 Там шашіль — спершу виведи його" : A.untested || B.untested || A.short || B.short ? "❔ Спершу перевір виріб — тапни на нього" : "💧 Клей ще сохне — зачекай трохи"); renderBoard(); return;
@@ -710,7 +712,7 @@ function renderBoard() {
     cell.classList.toggle("shut", !!shut); cell.classList.toggle("shut-next", !!shut && shut !== "shut");
     if (shut) { if (cell.dataset.key !== shut) { cell.dataset.key = shut; cell.innerHTML = HARD.shutHtml(i); } continue; }
     const key = it ? (MECH.tileKey(it) || it.c + ":" + it.l + (it.old ? ":o" : "") + (window.WH ? WH.tileKey(it) : "")) : "";
-    if (cell.dataset.key === key && !popIdx.has(i) && !spawnFrom.has(i) && !mergedIdx.has(i)) { cell.firstChild && cell.firstChild.classList.toggle("needed", neededIdx.has(i)); MECH.decorate(cell.firstChild, it); window.WH && WH.decorate(cell.firstChild, it); continue; }
+    if (cell.dataset.key === key && !popIdx.has(i) && !spawnFrom.has(i) && !mergedIdx.has(i)) { cell.firstChild && cell.firstChild.classList.toggle("needed", neededIdx.has(i)); MECH.decorate(cell.firstChild, it); window.WH && WH.decorate(cell.firstChild, it); window.DOG && DOG.decorate(cell.firstChild, it); continue; }
     cell.dataset.key = key;
     cell.innerHTML = "";
     if (!it) continue;
@@ -724,10 +726,11 @@ function renderBoard() {
     t.dataset.i = i;
     if (it.g) t.dataset.gen = it.g;
     t.textContent = itemIcon(it);
-    if (it.g) { const b = document.createElement("span"); b.className = "gen-badge"; b.textContent = "⚡"; t.appendChild(b); }
+    if (it.g && !(GENS[it.g] && GENS[it.g].pet)) { const b = document.createElement("span"); b.className = "gen-badge"; b.textContent = "⚡"; t.appendChild(b); }
     cell.appendChild(t);
     MECH.decorate(t, it);
     window.WH && WH.decorate(t, it);
+    window.DOG && DOG.decorate(t, it);
   }
   popIdx.clear(); spawnFrom.clear(); mergedIdx.clear();
   window.SOIL && SOIL.badge();
@@ -748,6 +751,8 @@ function renderInfo() {
     text = `<b>Павутиння</b><small>Об'єднай щось поруч${it.lock > 1 ? " ще " + it.lock + " рази" : ""} — під ним сюрприз</small>`;
   } else if (it.st) {
     text = `<b>Піч 🔥</b><small>Тапни, щоб приготувати страву</small>`;
+  } else if (it.g && GENS[it.g] && GENS[it.g].pet && window.DOG) {
+    text = DOG.info();
   } else if (it.g) {
     const ch = CHAINS[GENS[it.g].chain];
     MECH.refresh(it);
@@ -883,7 +888,8 @@ function renderStory(animateLast) {
     if (window.DECOR) all.push(...DECOR.yard(ch));
     if (window.FAM) all.push(...FAM.yard(ch));
     if (window.HOL) all.push(...HOL.yard(ch));
-    if (window.ENV) all.push(...ENV.yard(ch, all));            // місяць, ліхтарики, сезонні дрібниці                // прикраси, які поставила сама
+    if (window.ENV) all.push(...ENV.yard(ch, all));
+    if (window.DOG) all.push(...DOG.yard(ch, all));            // Бровко            // місяць, ліхтарики, сезонні дрібниці                // прикраси, які поставила сама
     if (window.HERO) all.push(...HERO.yard(ch, all));          // героїня — попереду, сусіди стають довкола
     all.push(...yardPeople(ch, all));
     if (window.GUESTS) all.push(...GUESTS.yard(ch, all));       // гість села
@@ -1367,6 +1373,7 @@ function tap(i) {
   const it = S.board[i];
   if (!it) return;
   if (it.lock) { selected = i; renderBoard(); renderInfo(); MECH.lockModal(i); return; }
+  if (it.crow && window.DOG && DOG.shoo(i)) return;            // прогнати ворону
   if (it.worm && window.WH) { selected = i; renderBoard(); renderInfo(); WH.wormModal(i); return; }
   if ((it.untested || it.short) && window.CRAFT) { selected = i; renderBoard(); renderInfo(); CRAFT.testModal(i); return; }
   if (it.st) { selected = i; renderInfo(); MECH.ovenModal(i); return; }
@@ -1510,6 +1517,7 @@ function init() {
     if (window.GUESTS) GUESTS.tick();
     if (window.POST) POST.tick();
     if (window.REB) REB.tick();
+    if (window.DOG) DOG.tick();
     if (window.ENV && ENV.key() !== envKeyShown) { envKeyShown = ENV.key(); renderStory(); if (window.Yard3D && Yard3D.refreshEnv) Yard3D.refreshEnv(); }   // світанок/вечір/ніч — перемальовуємо дворик
     if (window.WH) WH.tick();
     if (window.CRAFT) CRAFT.tick();
