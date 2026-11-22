@@ -30,4 +30,12 @@ cd ios/App && xcodebuild -project App.xcodeproj -scheme App -sdk iphonesimulator
 
 ## Android
 
-Потрібен Android Studio (у ньому JDK і Android SDK). Після встановлення: `npm run android`.
+Встановлено: Android Studio, Android SDK у `~/Library/Android/sdk`, JDK 21 (`brew install openjdk@21`).
+JDK 25, вбудований в Android Studio, Gradle 8.14 не підтримує — з терміналу збирати з JDK 21:
+
+```bash
+export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
+cd android && ./gradlew assembleDebug    # → app/build/outputs/apk/debug/app-debug.apk
+```
+
+Емулятор: `~/Library/Android/sdk/emulator/emulator -avd dvoryk_pixel` (Pixel 8, Android 16).
