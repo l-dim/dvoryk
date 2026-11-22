@@ -1,0 +1,21 @@
+{
+  "appId": "ua.dvoryk.app",
+  "appName": "Дворик",
+  "webDir": "www",
+  "backgroundColor": "#fff4e6",
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#fff4e6"
+  },
+  "android": {
+    "backgroundColor": "#fff4e6"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 800,
+      "launchAutoHide": true,
+      "backgroundColor": "#fff4e6",
+      "showSpinner": false
+    }
+  }
+}

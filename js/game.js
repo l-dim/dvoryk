@@ -724,6 +724,7 @@ function renderBoard() {
       (it.c && CHAINS[it.c].collect ? " collect" : "") + (isMax(it) && PRODUCT_CHAINS.includes(it.c) ? " max" : "") + (window.HARD && HARD.stale(it) ? " stale" : "") +
       anim + (neededIdx.has(i) ? " needed" : "");
     if (from && to) { t.style.setProperty("--fx", (from.left - to.left) + "px"); t.style.setProperty("--fy", (from.top - to.top) + "px"); }
+    if (anim) setTimeout(() => { t.classList.remove("spawn", "merged", "pop"); t.style.removeProperty("--fx"); t.style.removeProperty("--fy"); }, 1200);   // запасний варіант, якщо animationend не прийшов
     t.dataset.i = i;
     if (it.g) t.dataset.gen = it.g;
     t.textContent = itemIcon(it);
@@ -1217,6 +1218,8 @@ function fallbackCopy(t, ok) {
   document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); ok(); } catch (e) { toast("Не вдалося скопіювати — виділи код вручну"); }
   ta.remove();
 }
+/* у застосунку сейв дублюється в нативне сховище — перед перезавантаженням дочекатися запису */
+function reloadAfterSave() { (window.NATIVE ? NATIVE.flush() : Promise.resolve()).then(() => location.reload()); }
 function showImport() {
   modal({
     title: "Відновити прогрес 📥",
@@ -1231,7 +1234,7 @@ function showImport() {
           if (!confirm(`Відновити гру: рівень ${data.level}, розділ ${(data.chapter || 0) + 1}? Поточний прогрес на цьому телефоні заміниться.`)) return;
           S = null; // щоб автозбереження не перезаписало відновлене
           localStorage.setItem(SAVE_KEY, JSON.stringify(data));
-          location.reload();
+          reloadAfterSave();
         } catch (e) { toast("Код не підходить 🙈 Перевір, що скопіювала його повністю"); }
       } },
       { label: "Скасувати", cls: "ghost" }
@@ -1254,7 +1257,8 @@ function openSettings() {
       </div>
       <button class="btn ghost small" id="setGuide">📖 Довідник господині</button>
       <p class="hint-s">Справжні покупки поки не підключені — гроші гра не списує 💛</p>
-      <button class="btn ghost small" id="setReset">Почати гру спочатку</button>`,
+      <button class="btn ghost small" id="setReset">Почати гру спочатку</button>
+      <p class="hint-s" style="text-align:center;opacity:.6">Версія гри: ${APP_VER}</p>`,
     buttons: [{ label: "Зберегти", onClick: () => {
       S.name = $("setName").value.trim();
       S.sound = $("setSound").checked;
@@ -1268,13 +1272,14 @@ function openSettings() {
   $("setReset").onclick = () => {
     if (!confirm("Точно почати спочатку? Весь прогрес буде видалено.")) return;
     localStorage.removeItem(SAVE_KEY);
-    location.reload();
+    reloadAfterSave();
   };
 }
 
 /* ============================================================
    ВЗАЄМОДІЯ З ДОШКОЮ (тап і перетягування)
    ============================================================ */
+const APP_VER = "v150";   // разом із VERSION у sw.js
 let drag = null, dragAnim = false, dragGhost = null, envKeyShown = "";
 /* привид створюється один раз і живе весь час (новий шар на кожен дотик змушував дошку блимати) */
 function ghostEl() {
@@ -1427,7 +1432,7 @@ function showTab(name) {
    СТАРТ
    ============================================================ */
 function isIOS() { return /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1); }
-function isStandalone() { return window.navigator.standalone === true || matchMedia("(display-mode: standalone)").matches; }
+function isStandalone() { return !!window.NATIVE || window.navigator.standalone === true || matchMedia("(display-mode: standalone)").matches; }
 
 function startGame() {
   if (window.ENDLESS) ENDLESS.ensure(S.chapter + 10);     // історія без кінця
@@ -1586,5 +1591,6 @@ function showNoEnergyInfo() {
   });
 }
 
-document.addEventListener("DOMContentLoaded", init);
+/* у застосунку спершу відновлюємо сейв із нативного сховища (js/native.js) */
+document.addEventListener("DOMContentLoaded", () => (window.NATIVE ? NATIVE.ready : Promise.resolve()).then(init));
 window.addEventListener("yard3d-ready", () => { if (S && S.started) renderStory(); });

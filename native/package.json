@@ -1,0 +1,24 @@
+{
+  "name": "dvoryk-native",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Затишний дворик — нативні збірки iOS і Android (Capacitor)",
+  "type": "module",
+  "scripts": {
+    "www": "node scripts/build-www.mjs",
+    "sync": "npm run www && cap sync",
+    "ios": "npm run sync && cap open ios",
+    "android": "npm run sync && cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.6.2",
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/core": "^8.6.2",
+    "@capacitor/ios": "^8.6.2",
+    "@capacitor/preferences": "^8.0.1",
+    "@capacitor/splash-screen": "^8.0.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.6.2"
+  }
+}
