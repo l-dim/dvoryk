@@ -452,6 +452,7 @@ function deliver(id) {
   window.RARE && RARE.onDeliver(o);
   window.LOVE && LOVE.onDeliver(o);
   window.WOOD && WOOD.onDeliver(o);
+  window.GUESTS && GUESTS.onDeliver(o);
   window.FASH && FASH.onDeliver(o);
   if (o.dish) window.QUEST && QUEST.track("dish");
   if (o.urgent) window.QUEST && QUEST.track("urgent");
@@ -880,6 +881,7 @@ function renderStory(animateLast) {
     if (window.HOL) all.push(...HOL.yard(ch));                // прикраси, які поставила сама
     if (window.HERO) all.push(...HERO.yard(ch, all));          // героїня — попереду, сусіди стають довкола
     all.push(...yardPeople(ch, all));
+    if (window.GUESTS) all.push(...GUESTS.yard(ch, all));       // гість села
     if (window.QUEST && !ch.loc) all.push(...QUEST.yardGifts(ch, all));
     // справжній 3D-дворик
     scene.classList.add("is3d");
@@ -1487,6 +1489,7 @@ function init() {
     if (window.ENDLESS) ENDLESS.tick();
     if (window.LOVE) LOVE.tick();
     if (window.WOOD) WOOD.tick();
+    if (window.GUESTS) GUESTS.tick();
     if (window.WH) WH.tick();
     if (window.CRAFT) CRAFT.tick();
     if (window.GUIDE) GUIDE.tick();
