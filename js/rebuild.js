@@ -41,7 +41,7 @@ const REB_PROJECTS = [
 ];
 const REB_PAUSE_D = 2, REB_STAGE_COINS = [200, 350, 500, 800];
 const REB_STAGE_REWARD = [{ stars: 3, coins: 150 }, { stars: 4, coins: 200, chest: 0 }, { stars: 5, coins: 300 }, { stars: 8, coins: 500, chest: 2 }];
-const REB_ART = [];                                     // мальовані: reb-<id> — коли буде аркуш
+const REB_ART = ["reb-school", "reb-bridge", "reb-library", "reb-clinic", "reb-culture", "reb-park", "ui-build", "ui-village"];   // аркуш sheet-rebuild
 
 if (typeof UNLOCKS !== "undefined") UNLOCKS.push({ id: "rebuild", lvl: 12, icon: "🏗️", title: "Відбудова села",
   text: "Усе село разом відбудовує школу, міст, бібліотеку, амбулаторію, будинок культури й дитячий майданчик. Вноси вироби й монети, сусіди теж допомагають щодня. Кожна збудована будівля назавжди дає селу бонус. Шукай у «Подіях».",
@@ -168,7 +168,7 @@ window.REB = (() => {
       const cOk = s.coinsGot >= s.coins;
       const coins = `<div class="wd-row${cOk ? " done" : ""}"><span class="wd-ava">🪙</span><span class="wd-mid"><b>Монети на матеріали</b><small>внесено ${s.coinsGot} з ${s.coins}</small></span>` +
         (cOk ? `<span class="wd-ok">✅</span>` : `<button class="s-btn reb-pay${S.coins > 0 ? "" : " dim"}">Внести</button>`) + `</div>`;
-      body = `<p class="dq-when">${p.icon} <b>${p.name}</b> · етап ${s.stage + 1} з 4: «${p.stages[s.stage]}»</p>` +
+      body = `<div class="big-emoji">${s.stage < 3 ? "🏗️" : p.icon}</div><p class="dq-when">${p.icon} <b>${p.name}</b> · етап ${s.stage + 1} з 4: «${p.stages[s.stage]}»</p>` +
         `<div class="reb-bar"><b style="width:${Math.round(got / total * 100)}%"></b></div>` +
         `<div class="wd-list">${rows}${coins}</div><p class="hint-s">Вноси, що маєш, — потроху. Щодня хтось із сусідів теж щось приносить. Бонус після будови: <b>${p.perk}</b>.</p>`;
     }
