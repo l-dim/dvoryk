@@ -1234,7 +1234,7 @@ function openSettings() {
     title: "Налаштування ⚙️",
     html: `
       <label class="set-row">Ім'я <input id="setName" value="${(S.name || "").replace(/"/g, "&quot;")}" maxlength="20"></label>
-      <label class="set-row">🔊 Звук <input type="checkbox" id="setSound" ${S.sound ? "checked" : ""}></label>
+      <label class="set-row"><span id="setSoundIc">${S.sound ? "🔊" : "🔇"}</span> Звук <input type="checkbox" id="setSound" ${S.sound ? "checked" : ""}></label>
       <div class="set-backup">
         <b>Прогрес гри</b>
         <p class="hint-s">Збережи код прогресу в Нотатки — і зможеш відновити гру на новому телефоні чи після перевстановлення.${window.GUIDE ? " " + GUIDE.note() : ""}</p>
@@ -1250,6 +1250,7 @@ function openSettings() {
       renderAll(); save();
     } }]
   });
+  const ss = $("setSound"); if (ss) ss.onchange = () => { $("setSoundIc").textContent = ss.checked ? "🔊" : "🔇"; };
   $("setExport").onclick = showExport;
   $("setImport").onclick = showImport;
   $("setGuide").onclick = () => window.GUIDE && GUIDE.open();
