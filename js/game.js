@@ -1505,6 +1505,7 @@ function init() {
     if (window.WOOD) WOOD.tick();
     if (window.GUESTS) GUESTS.tick();
     if (window.POST) POST.tick();
+    if (window.REB) REB.tick();
     if (window.WH) WH.tick();
     if (window.CRAFT) CRAFT.tick();
     if (window.GUIDE) GUIDE.tick();

@@ -102,7 +102,7 @@ window.GUESTS = (() => {
     const g = cur(); if (!g) return;
     S.orders = S.orders.filter(o => !o.guest);
     S.guest = null; S.guestLast = g.id;
-    S.guestNext = now() + rndIn(GUEST_GAP_D) * 864e5;
+    S.guestNext = now() + rndIn(window.REB && REB.has("park") ? [2, 5] : GUEST_GAP_D) * 864e5;   // майданчик — гості частіше
     if (ok) {
       const parts = give(g.gift);
       playDialog([[g.id, g.bye]], () => modal({ title: "До зустрічі! 💛", html: `<img class="face" src="portraits/${g.id}.webp" alt="" style="max-height:140px"><p class="rewards">${parts.join(" &nbsp; ")}</p>`, buttons: [{ label: "До зустрічі!" }] }));

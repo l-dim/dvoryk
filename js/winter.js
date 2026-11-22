@@ -80,7 +80,7 @@ window.WD = (() => {
   function frost() {
     const w = st();
     w.frost = true;
-    const sick = Object.keys(WARDROBE).filter(k => known(k) && !w.dressed[k]);
+    const sick = window.REB && REB.has("clinic") ? [] : Object.keys(WARDROBE).filter(k => known(k) && !w.dressed[k]);   // амбулаторія — ніхто не хворіє
     sick.forEach(k => { w.sick[k] = true; });
     S.orders = S.orders.filter(o => !w.sick[o.ch]);
     fillOrders(); save(); renderAll();

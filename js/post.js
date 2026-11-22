@@ -80,7 +80,7 @@ window.POST = (() => {
     got.forEach(({ b, i }) => { b[i] = null; });
     if (selected >= 0 && !S.board[selected]) selected = -1;
     s.orders = s.orders.filter(x => x !== o);
-    s.sent.push({ who: o.who, city: o.city, coins: o.coins, stars: o.stars, arrive: now() + rndIn(POST_TRANSIT_H) * 3600e3 });
+    s.sent.push({ who: o.who, city: o.city, coins: o.coins, stars: o.stars, arrive: now() + rndIn(POST_TRANSIT_H) * 3600e3 * (window.REB && REB.has("bridge") ? 0.5 : 1) });   // міст — удвічі швидше
     if (window.QUEST) QUEST.track("deliver");
     sfx.deliver(); save(); renderAll();
     toast(`📦 Посилку для ${o.who} (${o.city}) відправлено! Оплата — щойно доїде`);

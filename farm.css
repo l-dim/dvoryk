@@ -1192,3 +1192,7 @@ body.farm .sell { position: relative; }
 .drag-ghost .dg-in.big { transform: scale(1.26); }
 @keyframes shine { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
 body.farm .tile.collect { filter: drop-shadow(0 0 5px rgba(255, 220, 110, .9)); }
+
+/* ---------- Відбудова села ---------- */
+.reb-bar { height: 10px; border-radius: 6px; background: rgba(120, 80, 40, .15); overflow: hidden; margin: 2px 0 8px; }
+.reb-bar b { display: block; height: 100%; border-radius: 6px; background: linear-gradient(90deg, #f2b84b, #e08a2a); }
