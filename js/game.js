@@ -538,8 +538,8 @@ function takeTea() {
   if (!teaReady()) return;
   S.teaAt = Date.now();
   addEnergy(TEA_BREAK_ENERGY);
-  sfx.coin();
-  toast("☕ Смачного! +" + TEA_BREAK_ENERGY + " ⚡");
+  sfx.pop();                                   // не «монетковий» звук — чай дає лише енергію
+  toast("☕ Смачного! +" + TEA_BREAK_ENERGY + " ⚡ · наступна перерва за " + Math.round(TEA_BREAK_MS / 3600000) + " год");
 }
 function hm(ms) {
   const m = Math.ceil(ms / 60000);
@@ -561,7 +561,7 @@ function energyPrice() {
 }
 function energyButtons(withWait) {
   const btns = [];
-  if (teaReady()) btns.push({ label: "☕ Перерва на чай: +" + TEA_BREAK_ENERGY + " ⚡", onClick: takeTea });
+  if (teaReady()) btns.push({ label: "☕ Перерва на чай: +" + TEA_BREAK_ENERGY + " ⚡ (раз на " + Math.round(TEA_BREAK_MS / 3600000) + " год)", onClick: takeTea });
   else btns.push({ label: "☕ Чай буде за " + hm(TEA_BREAK_MS - (Date.now() - S.teaAt)), disabled: true });
   const p = energyPrice();
   if (p) btns.push({ label: "Купити " + ENERGY_SHOP.amount + " ⚡ за " + p + " 🪙", cls: "ghost", disabled: S.coins < p, onClick: () => buy("energy") });
