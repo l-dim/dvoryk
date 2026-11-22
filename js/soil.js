@@ -12,7 +12,7 @@
 const SOIL_LIFE = 2000, SOIL_WARN = 0.25, SOIL_BAD = [0.5, 0.8], SOIL_BAD_RAMP = 300;
 const SOIL_FRESH = 150, SOIL_FRESH_UP = 0.25, SOIL_ROW_MS = 260;
 const SOIL_COST = L => 150 + 35 * L;
-const SOIL_ART = [];                                     // мальовані: junk, ui-tractor, ui-soil-fresh, ui-soil-tired
+const SOIL_ART = ["junk", "ui-tractor", "ui-soil-fresh", "ui-soil-tired"];   // аркуш sheet-soil
 const SOIL_IMG = (id, e) => SOIL_ART.includes(id) ? `<img class="e3d pnt" src="items/${id}.webp" alt="">` : e;
 
 window.PUA_MAP = window.PUA_MAP || {};
