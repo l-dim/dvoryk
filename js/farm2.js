@@ -192,10 +192,11 @@ window.DECOR = (() => {
   function panel() {
     if (!on()) return;
     const s = st(), here = s.placed[locKey(curCh())] || [];
-    const rows = DECOR_SHOP.map(([e, n, p]) => { const have = s.inv[e] || 0;
-      return `<div class="dc-row"><span class="dc-ic">${e}</span><span class="dc-t"><b>${n}</b><small>${have ? "у тебе: " + have : p + " 🪙"}</small></span>` +
+    const rows = DECOR_SHOP.map(([e, n, p, , souv]) => { const have = s.inv[e] || 0;
+      if (souv && !have && !Object.values(s.placed).some(a => a.some(d => d.e === e))) return "";   // сувенір — лише коли привезла з поїздки
+      return `<div class="dc-row"><span class="dc-ic">${e}</span><span class="dc-t"><b>${n}</b><small>${have ? "у тебе: " + have : souv ? "сувенір з поїздки" : p + " 🪙"}</small></span>` +
         (have ? `<button class="s-btn dc-put" data-e="${e}">Поставити</button>` : "") +
-        `<button class="s-btn ghost dc-buy${S.coins < p ? " dim" : ""}" data-e="${e}">${have ? "+1" : "Купити"}</button></div>`; }).join("");
+        (souv ? "" : `<button class="s-btn ghost dc-buy${S.coins < p ? " dim" : ""}" data-e="${e}">${have ? "+1" : "Купити"}</button>`) + `</div>`; }).join("");
     const placed = here.map(d => `<button class="dc-placed" data-id="${d.id}" title="Прибрати">${d.e}<i>✕</i></button>`).join("");
     modal({ title: "Двір на свій смак 🎨",
       html: `<p class="hint-s">Купи прикрасу, натисни «Поставити» — і тапни на землю у дворику.</p>` +
@@ -207,6 +208,7 @@ window.DECOR = (() => {
     document.querySelectorAll(".dc-placed").forEach(b => b.onclick = () => unplace(+b.dataset.id));
   }
   function buy(e) {
+    if ((DECOR_SHOP.find(x => x[0] === e) || [])[4]) return;      // сувеніри не продаються
     const p = price(e);
     if (S.coins < p) { sfx.nope(); toast(`Бракує ${p - S.coins} 🪙`); return; }
     S.coins -= p; st().inv[e] = (st().inv[e] || 0) + 1; sfx.coin(); renderTop(); save(); panel();

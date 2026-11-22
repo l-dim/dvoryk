@@ -12,33 +12,33 @@
 const SIDE_DUR = 48 * 3600e3, SIDE_GAP = 24 * 3600e3;
 const SIDE_ART = ["side-jam-0", "side-jam-1", "side-jam-2", "side-jam-3", "side-jam-4", "side-shirt-0", "side-shirt-1", "side-shirt-2", "side-shirt-3", "side-shirt-4", "side-fair-0", "side-fair-1", "side-fair-2", "side-fair-3", "side-fair-4", "side-garden-0", "side-garden-1", "side-garden-2", "side-garden-3", "side-garden-4", "side-gen-jam", "side-gen-shirt", "side-gen-fair", "side-gen-garden", "side-fish-0", "side-fish-1", "side-fish-2", "side-fish-3", "side-fish-4", "side-mush-0", "side-mush-1", "side-mush-2", "side-mush-3", "side-mush-4", "side-gen-fish", "side-gen-mush"];                    // мальовані: "side-jam-0", "side-gen-jam"…
 const SIDE_KINDS = [
-  { id: "jam", host: "halya", title: "Вишневе варення", gen: ["🪣", "Відро вишень"],
+  { id: "jam", short: "Варення", host: "halya", title: "Вишневе варення", gen: ["🪣", "Відро вишень"],
     items: [["🍒", "Вишенька"], ["🥣", "Миска вишень"], ["🫕", "Казанок варення"], ["🫙", "Банка варення"], ["🥧", "Вишневий пиріг"]],
     goals: [{ l: 3, t: 2 }, { l: 4, t: 1 }],
     ask: "{name}, вишні поспіли — аж гілки гнуться! 🍒 Допоможи наварити варення, поки не пообсипались. Дві банки й пиріг — і на всю зиму вистачить!",
     thanks: "Ох і варення вийшло! Густе, запашне — як у моєї мами. А пиріг — тобі, з чаєм 💛" },
-  { id: "shirt", host: "marichka", title: "Вишиванка для Марічки", gen: ["🧺", "Кошик рукодільниці"],
+  { id: "shirt", short: "Вишиванка", host: "marichka", title: "Вишиванка для Марічки", gen: ["🧺", "Кошик рукодільниці"],
     items: [["🪡", "Голка з ниткою"], ["🧵", "Котушка ниток"], ["🧶", "Клубок вовни"], ["👚", "Сорочка-заготовка"], ["👗", "Вишиванка"]],
     goals: [{ l: 3, t: 2 }, { l: 4, t: 1 }],
     ask: "{name}, у школі свято вишиванок, а в мене тільки стара, з якої я виросла 😢 Бабуся Галя каже, що разом ми встигнемо пошити нову!",
     thanks: "Вона така гарна! Я найщасливіша дівчинка в усій школі! Дякую-дякую-дякую! 👗💛" },
-  { id: "fair", host: "andriy", title: "Ярмарок ласощів", gen: ["🛒", "Ярмарковий візок"],
+  { id: "fair", short: "Ярмарок", host: "andriy", title: "Ярмарок ласощів", gen: ["🛒", "Ярмарковий візок"],
     items: [["🥜", "Горішки"], ["🍪", "Медяник"], ["🍭", "Півник на паличці"], ["🍫", "Шоколадна плитка"], ["🧺", "Кошик гостинців"]],
     goals: [{ l: 3, t: 2 }, { l: 4, t: 1 }],
     ask: "{name}, у суботу ярмарок у районі! Хочу привезти найкращі ласощі в окрузі. Допоможеш наготувати? 🍪",
     thanks: "Розкупили все за годину! Люди питали, хто це таке смачне робить. Я сказав — ми з тобою 😎" },
-  { id: "garden", host: "olya", title: "Квітник до свята", gen: ["🪴", "Ящик із розсадою"],
+  { id: "garden", short: "Квітник", host: "olya", title: "Квітник до свята", gen: ["🪴", "Ящик із розсадою"],
     items: [["🌱", "Розсада"], ["🌼", "Ромашка"], ["🌷", "Тюльпан"], ["🌹", "Троянда"], ["💐", "Святковий букет"]],
     goals: [{ l: 3, t: 2 }, { l: 4, t: 1 }],
     ask: "{name}, у неділю день села, а клумба біля клубу — суцільний бур'ян 😩 Допоможи виростити квіти й зібрати букет для гостей!",
     thanks: "Клумба — як із листівки! Голова сільради навіть сфотографувався біля неї 🌹" },
   /* вилазки — на них можна піти самій, коли захочеш (раз на добу кожна) */
-  { id: "fish", host: "stepan", title: "Рибалка на ставку", gen: ["🎣", "Дідова вудка"], outing: true, icon: "🎣",
+  { id: "fish", short: "Рибалка", host: "stepan", title: "Рибалка на ставку", gen: ["🎣", "Дідова вудка"], outing: true, icon: "🎣",
     items: [["🪱", "Черв'ячок"], ["🐟", "Карасик"], ["🐠", "Окунь"], ["🐡", "Сом-вусань"], ["🪣", "Відро риби"]],
     goals: [{ l: 2, t: 2 }, { l: 3, t: 1 }, { l: 4, t: 1 }],
     ask: "{name}, на ставку кльов — аж вода кипить! 🎣 Ходімо, поки зорі не згасли. Складай рибку до рибки — що більший улов, то смачніша юшка!",
     thanks: "Оце улов! Такого сома я з молодості не тягав 😄 Юшку зваримо на все село 💛" },
-  { id: "mush", host: "halya", title: "По гриби в ліс", gen: ["🌳", "Лісова галявина"], outing: true, icon: "🍄",
+  { id: "mush", short: "По гриби", host: "halya", title: "По гриби в ліс", gen: ["🌳", "Лісова галявина"], outing: true, icon: "🍄",
     items: [["🍂", "Шурхіт листя"], ["🍄‍🟫", "Опеньки"], ["🍄", "Підосичник"], ["🧺", "Кошик грибів"], ["🍲", "Грибна юшка"]],
     goals: [{ l: 2, t: 2 }, { l: 3, t: 1 }, { l: 4, t: 1 }],
     ask: "{name}, після дощу гриби лізуть — тільки встигай! 🍄 Бери кошика. Під кожним листочком щось ховається — складай докупи, назбираємо повний кошик!",
@@ -100,15 +100,15 @@ window.SIDE = (() => {
     intro(k, mid);
   }
   function intro(k, mid) {
-    const r = k.outing ? OUT_REWARD : SIDE_REWARD, top = k.goals[k.goals.length - 1].l;
+    const r = k.reward || (k.outing ? OUT_REWARD : SIDE_REWARD), top = k.goals[k.goals.length - 1].l;
     playDialog([[k.host, k.ask]], () => modal({
-      title: "Пригода: " + k.title,
+      title: (k.trip ? "Поїздка: " : "Пригода: ") + k.title,
       html: `<div class="big-emoji">${CHAINS[chainId()].items[top][0]}</div>` +
         `<p>Окрема дошка з генератором ${GENS[S.side.board[mid].g].icon}. Зроби: ` +
         k.goals.map(g => `<b>${g.t} × ${CHAINS[chainId()].items[g.l][0]} ${CHAINS[chainId()].items[g.l][1]}</b>`).join(" і ") +
-        `.</p><p>Час: <b>${k.outing ? "доба" : "2 дні"}</b>. Нагорода: ${CHAINS.chest.items[r.chest][0]} · +${r.stars} ⭐ · +${r.coins} 🪙 · 💛</p>` +
+        `.</p><p>Час: <b>${k.dur ? Math.round(k.dur / 864e5) + " дні" : k.outing ? "доба" : "2 дні"}</b>. Нагорода: ${CHAINS.chest.items[r.chest][0]} · +${r.stars} ⭐ · +${r.coins} 🪙 · 💛${k.souv ? ` · сувенір ${k.souv[0]} у дворик` : ""}</p>` + (k.note ? `<p class="hint-s">${k.note}</p>` : "") +
         (k.outing ? `<p class="hint-s">Що більший улов, то краще: кожен зайвий ${CHAINS[chainId()].items[top][0]} понад ціль — ще +${r.bonus} 🪙.</p>` : ""),
-      buttons: [{ label: "До пригоди! ✨", onClick: enter }, { label: "Пізніше", cls: "ghost" }]
+      buttons: [{ label: k.trip ? "Їдемо! ✨" : "До пригоди! ✨", onClick: enter }, { label: "Пізніше", cls: "ghost" }]
     }));
   }
   /* вилазка: рибалка чи гриби — коли захочеш, якщо зараз немає іншої пригоди */
@@ -121,14 +121,14 @@ window.SIDE = (() => {
     const board = Array(N).fill(null), mid = Math.floor(ROWS / 2) * COLS + Math.floor(COLS / 2);
     board[mid] = { g: "side_" + k.id, gl: 1 };
     [mid - 1, mid + 1, mid - COLS, mid + COLS].forEach(i => { board[i] = { c: "side_" + k.id, l: 0 }; });
-    S.side = { kind: k.id, until: now() + OUT_DUR, board, goals: k.goals.map(g => ({ l: g.l, t: g.t, n: 0 })), done: false, extra: 0 };
+    S.side = { kind: k.id, until: now() + (k.dur || OUT_DUR), board, goals: k.goals.map(g => ({ l: g.l, t: g.t, n: 0 })), done: false, extra: 0 };
     save(); renderButton();
     intro(k, mid);
   }
   function finish(ok) {
     const k = kind();
     if (S.sideOn) leave();
-    const R = k.outing ? OUT_REWARD : SIDE_REWARD;
+    const R = k.reward || (k.outing ? OUT_REWARD : SIDE_REWARD);
     let bonus = 0;
     if (ok) {
       const r = R;
@@ -144,16 +144,18 @@ window.SIDE = (() => {
       if (window.FASH) FASH.add(5, "з пригоди");
       if (window.CONTEST) CONTEST.give(3, k.id === "mush" ? ["veg"] : k.id === "jam" || k.id === "garden" ? ["berry"] : null, 2, "З пригоди");
       if (S.fr && FRIENDS[k.host]) S.fr[k.host] = Math.min(FRIEND_STEPS[2], (S.fr[k.host] || 0) + r.hearts);
+      if (k.souv && window.TRIPS) TRIPS.souvenir(k);
       confetti(); sfx.level();
     }
-    if (k.outing) { S.outNext = S.outNext || {}; S.outNext[k.id] = now() + OUT_GAP; }
+    if (k.outing) { S.outNext = S.outNext || {}; S.outNext[k.id] = now() + (k.gap || OUT_GAP); }
     else S.sideNext = now() + SIDE_GAP;
     S.side = null;
     save(); renderAll(); renderButton();
     const ch0 = CHAINS.chest.items[R.chest][0];
-    if (ok) playDialog([[k.host, k.thanks]], () => modal({ title: k.outing ? "Вилазка вдалася! 🎉" : "Пригоду завершено! 🎉", html: `<div class="big-emoji">${k.outing ? k.icon : "📦"}</div><p class="rewards">${ch0} &nbsp; +${R.stars} ⭐ &nbsp; +${R.coins} 🪙 &nbsp; +${R.hearts} 💛</p>` +
-      (bonus ? `<p class="rewards">Рекордний улов: +${bonus} 🪙</p>` : ""), buttons: [{ label: "Дякую! 💛" }] }));
-    else modal({ title: "Пригода минула ⏰", html: `<div class="big-emoji">${CHARS[k.host].icon}</div><p>«${k.title}» — не встигли цього разу. Нічого, ${k.outing ? "завтра знову можна" : "наступна пригода — вже скоро"}!</p>`, buttons: [{ label: "Добре" }] });
+    if (ok) playDialog([[k.host, k.thanks]], () => modal({ title: k.trip ? "Гарно відпочили! 🎉" : k.outing ? "Вилазка вдалася! 🎉" : "Пригоду завершено! 🎉", html: `<div class="big-emoji">${k.outing ? k.icon : "📦"}</div><p class="rewards">${ch0} &nbsp; +${R.stars} ⭐ &nbsp; +${R.coins} 🪙 &nbsp; +${R.hearts} 💛</p>` +
+      (k.souv ? `<p class="rewards">Сувенір у дворик: ${k.souv[0]} ${k.souv[1]}</p><p class="hint-s">Знайдеш його в «Двір на свій смак» 🎨</p>` : "") +
+      (bonus ? `<p class="rewards">${k.trip ? "Ще й понад план" : "Рекордний улов"}: +${bonus} 🪙</p>` : ""), buttons: [{ label: "Дякую! 💛" }] }));
+    else modal({ title: "Пригода минула ⏰", html: `<div class="big-emoji">${CHARS[k.host].icon}</div><p>«${k.title}» — не встигли цього разу. Нічого, ${k.trip ? "поїдемо ще — за тиждень" : k.outing ? "завтра знову можна" : "наступна пригода — вже скоро"}!</p>`, buttons: [{ label: "Добре" }] });
   }
 
   /* ---------- цілі пригоди ---------- */
@@ -172,7 +174,7 @@ window.SIDE = (() => {
     if (kind().outing) {        // вилазку можна продовжити — на рекордний улов
       S.side.done = true; save(); renderOrders();
       const top = CHAINS[chainId()].items[kind().goals[kind().goals.length - 1].l][0];
-      setTimeout(() => toast(`Ціль є! Лови ще — кожне зайве ${top} +${OUT_REWARD.bonus} 🪙. Або тисни «Додому»`), 600);
+      setTimeout(() => toast(`Ціль є! ${kind().trip ? "Можна ще" : "Лови ще"} — кожне зайве ${top} +${(kind().reward || OUT_REWARD).bonus} 🪙. Або тисни «Додому»`), 600);
     } else setTimeout(() => finish(true), 700);
   }
   function renderGoals(box) {
@@ -181,7 +183,7 @@ window.SIDE = (() => {
     host.className = "order side-host pic";
     host.innerHTML = `<div class="o-who"><span class="o-name">${CHARS[k.host].name.split(" ").pop()}</span></div>` +
       `<div class="o-body"><div class="o-pic">${PORTRAITS_FULL.includes(k.host) || PORTRAITS.includes(k.host) ? `<img src="portraits/${k.host}.webp" alt="">` : CHARS[k.host].icon}</div>` +
-      `<div class="side-info"><b>${k.title}</b><span class="side-time">⏰ ${hm(left())}</span></div></div>` +
+      `<div class="side-info"><span class="side-time">⏰ ${hm(left())}</span></div></div><div class="side-title">${k.short || k.title}</div>` +
       (k.outing && S.side.done ? `<button class="o-btn side-home">Додому ✓</button>` : "");
     const hb = host.querySelector(".side-home"); if (hb) hb.onclick = () => finish(true);
     if (k.outing && S.side.done) host.classList.add("ready");
