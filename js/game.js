@@ -706,37 +706,66 @@ function renderBoard() {
     board.innerHTML = "";
     for (let i = 0; i < N; i++) { const c = document.createElement("div"); c.className = "cell"; c.dataset.i = i; board.appendChild(c); }
   }
+  // одноразові анімації забираємо й очищаємо одразу: навіть якщо якась клітинка зламається,
+  // наступне відмальовування не повторить старі вильоти з генератора
+  const spawnNow = new Map(spawnFrom), popNow = new Set(popIdx), mergedNow = new Set(mergedIdx);
+  popIdx.clear(); spawnFrom.clear(); mergedIdx.clear();
   for (let i = 0; i < N; i++) {
     const cell = board.children[i], it = S.board[i];
-    cell.classList.toggle("sel", i === selected);
-    const shut = window.HARD ? HARD.shutKey(i) : null;
-    cell.classList.toggle("shut", !!shut); cell.classList.toggle("shut-next", !!shut && shut !== "shut");
-    if (shut) { if (cell.dataset.key !== shut) { cell.dataset.key = shut; cell.innerHTML = HARD.shutHtml(i); } continue; }
-    const key = it ? (MECH.tileKey(it) || it.c + ":" + it.l + (it.old ? ":o" : "") + (window.WH ? WH.tileKey(it) : "")) : "";
-    if (cell.dataset.key === key && !popIdx.has(i) && !spawnFrom.has(i) && !mergedIdx.has(i)) { cell.firstChild && cell.firstChild.classList.toggle("needed", neededIdx.has(i)); MECH.decorate(cell.firstChild, it); window.WH && WH.decorate(cell.firstChild, it); window.DOG && DOG.decorate(cell.firstChild, it); continue; }
-    cell.dataset.key = key;
-    cell.innerHTML = "";
-    if (!it) continue;
-    const t = document.createElement("div");
-    const from = spawnFrom.has(i) && FARM ? cellRect(spawnFrom.get(i)) : null, to = from && cellRect(i);
-    const anim = from && to ? " spawn" : mergedIdx.has(i) && FARM ? " merged" : popIdx.has(i) ? " pop" : "";
-    t.className = "tile" + (it.g ? " gen" : "") + (it.c && CHAINS[it.c].open ? " chest" : "") + (it.c === "dish" ? " dish" : "") +
-      (it.c && CHAINS[it.c].collect ? " collect" : "") + (isMax(it) && PRODUCT_CHAINS.includes(it.c) ? " max" : "") + (window.HARD && HARD.stale(it) ? " stale" : "") +
-      anim + (neededIdx.has(i) ? " needed" : "");
-    if (from && to) { t.style.setProperty("--fx", (from.left - to.left) + "px"); t.style.setProperty("--fy", (from.top - to.top) + "px"); }
-    if (anim) setTimeout(() => { t.classList.remove("spawn", "merged", "pop"); t.style.removeProperty("--fx"); t.style.removeProperty("--fy"); }, 1200);   // запасний варіант, якщо animationend не прийшов
-    t.dataset.i = i;
-    if (it.g) t.dataset.gen = it.g;
-    t.textContent = itemIcon(it);
-    if (it.g && !(GENS[it.g] && GENS[it.g].pet)) { const b = document.createElement("span"); b.className = "gen-badge"; b.textContent = "⚡"; t.appendChild(b); }
-    cell.appendChild(t);
-    MECH.decorate(t, it);
-    window.WH && WH.decorate(t, it);
-    window.DOG && DOG.decorate(t, it);
+    try {
+      cell.classList.toggle("sel", i === selected);
+      const shut = window.HARD ? HARD.shutKey(i) : null;
+      cell.classList.toggle("shut", !!shut); cell.classList.toggle("shut-next", !!shut && shut !== "shut");
+      if (shut) { if (cell.dataset.key !== shut) { cell.dataset.key = shut; cell.innerHTML = HARD.shutHtml(i); } continue; }
+      const key = it ? (MECH.tileKey(it) || it.c + ":" + it.l + (it.old ? ":o" : "") + (window.WH ? WH.tileKey(it) : "")) : "";
+      if (cell.dataset.key === key && !popNow.has(i) && !spawnNow.has(i) && !mergedNow.has(i)) { cell.firstChild && cell.firstChild.classList.toggle("needed", neededIdx.has(i)); MECH.decorate(cell.firstChild, it); window.WH && WH.decorate(cell.firstChild, it); window.DOG && DOG.decorate(cell.firstChild, it); continue; }
+      cell.dataset.key = key;
+      cell.innerHTML = "";
+      if (!it) continue;
+      const t = document.createElement("div");
+      const from = spawnNow.has(i) && FARM ? cellRect(spawnNow.get(i)) : null, to = from && cellRect(i);
+      const anim = from && to ? " spawn" : mergedNow.has(i) && FARM ? " merged" : popNow.has(i) ? " pop" : "";
+      t.className = "tile" + (it.g ? " gen" : "") + (it.c && CHAINS[it.c] && CHAINS[it.c].open ? " chest" : "") + (it.c === "dish" ? " dish" : "") +
+        (it.c && CHAINS[it.c] && CHAINS[it.c].collect ? " collect" : "") + (isMax(it) && PRODUCT_CHAINS.includes(it.c) ? " max" : "") + (window.HARD && HARD.stale(it) ? " stale" : "") +
+        anim + (neededIdx.has(i) ? " needed" : "");
+      if (from && to) { t.style.setProperty("--fx", (from.left - to.left) + "px"); t.style.setProperty("--fy", (from.top - to.top) + "px"); }
+      if (anim) setTimeout(() => { t.classList.remove("spawn", "merged", "pop"); t.style.removeProperty("--fx"); t.style.removeProperty("--fy"); }, 1200);   // запасний варіант, якщо animationend не прийшов
+      t.dataset.i = i;
+      if (it.g) t.dataset.gen = it.g;
+      t.textContent = itemIcon(it);
+      if (it.g && !(GENS[it.g] && GENS[it.g].pet)) { const b = document.createElement("span"); b.className = "gen-badge"; b.textContent = "⚡"; t.appendChild(b); }
+      cell.appendChild(t);
+      MECH.decorate(t, it);
+      window.WH && WH.decorate(t, it);
+      window.DOG && DOG.decorate(t, it);
+    } catch (e) {
+      cell.dataset.key = "";                       // наступного разу спробуємо намалювати знову
+      logErr(e, "клітинка " + i + (it ? " " + (it.g ? "g:" + it.g : it.c + ":" + it.l) : ""));
+    }
   }
-  popIdx.clear(); spawnFrom.clear(); mergedIdx.clear();
-  window.SOIL && SOIL.badge();
+  try { window.SOIL && SOIL.badge(); } catch (e) { logErr(e, "SOIL.badge"); }
 }
+
+/* журнал помилок — останні кілька, показуються в налаштуваннях під версією гри */
+function logErr(e, where) {
+  try {
+    const sl = e && e.stack ? (String(e.stack).split("\n").find(l => /\.js/.test(l)) || "") : "";
+    const at = (sl.match(/(js\/[\w.-]+\.js)[^:]*:(\d+)/) || []).slice(1).join(":");
+    const msg = ((where ? where + ": " : "") + (e && e.message ? e.message : String(e)) + (at ? " @ " + at : "")).slice(0, 220);
+    const L = JSON.parse(localStorage.getItem("dvoryk_errs") || "[]");
+    if (L[0] && L[0].m === msg) { L[0].n = (L[0].n || 1) + 1; L[0].t = Date.now(); } else L.unshift({ m: msg, v: APP_VER, t: Date.now() });
+    localStorage.setItem("dvoryk_errs", JSON.stringify(L.slice(0, 5)));
+  } catch (_) {}
+}
+function errsHtml() {
+  let L = []; try { L = JSON.parse(localStorage.getItem("dvoryk_errs") || "[]"); } catch (_) {}
+  L = L.filter(x => x.v === APP_VER);              // лише помилки поточної версії
+  if (!L.length) return "";
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  return `<p class="hint-s" style="font-size:10px;opacity:.6;word-break:break-all;text-align:left">⚠️ ${L.map(x => esc(x.m) + (x.n > 1 ? " ×" + x.n : "")).join("<br>⚠️ ")}</p>`;
+}
+window.addEventListener("error", e => logErr(e.error || e.message));
+window.addEventListener("unhandledrejection", e => logErr(e.reason));
 
 function renderInfo() {
   const box = $("info");
@@ -1258,7 +1287,7 @@ function openSettings() {
       <button class="btn ghost small" id="setGuide">📖 Довідник господині</button>
       <p class="hint-s">Справжні покупки поки не підключені — гроші гра не списує 💛</p>
       <button class="btn ghost small" id="setReset">Почати гру спочатку</button>
-      <p class="hint-s" style="text-align:center;opacity:.6">Версія гри: ${APP_VER}</p>`,
+      <p class="hint-s" style="text-align:center;opacity:.6">Версія гри: ${APP_VER}</p>${errsHtml()}`,
     buttons: [{ label: "Зберегти", onClick: () => {
       S.name = $("setName").value.trim();
       S.sound = $("setSound").checked;
@@ -1279,7 +1308,7 @@ function openSettings() {
 /* ============================================================
    ВЗАЄМОДІЯ З ДОШКОЮ (тап і перетягування)
    ============================================================ */
-const APP_VER = "v150";   // разом із VERSION у sw.js
+const APP_VER = "v151";   // разом із VERSION у sw.js
 let drag = null, dragAnim = false, dragGhost = null, envKeyShown = "";
 /* привид створюється один раз і живе весь час (новий шар на кожен дотик змушував дошку блимати) */
 function ghostEl() {
