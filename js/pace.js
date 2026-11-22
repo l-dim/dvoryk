@@ -9,7 +9,7 @@ const PACE_UNLOCK = {
   store: 8, cat: 8, outing: 9, medals: 9, week: 10, map: 10, wear: 11, selllimit: 11,
   path: 12, weather: 12, patience: 13, spoil: 13, rare: 14, prices: 14, album: 15, flash: 15,
   ech: 16, paidtasks: 16, seasonal: 17, fashion: 17, boost: 18, bigflash: 18, contest: 19,
-  barn: 20, toloka: 21, look: 22
+  barn: 20, toloka: 21, look: 22, soil: 9
 };
 const PACE_GENS = { forest: 12, poultry: 17, pottery: 23 };
 const PACE_BARN = { cow: 20, goat: 25, sheep: 30 };

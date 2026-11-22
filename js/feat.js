@@ -255,7 +255,7 @@ window.XTRA = (() => {
 
   /* ---------- сховок ---------- */
   const store = () => (S.store || (S.store = { slots: STORE_START, items: [] }));
-  const canStore = it => it && !it.lock && !it.st && !(window.SIDE && SIDE.isSideItem && SIDE.isSideItem(it));
+  const canStore = it => it && !it.lock && !it.st && !(CHAINS[it.c] && CHAINS[it.c].trash) && !(window.SIDE && SIDE.isSideItem && SIDE.isSideItem(it));
   function storeBtn(it) {
     if (!on("store") || S.sideOn || !canStore(it)) return "";
     return `<button class="sell store-b" id="storeBtn"><small>сховати</small><span>🗄️</span></button>`;

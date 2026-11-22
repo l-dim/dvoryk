@@ -233,6 +233,7 @@ function produce(i) {
   if (x2) item.l = Math.min(CHAINS[item.c].items.length - 1, item.l + 1);
   if (window.WH) item = WH.afterTap(gIt, item);
   if (window.FARM2) item = FARM2.afterTap(gIt, item, i);
+  if (window.SOIL) item = SOIL.afterTap(gIt, item);             // виснажена земля дає брак
   if (!item) { sfx.nope(); bounce(i); renderBoard(); renderTop(); renderInfo(); save(); return; }   // квітка зів'яла на спеці
   const at = placeItem(item, i);
   if (at >= 0) spawnFrom.set(at, i);
@@ -728,6 +729,7 @@ function renderBoard() {
     window.WH && WH.decorate(t, it);
   }
   popIdx.clear(); spawnFrom.clear(); mergedIdx.clear();
+  window.SOIL && SOIL.badge();
 }
 
 function renderInfo() {
@@ -751,12 +753,15 @@ function renderInfo() {
     const lv = MECH.gl(it) > 1 ? ` <span class="lvl-tag">рів. ${MECH.gl(it)}</span>` : "";
     text = MECH.resting(it)
       ? `<b>${GENS[it.g].name}</b>${lv}<small>💤 Відпочиває ще ${Math.ceil((it.rest - Date.now()) / 60e3)} хв</small>`
-      : `<b>${GENS[it.g].name}</b>${lv}<small>Заряд ${it.ch}/${MECH.cap(it)}${window.HARD ? HARD.genInfo(it) : ""}${window.WH ? WH.genInfo(it) : ""}${window.CRAFT ? CRAFT.genInfo(it) : ""}${window.FARM2 ? FARM2.genInfo(it) : ""} · тапай, щоб отримати ${ch.items[0][0]} (−1 ⚡)</small>`;
+      : `<b>${GENS[it.g].name}</b>${lv}<small>Заряд ${it.ch}/${MECH.cap(it)}${window.HARD ? HARD.genInfo(it) : ""}${window.WH ? WH.genInfo(it) : ""}${window.CRAFT ? CRAFT.genInfo(it) : ""}${window.FARM2 ? FARM2.genInfo(it) : ""}${window.SOIL ? SOIL.genInfo(it) : ""} · тапай, щоб отримати ${ch.items[0][0]} (−1 ⚡)</small>`;
   } else if (it.c === "dish") {
     text = `<b>${itemName(it)}</b><small>Страву просять сусіди за ⭐⭐</small>`;
     btn = `<button class="sell${window.ECON && !ECON.canSell() ? " dim" : ""}" id="sellBtn"><small>продати${window.ECON && ECON.sellNote() ? " " + ECON.sellNote() : ""}</small><span>+${sellPrice(it)}🪙</span></button>`;
   } else if (CHAINS[it.c].open) {
     text = `<b>${itemName(it)}</b><small>Тапни ще раз, щоб відкрити!${isMax(it) ? "" : " Або об'єднай два однакові"}</small>`;
+  } else if (CHAINS[it.c].trash) {
+    text = `<b>${itemName(it)}</b><small>Виснажена земля дала брак — його можна лише викинути</small>`;
+    btn = `<button class="sell" id="trashBtn"><small>викинути</small><span>🗑️</span></button>`;
   } else if (CHAINS[it.c].collect) {
     text = `<b>${itemName(it)}</b><small>Тапни ще раз, щоб забрати +${CHAINS[it.c].values[it.l]} ${it.c === "coin" ? "🪙" : "⚡"}</small>`;
   } else {
@@ -768,6 +773,7 @@ function renderInfo() {
   box.innerHTML = `<span class="info-ic">${itemIcon(it)}</span><span class="info-txt">${text}</span>${window.XTRA ? XTRA.storeBtn(it) : ""}${window.WH && it.g ? WH.genButton(it) : ""}${btn}`;
   const shb = $("sharpBtn"); if (shb) shb.onclick = () => WH.sharpenModal(selected);
   const stb = $("storeBtn"); if (stb) stb.onclick = () => XTRA.stash(selected);
+  const tb = $("trashBtn"); if (tb && window.SOIL) tb.onclick = () => SOIL.trash(selected);
   const sb = $("sellBtn");
   if (sb) sb.onclick = () => {
     if (it.l >= 3 && !sb.dataset.sure) { sb.dataset.sure = 1; sb.innerHTML = "<small>точно?</small>Так"; return; }
