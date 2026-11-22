@@ -1253,9 +1253,29 @@ function openSettings() {
 /* ============================================================
    ВЗАЄМОДІЯ З ДОШКОЮ (тап і перетягування)
    ============================================================ */
-let drag = null;
+let drag = null, dragAnim = false;
+/* привид предмета трохи над пальцем (на дотик), щоб палець його не закривав;
+   ціль — клітинка, найближча до привида, а клітинка, з якою можна об'єднати, «притягує» здалеку */
+const DRAG_START = 6, DRAG_LIFT = 0.5, DRAG_SNAP = 0.75, DRAG_MAGNET = 1.0;
+function canMergeAt(a, b) {
+  if (a === b) return false;
+  const t = S.board[b], A = S.board[a];
+  return !!(t && A && !A.g && !t.g && !t.lock && !t.st && t.c === A.c && t.l === A.l && !isMax(A)) || MECH.canMergeGens(A, t);
+}
+function dragTarget(d, x, y) {
+  const px = x, py = y - d.lift;
+  let best = null, bd = Infinity, merge = null, md = Infinity;
+  for (const c of d.cells) {
+    const dist = Math.hypot(c.x - px, c.y - py);
+    if (dist < bd) { bd = dist; best = c; }
+    if (dist < c.w * DRAG_MAGNET && dist < md && canMergeAt(d.i, c.i)) { md = dist; merge = c; }
+  }
+  if (merge) return merge;
+  return best && bd < best.w * DRAG_SNAP ? best : null;
+}
 function onDown(e) {
   document.body.classList.remove("nav-open");
+  if (drag || dragAnim) return;
   const tile = e.target.closest(".tile");
   if (!tile) {
     const sc = e.target.closest(".cell.shut");
@@ -1265,45 +1285,60 @@ function onDown(e) {
   e.preventDefault();
   audio();
   const i = +tile.dataset.i;
-  drag = { i, x: e.clientX, y: e.clientY, tile, ghost: null, over: null };
+  drag = { i, pid: e.pointerId, x: e.clientX, y: e.clientY, lx: e.clientX, ly: e.clientY, tile, ghost: null, over: null, touch: e.pointerType !== "mouse", raf: 0 };
+}
+function dragFrame() {
+  const d = drag; if (!d || !d.ghost) return;
+  d.raf = 0;
+  const t = dragTarget(d, d.lx, d.ly), cell = t ? t.el : null, can = !!(t && canMergeAt(d.i, t.i));
+  d.ghost.style.transform = `translate3d(${d.lx - d.w / 2}px, ${d.ly - d.h / 2 - d.lift}px, 0) scale(${can ? 1.24 : 1.14})`;
+  if (d.over !== cell) {
+    if (d.over) d.over.classList.remove("over", "can-merge");
+    if (cell) { cell.classList.add("over"); cell.classList.toggle("can-merge", can); }
+    if (can && navigator.vibrate) try { navigator.vibrate(8); } catch (_) {}
+    d.over = cell;
+  }
 }
 function onMove(e) {
-  if (!drag) return;
-  const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-  if (!drag.ghost && dx * dx + dy * dy < 64) return;
-  if (S.board[drag.i] && S.board[drag.i].lock) return;
-  if (!drag.ghost) {
-    const r = drag.tile.getBoundingClientRect();
-    const g = drag.tile.cloneNode(true);
-    g.classList.add("drag-ghost"); g.classList.remove("pop", "needed");
+  const d = drag;
+  if (!d || e.pointerId !== d.pid) return;
+  d.lx = e.clientX; d.ly = e.clientY;
+  if (!d.ghost) {
+    const dx = e.clientX - d.x, dy = e.clientY - d.y;
+    if (dx * dx + dy * dy < DRAG_START * DRAG_START) return;
+    if (S.board[d.i] && S.board[d.i].lock) return;
+    const r = d.tile.getBoundingClientRect();
+    const g = d.tile.cloneNode(true);
+    g.classList.add("drag-ghost"); g.classList.remove("pop", "needed", "spawn", "tap");
     g.style.width = r.width + "px"; g.style.height = r.height + "px";
     document.body.appendChild(g);
-    drag.ghost = g; drag.w = r.width; drag.h = r.height;
-    drag.tile.classList.add("lifted");
-    selected = drag.i;
+    Object.assign(d, { ghost: g, w: r.width, h: r.height, lift: d.touch ? r.height * DRAG_LIFT : 0 });
+    d.cells = [...$("board").children].map(c => { const q = c.getBoundingClientRect(); return { el: c, i: +c.dataset.i, x: q.left + q.width / 2, y: q.top + q.height / 2, w: q.width }; });
+    d.tile.classList.add("lifted");
+    selected = d.i;
   }
-  drag.ghost.style.transform = `translate(${e.clientX - drag.w / 2}px, ${e.clientY - drag.h / 2 - 10}px) scale(1.15)`;
-  const el = document.elementFromPoint(e.clientX, e.clientY);
-  const cell = el && el.closest && el.closest(".cell");
-  if (drag.over && drag.over !== cell) drag.over.classList.remove("over");
-  if (cell) {
-    const t = S.board[+cell.dataset.i], A = S.board[drag.i];
-    cell.classList.add("over");
-    cell.classList.toggle("can-merge", +cell.dataset.i !== drag.i && (!!(t && A && !A.g && !t.g && !t.lock && !t.st && t.c === A.c && t.l === A.l && !isMax(A)) || MECH.canMergeGens(A, t)));
-  }
-  drag.over = cell;
+  e.preventDefault();
+  if (!d.raf) d.raf = requestAnimationFrame(dragFrame);
+}
+/* привид плавно долітає до клітинки (або вертається назад), потім — сама дія */
+function settleGhost(d, x, y, scale, ms, done) {
+  dragAnim = true;
+  const g = d.ghost;
+  g.style.transition = `transform ${ms}ms cubic-bezier(.2, .8, .3, 1)`;
+  g.style.transform = `translate3d(${x - d.w / 2}px, ${y - d.h / 2}px, 0) scale(${scale})`;
+  setTimeout(() => { g.remove(); d.tile.classList.remove("lifted"); dragAnim = false; done(); }, ms);
 }
 function onUp(e) {
-  if (!drag) return;
-  const d = drag; drag = null;
+  const d = drag;
+  if (!d || (e.pointerId !== undefined && e.pointerId !== d.pid)) return;
+  drag = null;
+  if (d.raf) cancelAnimationFrame(d.raf);
   if (d.over) d.over.classList.remove("over", "can-merge");
-  if (!d.ghost) { tap(d.i); return; }
-  d.ghost.remove();
-  d.tile.classList.remove("lifted");
-  const el = document.elementFromPoint(e.clientX, e.clientY);
-  const cell = el && el.closest && el.closest(".cell");
-  if (cell) handleDrop(d.i, +cell.dataset.i);
-  else renderBoard();
+  if (!d.ghost) { if (e.type !== "pointercancel") tap(d.i); return; }
+  const t = e.type === "pointercancel" ? null : dragTarget(d, e.clientX || d.lx, e.clientY || d.ly);
+  const home = d.cells.find(c => c.i === d.i);
+  if (t && t.i !== d.i) settleGhost(d, t.x, t.y, canMergeAt(d.i, t.i) ? 0.9 : 1, 90, () => handleDrop(d.i, t.i));
+  else settleGhost(d, home.x, home.y, 1, 170, () => renderBoard());
 }
 function tap(i) {
   const it = S.board[i];

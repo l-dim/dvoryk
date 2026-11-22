@@ -106,7 +106,7 @@ main { flex: 1; min-height: 0; position: relative; }
 .board { width: min(100cqw, 100cqh * 7 / 9); aspect-ratio: 7 / 9; container-type: inline-size;
   display: grid; grid-template-columns: repeat(7, 1fr); grid-template-rows: repeat(9, 1fr); gap: 3px;
   background: #e8cfae; padding: 5px; border-radius: 18px; box-shadow: inset 0 2px 6px rgba(120, 80, 40, .18), 0 3px 0 rgba(150, 100, 60, .15); touch-action: none; }
-.cell { border-radius: 10px; background: var(--cell); position: relative; }
+.cell { border-radius: 10px; background: var(--cell); position: relative; transition: background-color .12s, box-shadow .12s; }
 .cell:nth-child(2n) { background: var(--cell-alt); }
 .cell.over { background: #fff3c4; }
 .cell.can-merge { background: #d9f2c9; box-shadow: inset 0 0 0 3px var(--green); }
@@ -118,12 +118,12 @@ main { flex: 1; min-height: 0; position: relative; }
 .tile.collect { filter: drop-shadow(0 0 4px rgba(255, 210, 90, .9)); }
 .tile.max::before { content: ""; position: absolute; inset: 2px; border-radius: 9px; box-shadow: inset 0 0 0 2px var(--gold); }
 .tile.needed::after { content: "✓"; position: absolute; right: 1px; bottom: 1px; width: 15px; height: 15px; border-radius: 50%; background: var(--green); color: #fff; font: 900 10px/15px var(--font); text-align: center; }
-.tile.lifted { opacity: .25; }
+.tile.lifted { opacity: .3; transform: scale(.88); transition: opacity .12s, transform .12s; }
 .tile.pop { animation: pop .32s cubic-bezier(.3, 1.6, .5, 1); }
 .tile.tap { animation: tap .25s ease; }
 .gen-badge { position: absolute; left: 2px; top: 1px; font-size: 3cqw; }
 .drag-ghost { position: fixed; left: 0; top: 0; z-index: 50; pointer-events: none; display: grid; place-items: center; font-family: var(--emoji);
-  font-size: 34px; filter: drop-shadow(0 8px 10px rgba(90, 60, 30, .35)); background: none !important; box-shadow: none !important; }
+  font-size: 34px; filter: drop-shadow(0 8px 10px rgba(90, 60, 30, .35)); background: none !important; box-shadow: none !important; will-change: transform; }
 .drag-ghost .gen-badge { display: none; }
 
 /* ---------- Інфо ---------- */
