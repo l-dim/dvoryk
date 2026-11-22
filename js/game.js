@@ -1521,6 +1521,7 @@ function init() {
     if (window.REB) REB.tick();
     if (window.DOG) DOG.tick();
     if (window.HERB) HERB.tick();
+    if (window.ANDR) ANDR.tick();
     if (window.ENV && ENV.key() !== envKeyShown) { envKeyShown = ENV.key(); renderStory(); if (window.Yard3D && Yard3D.refreshEnv) Yard3D.refreshEnv(); }   // світанок/вечір/ніч — перемальовуємо дворик
     if (window.WH) WH.tick();
     if (window.CRAFT) CRAFT.tick();

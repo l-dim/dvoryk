@@ -24,10 +24,29 @@ function orthodoxEaster(y) {
 }
 const fromEaster = (y, a, b) => { const E = orthodoxEaster(y), at = n => new Date(E.getFullYear(), E.getMonth(), E.getDate() + n).getTime(); return { start: at(a), end: at(b) }; };   // календарними днями (без зсуву через літній час)
 const fixed = (y, m1, d1, m2, d2, y2 = y) => ({ start: new Date(y, m1, d1).getTime(), end: new Date(y2, m2, d2).getTime() });
+/* n-й день тижня місяця (wd: 0 — неділя, 4 — четвер) і вікно довкола нього, календарними днями */
+const nthDay = (y, m, wd, n) => { const d = new Date(y, m, 1); const off = (wd - d.getDay() + 7) % 7; return new Date(y, m, 1 + off + (n - 1) * 7); };
+const around = (d, a, b) => ({ start: new Date(d.getFullYear(), d.getMonth(), d.getDate() + a).getTime(), end: new Date(d.getFullYear(), d.getMonth(), d.getDate() + b).getTime() });
+/* коротші свята — скромніша шкала нагород */
+const HOL_MS_SHORT = [
+  { pts: 6, reward: { energy: 5 } }, { pts: 15, reward: { chest: 0 } }, { pts: 28, reward: { coins: 120 } },
+  { pts: 42, reward: { chest: 1, stars: 2 }, story: "mid" }, { pts: 60, reward: { coins: 200 } },
+  { pts: 80, reward: { chest: 2, stars: 4 }, story: "final" }
+];
+const HOL_MS_TINY = [
+  { pts: 4, reward: { energy: 5 } }, { pts: 10, reward: { chest: 0 } }, { pts: 18, reward: { coins: 100 } },
+  { pts: 28, reward: { chest: 1, stars: 2 }, story: "mid" }, { pts: 40, reward: { coins: 150 } },
+  { pts: 55, reward: { chest: 2, stars: 3 }, story: "final" }
+];
+const HOL_MS_MID = [
+  { pts: 8, reward: { energy: 8 } }, { pts: 20, reward: { chest: 0 } }, { pts: 36, reward: { coins: 160 } },
+  { pts: 55, reward: { chest: 1, stars: 2 }, story: "mid" }, { pts: 80, reward: { energy: 15, coins: 250 } },
+  { pts: 110, reward: { chest: 2, stars: 5 }, story: "final" }
+];
 
 const HOLIDAYS = [
   { key: "rizdvo", title: "Різдвяні свята", pt: "🕯️", ptName: "свічечки", gen: ["🌾", "Дідух"], who: ["ivan", "taras", "halya"],
-    window: y => fixed(y, 11, 15, 0, 8, y + 1),
+    window: y => fixed(y, 11, 15, 11, 31),
     desc: "Готуємо Святвечір і колядки! Тапай дідуха, об'єднуй святкові страви й віддавай колядникам.",
     items: [["🌾", "Колосок"], ["🕯️", "Свічечка"], ["🥣", "Кутя"], ["🥯", "Пампушки"], ["🌟", "Різдвяна зірка"], ["🎄", "Святвечірній стіл"]],
     deco: [["🎄", 22, 52, 12], ["🌟", 78, 30, 6], ["🕯️", 70, 70, 5], ["🌾", 30, 74, 6]],
@@ -77,9 +96,9 @@ const HOLIDAYS = [
       mid: [["olya", "Мій вінок поплив далеко-далеко… Може, і мені суджений знайдеться? 🥹"], ["liza", "Знайдеться! Тільки через вогнище стрибнути не забудь 😄🔥"]],
       final: [["marichka", "Ми знайшли цвіт папороті! ✨ Ну… майже. Але бажання я загадала!"], ["liza", "Дякую, {name}! Найчарівніша ніч у році 🌸"]],
       ending: [["liza", "Купальська ніч минула — а вінки ще пливуть річкою 🌼"]] } },
-  { key: "spas", title: "Медовий і Яблучний Спас", pt: "🍯", ptName: "медові краплинки", gen: ["🐝", "Вулик"], who: ["stepan", "halya", "andriy"],
-    window: y => fixed(y, 7, 1, 7, 10),
-    desc: "Перший мед і перші яблука! Тапай вулик, об'єднуй і неси святити.",
+  { key: "spas", title: "Три Спаси", pt: "🍯", ptName: "медові краплинки", gen: ["🐝", "Вулик"], who: ["stepan", "halya", "andriy"],
+    window: y => fixed(y, 7, 1, 7, 18),
+    desc: "Медовий, Яблучний і Горіховий Спас — 1, 6 і 16 серпня! Тапай вулик, об'єднуй і неси святити.",
     items: [["🍏", "Яблучко"], ["🍯", "Стільник"], ["🫙", "Глечик меду"], ["🧺", "Кошик яблук"], ["🍪", "Медяник"], ["🎁", "Освячений кошик"]],
     deco: [["🍯", 26, 72, 5], ["🧺", 72, 72, 5], ["🌳", 80, 48, 11]],
     story: {
@@ -106,26 +125,82 @@ const HOLIDAYS = [
       intro: [["olya", "{name}, Покрова! 🍂 Свято осені й наших захисників. Пироги, калина, хустки…"], ["andriy", "Я кошик поставив у твоєму дворику — тапай і віддавай нам осінні дари 🍁"]],
       mid: [["halya", "Кажуть: на Покрову дівчата свататися чекають 😄 Олю, чого почервоніла?"], ["olya", "Та то від калини! 🍒"]],
       final: [["andriy", "Пиріг на все село спекли! 🥧 А частину — нашим захисникам"], ["halya", "Хай Покрова вкриває всіх наших. Дякую, {name} 💛"]],
-      ending: [["olya", "Покрова минула — попереду золота осінь 🍂"]] } }
+      ending: [["olya", "Покрова минула — попереду золота осінь 🍂"]] } },
+  /* ---------- нові свята ---------- */
+  { key: "novyirik", title: "Новий рік і Водохреще", pt: "✨", ptName: "іскорки", gen: ["🧺", "Кошик щедрувальників"], who: ["marichka", "taras", "andriy"], ms: "mid",
+    window: y => fixed(y, 11, 31, 0, 11, y + 1),
+    desc: "Щедрий вечір, засівання на Новий рік і Водохреще! Тапай кошик щедрувальників, об'єднуй гостинці й віддавай.",
+    items: [["🌾", "Посівальне зерно"], ["🍬", "Цукерки щедрувальникам"], ["🍊", "Мандаринки"], ["🎁", "Новорічний подарунок"], ["🎆", "Феєрверк"], ["🕊️", "Голуб Водохреща"]],
+    deco: [["🎆", 78, 24, 6], ["✨", 22, 30, 5], ["🎁", 70, 72, 5], ["🕊️", 30, 40, 5]],
+    story: {
+      intro: [["marichka", "{name}, сьогодні Щедрий вечір! 🌟 Ми підемо щедрувати, а зранку хлопці прийдуть засівати зерном — на щастя!"],
+        ["andriy", "А я наготую щедру кутю й вареники. Тапай кошик щедрувальників, віддавай нам гостинці — за кожен іскорки ✨"]],
+      mid: [["taras", "Щедрик, щедрик, щедрівочка… 🎶 Я записав, як Марічка щедрує — на все село слава!"], ["marichka", "А мені насипали стільки цукерок, що кишені рвуться 😄"]],
+      final: [["andriy", "З Новим роком! 🎆 А на Водохреще вся громада ходила до річки святити воду 💧"], ["marichka", "І голубів пускали в небо! 🕊️ Дякуємо, {name}, — свято вдалося!"]],
+      ending: [["halya", "Святки закінчилися. Хай рік буде щедрим і мирним 💛"]] } },
+  { key: "stritennia", title: "Стрітення", pt: "🌤️", ptName: "сонечка", gen: ["🕯️", "Громична свічка"], who: ["halya", "stepan", "olya"], ms: "short",
+    window: y => fixed(y, 0, 30, 1, 6),
+    desc: "Зима з весною зустрічаються! Тапай громичну свічку, збирай прикмети весни й віддавай сусідам.",
+    items: [["🧊", "Бурулька"], ["💧", "Крапля відлиги"], ["🕯️", "Громична свічка"], ["🐦", "Перша пташка"], ["🌱", "Перший паросток"], ["🌤️", "Весняне сонце"]],
+    deco: [["🕯️", 24, 70, 5], ["🌤️", 78, 16, 7], ["🐦", 70, 40, 4]],
+    story: {
+      intro: [["halya", "{name}, на Стрітення зима з весною зустрічаються! ❄️🌤️ Як сьогодні тепло — весна буде рання 😊"],
+        ["stepan", "А я засвічу громницю — від грому й біди. Тапай свічку, збирай прикмети весни — за них сонечка 🌤️"]],
+      mid: [["olya", "Бурульки капають — весна вже стукає у вікна! 💧"], ["halya", "Перші пташки прилетіли — на добро 🐦"]],
+      final: [["stepan", "Зима поступилася! 🌤️ Весна виграла цей поєдинок"], ["olya", "Скоро сіятимемо — дякую, {name}, що зустріли весну разом 💛"]],
+      ending: [["halya", "Громницю сховаю за образи — хай береже хату до літа 🕯️"]] } },
+  { key: "blahovishchennia", title: "Благовіщення", pt: "🕊️", ptName: "голубки", gen: ["🪺", "Пташине гніздечко"], who: ["olya", "iryna", "liza"], ms: "short",
+    window: y => fixed(y, 2, 21, 2, 29),
+    desc: "«Птиця гнізда не в'є» — весна прийшла! Печемо жайворонків, випускаємо голубів. Тапай гніздечко й віддавай.",
+    items: [["🌱", "Паросток"], ["🌷", "Тюльпан"], ["🥨", "Тістечко-жайворонок"], ["🐦", "Весняна пташка"], ["🕊️", "Голубка"], ["💐", "Весняний букет"]],
+    deco: [["🕊️", 76, 24, 6], ["🌷", 26, 76, 5], ["🪺", 72, 64, 6]],
+    story: {
+      intro: [["iryna", "Сьогодні Благовіщення — «птиця гнізда не в'є» 🕊️ А весна вже точно прийшла!"],
+        ["olya", "Напечемо жайворонків і випустимо голубів! Тапай гніздечко, збирай весняне — за все голубки 🕊️"]],
+      mid: [["liza", "Діти бігають із жайворонками й кличуть весну: «Весна, весна красна!» 🎶"], ["olya", "А в мене перший тюльпан розпустився 🌷"]],
+      final: [["iryna", "Голуби злетіли над селом 🕊️ — тепер весна наша!"], ["liza", "Дякуємо, {name}! Це найсвітліше свято весни 💛"]],
+      ending: [["olya", "Благовіщення минуло — пора сіяти 🌱"]] } },
+  { key: "maty", title: "День матері", pt: "💐", ptName: "букетики", gen: ["🌷", "Клумба для мам"], who: ["marichka", "liza", "andriy"], ms: "tiny",
+    window: y => around(nthDay(y, 4, 0, 2), -1, 2),
+    desc: "Друга неділя травня — свято мам і бабусь! Тапай клумбу, готуй квіти, листівки й смаколики.",
+    items: [["🌼", "Ромашка"], ["💌", "Листівка"], ["🍰", "Тістечко"], ["🎀", "Подарунок із бантом"], ["💐", "Букет для мами"], ["🧺", "Кошик-сюрприз"]],
+    deco: [["💐", 24, 74, 6], ["🎀", 76, 70, 5], ["💖", 50, 20, 5]],
+    story: {
+      intro: [["marichka", "{name}, у неділю День матері! 💐 Хочу зробити мамі й бабусі Галі найкращі подарунки!"],
+        ["liza", "Допоможемо! Тапай клумбу — квіти, листівки, тістечка… Віддавай нам, за кожен — букетики 💐"]],
+      mid: [["andriy", "Я спік для всіх мам у селі торт із полуницею 🍰"], ["marichka", "А я листівку намалювала — тільки нікому не кажи! 🤫"]],
+      final: [["halya", "Ой, діточки, які подарунки… аж сльози на очах 🥹 Дякую вам!"], ["marichka", "Мамо, бабусю — ми вас любимо! 💛 Дякую, {name}!"]],
+      ending: [["liza", "Кожен день — трохи День матері. Обійміть своїх мам 💛"]] } },
+  { key: "vyshyvanka", title: "День вишиванки", pt: "🧵", ptName: "ниточки", gen: ["🧺", "Кошик вишивальниці"], who: ["olya", "iryna", "taras"], ms: "short",
+    window: y => around(nthDay(y, 4, 4, 3), -2, 3),
+    desc: "Третій четвер травня — усі у вишиванках! Тапай кошик вишивальниці, вишивай і даруй.",
+    items: [["🧵", "Нитки"], ["🪡", "Голка з ниткою"], ["🌸", "Вишита квітка"], ["🧣", "Вишита хустка"], ["👕", "Сорочка-вишиванка"], ["👗", "Святковий стрій"]],
+    deco: [["👕", 24, 66, 7], ["🧵", 76, 72, 5], ["🌸", 70, 30, 5]],
+    story: {
+      intro: [["olya", "{name}, у четвер — День вишиванки! 🧵 Усе село вдягне вишиванки, а я ще й нові вишиваю"],
+        ["iryna", "А в школі — свято вишиванок! Тапай кошик вишивальниці, віддавай нам — за все ниточки 🧵"]],
+      mid: [["taras", "Фотографую всіх у вишиванках — буде альбом «Наше село вишите» 📸"], ["olya", "Кожна вишиванка — своя історія: червоне — любов, чорне — земля 🧵"]],
+      final: [["iryna", "Ціле село у вишиванках! 👕👗 Яка ж це сила й краса!"], ["taras", "Найкращий кадр року. Дякую, {name}! 💛"]],
+      ending: [["olya", "Вишиванку — не лише на свято. Носімо її з гордістю 💛"]] } }
 ];
 
 window.PUA_MAP = window.PUA_MAP || {};
 HOLIDAYS.forEach((h, k) => {
   const art = id => HOL_ART.includes(id) ? `items/${id}.webp` : null;
   const chain = "hol_" + h.key;
-  CHAINS[chain] = { name: h.title, items: h.items.map(([e, n], l) => { const c = String.fromCharCode(0xE600 + k * 16 + l); PUA_MAP[c] = { e, img: art(`hol-${h.key}-${l}`) }; return [c, n]; }) };
-  const g = String.fromCharCode(0xE6A0 + k);
+  CHAINS[chain] = { name: h.title, items: h.items.map(([e, n], l) => { const c = String.fromCharCode((k < 8 ? 0xE600 + k * 16 : 0xE700 + (k - 8) * 16) + l); PUA_MAP[c] = { e, img: art(`hol-${h.key}-${l}`) }; return [c, n]; }) };
+  const g = String.fromCharCode(k < 8 ? 0xE6A0 + k : 0xE7A0 + (k - 8));
   PUA_MAP[g] = { e: h.gen[0], img: art("gen-hol-" + h.key) };
   GENS[chain] = { icon: g, name: h.gen[1], chain, holiday: true };
   /* велика прикраса двору: мальована фігура замість емодзі поруч */
   const at = HOL_YARD[h.key], yimg = art("yard-" + h.key);
   if (at && yimg) {
-    const yc = String.fromCharCode(0xE6B0 + k);
+    const yc = String.fromCharCode(k < 8 ? 0xE6B0 + k : 0xE7B0 + (k - 8));
     PUA_MAP[yc] = { e: h.deco[0][0], img: yimg };
     window.PAINTED[yc.codePointAt(0).toString(16)] = yimg;
     h.deco = [[yc, ...at]].concat(h.deco.filter(d => Math.abs(d[1] - at[0]) > 15 || d[3] < 6));
   }
-  Object.assign(h, { chain, gen: chain, genName: h.gen[1], milestones: HOL_MS });
+  Object.assign(h, { chain, gen: chain, genName: h.gen[1], milestones: h.ms === "tiny" ? HOL_MS_TINY : h.ms === "short" ? HOL_MS_SHORT : h.ms === "mid" ? HOL_MS_MID : HOL_MS });
 });
 if (GENS.mykolai) GENS.mykolai.holiday = true;
 /* Миколай — теж у календарі (з тими самими даними, що й були) */
@@ -171,8 +246,9 @@ window.HOL = (() => {
   /* календар свят */
   function calendar() {
     const t = now(), y = new Date(t).getFullYear();
+    const andr = { h: { pt: "🥟", title: "Андріївські вечорниці (ворожіння)" }, w: (() => { let w = fixed(y, 10, 29, 11, 1); if (w.end <= t) w = fixed(y + 1, 10, 29, 11, 1); return w; })(), live: false };
     const rows = HOL_ALL.map(h => { let w = h.window(y); if (w.end <= t) w = h.window(y + 1); const live = inWin(h) && window.EV && EV.active() && cur === h;
-      return { h, w, live }; }).sort((a, b) => a.w.start - b.w.start)
+      return { h, w, live }; }).concat([andr]).sort((a, b) => a.w.start - b.w.start)
       .map(({ h, w, live }) => `<div class="hl-row${live ? " live" : ""}"><span class="hl-ic">${h.pt}</span><span class="hl-t"><b>${h.title}</b><small>${fmt(w.start)} — ${fmt(w.end - 864e5)}</small></span>${live ? `<span class="hl-on">триває!</span>` : ""}</div>`).join("");
     modal({ title: "Свята року 🗓️", html: `<p class="hint-s">Кожне свято — у свої справжні дні: окремий генератор, замовлення від господарів свята й шкала нагород.</p><div class="hl-list">${rows}</div>`,
       buttons: [...(window.EV && EV.active() ? [{ label: `${cur.pt} ${cur.title}`, onClick: () => EV.panel() }] : []), { label: "Закрити", cls: "ghost" }] });
@@ -188,3 +264,37 @@ window.HOL = (() => {
 })();
 window.HUB_EXTRA = (window.HUB_EXTRA || []).concat([() => HOL.card()]);
 window.HUB_ACTS = Object.assign(window.HUB_ACTS || {}, { "hol-cal": () => HOL.calendar(), "hol-ev": () => EV.panel() });
+
+/* ============================================================
+   АНДРІЇВСЬКІ ВЕЧОРНИЦІ 🥟 — 29–30 листопада, одна сценка з ворожінням на варениках
+   (не окреме свято — щоб не перебивати Миколая). Стан: S.andr — рік, коли вже ворожили.
+   ============================================================ */
+window.ANDR = (() => {
+  const now = () => new Date(window.DVORYK_NOW || Date.now());
+  const busy = () => $("modal").classList.contains("show") || $("dialog").classList.contains("show");
+  function tick() {
+    if (!S || !S.started || S.level < 4 || S.sideOn || busy()) return;
+    const d = now(); if (d.getMonth() !== 10 || d.getDate() < 29) return;
+    if (S.andr === d.getFullYear()) return;
+    S.andr = d.getFullYear(); save();
+    playDialog([["liza", "{name}, сьогодні Андріївські вечорниці! 🕯️ Ворожимо, співаємо, жартуємо — ходімо!"],
+      ["halya", "А я вареників наліпила з сюрпризами 🥟 Обирай один — і дізнаєшся, що тебе чекає цього року!"]], pick3);
+  }
+  function pick3() {
+    modal({ title: "Ворожіння на варениках 🥟", html: `<div class="big-emoji">🥟</div><p>Три вареники — у кожному свій сюрприз. Який обереш?</p>`,
+      buttons: ["🥟 Лівий", "🥟 Середній", "🥟 Правий"].map(label => ({ label, onClick: reveal })) });
+  }
+  function reveal() {
+    const r = Math.random(); let title, got;
+    if (r < 0.34) { S.coins += 200; title = "З монеткою — до багатства! 💰"; got = "+200 🪙"; }
+    else if (r < 0.67) {
+      S.stars += 5; got = "+5 ⭐";
+      const fr = typeof FRIENDS !== "undefined" ? Object.keys(FRIENDS).filter(k => k !== "cat" && CHARS[k] && (CHARS[k].from || 0) <= S.chapter) : [];
+      if (fr.length) { const k = fr[Math.floor(Math.random() * fr.length)]; S.fr = S.fr || {}; S.fr[k] = Math.min(FRIEND_STEPS[2], (S.fr[k] || 0) + 1); got += ` · 💛 ${CHARS[k].name.split(" ").pop()}`; }
+      title = "З вишнею — до кохання й дружби! 🍒";
+    } else { placeItem({ c: "chest", l: 1 }); title = "З сиром — до достатку в хаті! 🧀"; got = CHAINS.chest.items[1][0]; }
+    save(); renderAll(); confetti(); sfx.level();
+    modal({ title, html: `<div class="big-emoji">🥟</div><p class="rewards">${got}</p><p class="hint-s">Андріївські вечорниці — щороку 29–30 листопада.</p>`, buttons: [{ label: "Хай збудеться! 💛" }] });
+  }
+  return { tick };
+})();
