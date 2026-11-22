@@ -1263,7 +1263,12 @@ function openSettings() {
 /* ============================================================
    ВЗАЄМОДІЯ З ДОШКОЮ (тап і перетягування)
    ============================================================ */
-let drag = null, dragAnim = false;
+let drag = null, dragAnim = false, dragGhost = null;
+/* привид створюється один раз і живе весь час (новий шар на кожен дотик змушував дошку блимати) */
+function ghostEl() {
+  if (!dragGhost) { dragGhost = document.createElement("div"); dragGhost.className = "tile drag-ghost idle"; document.body.appendChild(dragGhost); }
+  return dragGhost;
+}
 /* привид предмета трохи над пальцем (на дотик), щоб палець його не закривав;
    ціль — клітинка, найближча до привида, а клітинка, з якою можна об'єднати, «притягує» здалеку */
 const DRAG_START = 6, DRAG_LIFT = 0.5, DRAG_SNAP = 0.75, DRAG_MAGNET = 1.0;
@@ -1318,10 +1323,11 @@ function onMove(e) {
     if (dx * dx + dy * dy < DRAG_START * DRAG_START) return;
     if (S.board[d.i] && S.board[d.i].lock) return;
     const r = d.tile.getBoundingClientRect();
-    const g = d.tile.cloneNode(true);
-    g.classList.add("drag-ghost"); g.classList.remove("pop", "needed", "spawn", "tap");
+    const g = ghostEl();
+    g.innerHTML = d.tile.innerHTML; g.style.transition = "none";
     g.style.width = r.width + "px"; g.style.height = r.height + "px";
-    document.body.appendChild(g);
+    g.style.transform = `translate3d(${d.lx - r.width / 2}px, ${d.ly - r.height / 2 - (d.touch ? r.height * DRAG_LIFT : 0)}px, 0) scale(1.14)`;
+    g.classList.remove("idle"); document.body.classList.add("dragging");
     Object.assign(d, { ghost: g, w: r.width, h: r.height, lift: d.touch ? r.height * DRAG_LIFT : 0 });
     d.cells = [...$("board").children].map(c => { const q = c.getBoundingClientRect(); return { el: c, i: +c.dataset.i, x: q.left + q.width / 2, y: q.top + q.height / 2, w: q.width }; });
     d.tile.classList.add("lifted");
@@ -1336,7 +1342,7 @@ function settleGhost(d, x, y, scale, ms, done) {
   const g = d.ghost;
   g.style.transition = `transform ${ms}ms cubic-bezier(.2, .8, .3, 1)`;
   g.style.transform = `translate3d(${x - d.w / 2}px, ${y - d.h / 2}px, 0) scale(${scale})`;
-  setTimeout(() => { g.remove(); d.tile.classList.remove("lifted"); dragAnim = false; done(); }, ms);
+  setTimeout(() => { g.classList.add("idle"); g.style.transition = "none"; g.innerHTML = ""; d.tile.classList.remove("lifted"); document.body.classList.remove("dragging"); dragAnim = false; done(); }, ms);
 }
 function onUp(e) {
   const d = drag;
@@ -1472,7 +1478,7 @@ function init() {
   $("dialog").onclick = nextLine;
 
   setInterval(() => {
-    if (!S || !S.started) return;
+    if (!S || !S.started || drag || dragAnim) return;      // під час перетягування нічого не перемальовуємо
     const before = S.energy;
     renderTop();
     if (window.EV) { EV.renderButton(); if (Date.now() % 5000 < 1000) EV.tick(); }

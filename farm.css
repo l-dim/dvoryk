@@ -1181,3 +1181,12 @@ body.farm .sell { position: relative; }
   .info:has(.sell + .sell) .info-ic, .info:has(.sell ~ .sell) .info-ic { display: none; }
   body.farm .info .sell { min-width: 50px; padding: 4px 6px 5px; }
 }
+
+/* ---------- Плавне перетягування ----------
+   дошка — окремий шар (привид над нею не змушує перемальовувати всі предмети),
+   під час перетягування вічні анімації предметів стоять, а «світіння» не анімує фільтр */
+.board { transform: translateZ(0); }
+.drag-ghost.idle { opacity: 0; transform: translate3d(-600px, -600px, 0) !important; }
+body.dragging .tile, body.dragging .tile * { animation-play-state: paused !important; }
+@keyframes shine { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+body.farm .tile.collect { filter: drop-shadow(0 0 5px rgba(255, 220, 110, .9)); }
