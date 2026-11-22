@@ -241,6 +241,7 @@ function produce(i) {
   window.CRAFT && CRAFT.afterTap(i);
   window.RARE && RARE.onTap(i);
   window.SEAS && SEAS.onTap(i);
+  window.HERB && HERB.onTap(i);                  // гербарій: рідкісна квітка чи метелик
   sfx.pop();
   bounce(i);
   if (S.tut === 0) setTut(1);
@@ -1374,6 +1375,7 @@ function tap(i) {
   if (!it) return;
   if (it.lock) { selected = i; renderBoard(); renderInfo(); MECH.lockModal(i); return; }
   if (it.crow && window.DOG && DOG.shoo(i)) return;            // прогнати ворону
+  if (it.c === "herb" && window.HERB && HERB.collect(i)) return;   // у гербарій
   if (it.worm && window.WH) { selected = i; renderBoard(); renderInfo(); WH.wormModal(i); return; }
   if ((it.untested || it.short) && window.CRAFT) { selected = i; renderBoard(); renderInfo(); CRAFT.testModal(i); return; }
   if (it.st) { selected = i; renderInfo(); MECH.ovenModal(i); return; }
@@ -1518,6 +1520,7 @@ function init() {
     if (window.POST) POST.tick();
     if (window.REB) REB.tick();
     if (window.DOG) DOG.tick();
+    if (window.HERB) HERB.tick();
     if (window.ENV && ENV.key() !== envKeyShown) { envKeyShown = ENV.key(); renderStory(); if (window.Yard3D && Yard3D.refreshEnv) Yard3D.refreshEnv(); }   // світанок/вечір/ніч — перемальовуємо дворик
     if (window.WH) WH.tick();
     if (window.CRAFT) CRAFT.tick();
