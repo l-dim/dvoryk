@@ -1285,7 +1285,7 @@ function ghostEl() {
    Ціль — клітинка під пальцем (куди відпустила — туди й лягло); клітинка, з якою можна об'єднати,
    «притягує» здалеку — і від пальця, і від привида. Підсвітка цілі — окрема рамка, що ковзає між
    клітинками, тож дошка під час руху взагалі не перемальовується. */
-const DRAG_START = 4, DRAG_LIFT = 0.32, DRAG_SNAP = 0.8, DRAG_MAGNET = 1.1;
+const DRAG_START = 4, DRAG_LIFT = 0.32, DRAG_SNAP = 0.8, DRAG_MAGNET = 1.1, DRAG_INSIDE = 0.4;
 let dragHl = null;
 function hlEl() {
   if (!dragHl) { dragHl = document.createElement("div"); dragHl.className = "drag-hl"; document.body.appendChild(dragHl); }
@@ -1304,7 +1304,8 @@ function dragTarget(d, x, y) {
     if (df < bd) { bd = df; best = c; }
     if (dist < c.w * DRAG_MAGNET && dist < md && canMergeAt(d.i, c.i)) { md = dist; merge = c; }
   }
-  if (merge) return merge;
+  if (best && bd < best.w * DRAG_INSIDE) return best;      // палець усередині клітинки — саме вона
+  if (merge) return merge;                                  // палець між клітинками — притягує пара
   return best && bd < best.w * DRAG_SNAP ? best : null;
 }
 function onDown(e) {
@@ -1490,6 +1491,15 @@ function init() {
 
   const board = $("board");
   board.addEventListener("pointerdown", onDown);
+  /* одноразові анімації (виліт із генератора, злиття, поява, тап) знімаються, щойно скінчились —
+     інакше айфон програє їх наново, коли дошка на мить ставить анімації на паузу під час перетягування */
+  board.addEventListener("animationend", e => {
+    const t = e.target;
+    if (!t.classList || !t.classList.contains("tile")) return;
+    if (t.classList.contains("spawn") || t.classList.contains("merged") || t.classList.contains("pop") || t.classList.contains("tap")) {
+      t.classList.remove("spawn", "merged", "pop", "tap"); t.style.removeProperty("--fx"); t.style.removeProperty("--fy");
+    }
+  });
   window.addEventListener("pointermove", onMove, { passive: false });
   window.addEventListener("pointerup", onUp);
   window.addEventListener("pointercancel", onUp);

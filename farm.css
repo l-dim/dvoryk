@@ -1187,7 +1187,7 @@ body.farm .sell { position: relative; }
    під час перетягування вічні анімації предметів стоять, а «світіння» не анімує фільтр */
 .board { transform: translateZ(0); }
 .drag-ghost.idle { opacity: 0; transform: translate3d(-600px, -600px, 0) !important; }
-.board.dragging .tile, .board.dragging .tile * { animation-play-state: paused !important; }
+.board.dragging .tile:not(.spawn):not(.merged):not(.pop):not(.tap), .board.dragging .tile:not(.spawn):not(.merged):not(.pop):not(.tap) * { animation-play-state: paused !important; }
 .drag-ghost .dg-in { width: 100%; height: 100%; display: grid; place-items: center; transform: scale(1.14); transition: transform .14s ease-out; }
 .drag-ghost .dg-in.big { transform: scale(1.26); }
 .drag-ghost .dg-in { will-change: transform; transition-duration: .1s; }
