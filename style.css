@@ -45,6 +45,9 @@ input { font-family: inherit; }
 .btn.ghost { background: #fff; color: var(--ink); box-shadow: 0 3px 0 var(--line); border: 2px solid var(--line); }
 .btn.big { font-size: 20px; padding: 16px; }
 .btn.small { font-size: 14px; padding: 9px; margin-top: 8px; }
+/* Sign in with Apple — чорна кнопка за правилами Apple */
+.btn.apple, body.td .btn.apple { background: #000; color: #fff; border: 0; box-shadow: 0 3px 0 #3a3a3a; text-shadow: none; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn.apple svg { width: 17px; height: 20px; fill: currentColor; flex: none; margin-top: -2px; }
 .btn:disabled, .dim { opacity: .5; }
 .btn + .btn { margin-top: 10px; }
 
