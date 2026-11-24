@@ -11,7 +11,7 @@
    4. Гарнітури: іноді просять комплект із 3 різних виробів — 12 годин, нагорода ×1.6 і більше ⭐.
    ============================================================ */
 window.PUA_MAP = window.PUA_MAP || {};
-CHAINS.woodjunk = { name: "Брак", side: true, woody: true, nomerge: true, value: 2, items: [[String.fromCharCode(0xE480), "Кривий брусок"]] };
+CHAINS.woodjunk = { name: tt`Брак`, side: true, woody: true, nomerge: true, value: 2, items: [[String.fromCharCode(0xE480), tt`Кривий брусок`]] };
 PUA_MAP[String.fromCharCode(0xE480)] = { e: "🪃", img: "items/woodjunk.webp" };   // кривий, як бумеранг 😄
 const DULL_AT = 60, DULL_JUNK = 0.35, SHARPEN_MIN = 30, SHARPEN_COINS = 120;
 const DRY_MIN = l => (l - 2) * 10, WORM_EVERY_H = [3, 6], WORM_SPREAD_H = 6, WORM_CURE = 90;
@@ -22,7 +22,7 @@ window.WH = (() => {
   const woody = it => !!(it && !it.g && CHAINS[it.c] && CHAINS[it.c].timber);   // лише деревина
   const woodGen = it => !!(it && it.g && GENS[it.g] && CHAINS[GENS[it.g].chain] && CHAINS[GENS[it.g].chain].timber);
   const wboard = () => (S.woodOn ? S.board : S.wood && S.wood.board);
-  const hm = ms => { const t = Math.max(1, Math.ceil(ms / 6e4)); return t >= 60 ? Math.floor(t / 60) + " год " + (t % 60) + " хв" : t + " хв"; };
+  const hm = ms => { const t = Math.max(1, Math.ceil(ms / 6e4)); return t >= 60 ? Math.floor(t / 60) + tt` год ` + (t % 60) + tt` хв` : t + tt` хв`; };
   function hint(flag, lines) {
     if (!S.wood || S.wood["seen_" + flag]) return;
     S.wood["seen_" + flag] = true; save();
@@ -37,7 +37,7 @@ window.WH = (() => {
     gIt.wd = (gIt.wd || 0) + 1;
     if (!gIt.dull && gIt.wd >= DULL_AT) {
       gIt.dull = true;
-      hint("dull", [[LOVE.who(), "Ой, інструмент затупився 😅 Тепер частина виробів виходить кривою. Тапни верстат і натисни «Наточити» — або почекай, або заплати точильникові."]]);
+      hint("dull", [[LOVE.who(), tt`Ой, інструмент затупився 😅 Тепер частина виробів виходить кривою. Тапни верстат і натисни «Наточити» — або почекай, або заплати точильникові.`]]);
     }
     if (gIt.dull && Math.random() < DULL_JUNK) return { c: "woodjunk", l: 0 };
     return item;
@@ -45,32 +45,32 @@ window.WH = (() => {
   function canTap(i) {
     const it = S.board[i];
     if (!woodGen(it) || !sharpening(it)) return true;
-    sfx.nope(); toast(`🪨 Точиться ще ${hm(it.sharpUntil - now())}`);
+    sfx.nope(); toast(tt`🪨 Точиться ще ${hm(it.sharpUntil - now())}`);
     return false;
   }
   const sharpPrice = () => (window.ECON ? ECON.price("sharpen", SHARPEN_COINS) : SHARPEN_COINS);
   function sharpenModal(i) {
     const it = S.board[i];
-    modal({ title: "Наточити інструмент 🪨",
-      html: `<div class="big-emoji">${GENS[it.g].icon}</div><p><b>${GENS[it.g].name}</b> затупився — ${Math.round(DULL_JUNK * 100)}% виробів виходять кривими.</p><p class="hint-s">Самому наточити — ${SHARPEN_MIN} хв (верстат тим часом не працює). Точильник зробить одразу.</p>`,
-      buttons: [{ label: `Наточити самому · ${SHARPEN_MIN} хв`, onClick: () => { it.sharpUntil = now() + SHARPEN_MIN * 60e3; save(); renderBoard(); renderInfo(); toast("🪨 Точимо…"); } },
-        { label: `Точильник · ${sharpPrice()} 🪙`, cls: "ghost", disabled: S.coins < sharpPrice(), onClick: () => { S.coins -= sharpPrice(); window.ECON && ECON.bought("sharpen"); it.dull = false; it.wd = 0; delete it.sharpUntil; sfx.coin(); toast("✨ Як бритва!"); renderBoard(); renderTop(); renderInfo(); save(); } },
-        { label: "Пізніше", cls: "ghost" }] });
+    modal({ title: tt`Наточити інструмент 🪨`,
+      html: tt`<div class="big-emoji">${GENS[it.g].icon}</div><p><b>${GENS[it.g].name}</b> затупився — ${Math.round(DULL_JUNK * 100)}% виробів виходять кривими.</p><p class="hint-s">Самому наточити — ${SHARPEN_MIN} хв (верстат тим часом не працює). Точильник зробить одразу.</p>`,
+      buttons: [{ label: tt`Наточити самому · ${SHARPEN_MIN} хв`, onClick: () => { it.sharpUntil = now() + SHARPEN_MIN * 60e3; save(); renderBoard(); renderInfo(); toast(tt`🪨 Точимо…`); } },
+        { label: tt`Точильник · ${sharpPrice()} 🪙`, cls: "ghost", disabled: S.coins < sharpPrice(), onClick: () => { S.coins -= sharpPrice(); window.ECON && ECON.bought("sharpen"); it.dull = false; it.wd = 0; delete it.sharpUntil; sfx.coin(); toast(tt`✨ Як бритва!`); renderBoard(); renderTop(); renderInfo(); save(); } },
+        { label: tt`Пізніше`, cls: "ghost" }] });
   }
   function genInfo(it) {
     if (!woodGen(it)) return "";
-    if (sharpening(it)) return ` · 🪨 точиться ще ${hm(it.sharpUntil - now())}`;
-    if (it.dull) return " · 🪨 тупий — брак 35%";
-    return ` · гострота ${Math.max(0, DULL_AT - (it.wd || 0))}/${DULL_AT}`;
+    if (sharpening(it)) return tt` · 🪨 точиться ще ${hm(it.sharpUntil - now())}`;
+    if (it.dull) return tt` · 🪨 тупий — брак 35%`;
+    return tt` · гострота ${Math.max(0, DULL_AT - (it.wd || 0))}/${DULL_AT}`;
   }
-  function genButton(it) { return woodGen(it) && it.dull && !sharpening(it) ? `<button class="sell sharp-b" id="sharpBtn"><small>наточити</small><span>🪨</span></button>` : ""; }
+  function genButton(it) { return woodGen(it) && it.dull && !sharpening(it) ? tt`<button class="sell sharp-b" id="sharpBtn"><small>наточити</small><span>🪨</span></button>` : ""; }
 
   /* ---------- 2. клей сохне ---------- */
   const wet = it => !!(it && it.dry && now() < it.dry);
   function onMerged(b, nl) {
     const it = S.board[b];
     if (!woody(it)) return;
-    if (nl >= 3) { it.dry = now() + DRY_MIN(nl) * 60e3; hint("dry", [[LOVE.who(), "Клей ще не висох 💧 Поки сохне — не зливай і не віддавай цей виріб. Великі речі сохнуть довше!"]]); }
+    if (nl >= 3) { it.dry = now() + DRY_MIN(nl) * 60e3; hint("dry", [[LOVE.who(), tt`Клей ще не висох 💧 Поки сохне — не зливай і не віддавай цей виріб. Великі речі сохнуть довше!`]]); }
     cureAround(b);
   }
   /* чи можна зливати/віддавати */
@@ -82,16 +82,16 @@ window.WH = (() => {
     [[r - 1, c], [r + 1, c], [r, c - 1], [r, c + 1]].forEach(([rr, cc]) => {
       if (rr < 0 || rr >= ROWS || cc < 0 || cc >= COLS) return;
       const j = rr * COLS + cc, it = S.board[j];
-      if (it && it.worm) { delete it.worm; popIdx.add(j); sparkle(j, "✨", 5); toast("🐛 Шашіль вигнали!"); }
+      if (it && it.worm) { delete it.worm; popIdx.add(j); sparkle(j, "✨", 5); toast(tt`🐛 Шашіль вигнали!`); }
     });
   }
   const wormPrice = () => (window.ECON ? ECON.price("worm", WORM_CURE) : WORM_CURE);
   function wormModal(i) {
     const it = S.board[i];
-    modal({ title: "Шашіль 🐛",
-      html: `<div class="big-emoji">🐛</div><p>У «${itemName(it)}» завівся шашіль! Такий виріб не можна ні злити, ні віддати, а за ${WORM_SPREAD_H} год шашіль переповзе на сусідній.</p><p class="hint-s">Злий щось на сусідній клітинці — і шашіль втече. Або оброби воском.</p>`,
-      buttons: [{ label: `Обробити воском · ${wormPrice()} 🪙`, disabled: S.coins < wormPrice(), onClick: () => { S.coins -= wormPrice(); window.ECON && ECON.bought("worm"); delete it.worm; sfx.coin(); popIdx.add(i); renderBoard(); renderTop(); save(); } },
-        { label: "Добре", cls: "ghost" }] });
+    modal({ title: tt`Шашіль 🐛`,
+      html: tt`<div class="big-emoji">🐛</div><p>У «${itemName(it)}» завівся шашіль! Такий виріб не можна ні злити, ні віддати, а за ${WORM_SPREAD_H} год шашіль переповзе на сусідній.</p><p class="hint-s">Злий щось на сусідній клітинці — і шашіль втече. Або оброби воском.</p>`,
+      buttons: [{ label: tt`Обробити воском · ${wormPrice()} 🪙`, disabled: S.coins < wormPrice(), onClick: () => { S.coins -= wormPrice(); window.ECON && ECON.bought("worm"); delete it.worm; sfx.coin(); popIdx.add(i); renderBoard(); renderTop(); save(); } },
+        { label: tt`Добре`, cls: "ghost" }] });
   }
   function wormTick() {
     const b = wboard(); if (!b) return;
@@ -101,7 +101,7 @@ window.WH = (() => {
     if (now() >= w.wormAt) {
       const c = b.map((it, i) => woody(it) && it.c !== "woodjunk" && it.l >= 1 && !it.worm ? i : -1).filter(i => i >= 0);
       if (c.length) { const i = pick(c); b[i].worm = now() + WORM_SPREAD_H * 3600e3; ch = true;
-        if (S.woodOn) { popIdx.add(i); hint("worm", [[LOVE.who(), "Ой лихо — шашіль! 🐛 Злий щось поруч — і він утече. Не зволікай, бо переповзе на інші вироби!"]]); } }
+        if (S.woodOn) { popIdx.add(i); hint("worm", [[LOVE.who(), tt`Ой лихо — шашіль! 🐛 Злий щось поруч — і він утече. Не зволікай, бо переповзе на інші вироби!`]]); } }
       w.wormAt = now() + (WORM_EVERY_H[0] + Math.random() * (WORM_EVERY_H[1] - WORM_EVERY_H[0])) * 3600e3;
     }
     b.forEach((it, i) => {
@@ -115,7 +115,7 @@ window.WH = (() => {
   }
 
   /* ---------- 4. гарнітури ---------- */
-  const SETS = ["Весільний гарнітур", "Дитяча кімнатка", "Святковий стіл", "Подарунок на новосілля", "Кухонний набір"];
+  const SETS = [tt`Весільний гарнітур`, tt`Дитяча кімнатка`, tt`Святковий стіл`, tt`Подарунок на новосілля`, tt`Кухонний набір`];
   function maybeSet(o) {
     const w = S.wood;
     if (!w || w.done < 8 || w.orders.some(x => x.set) || Math.random() >= 0.22) return o;
@@ -131,7 +131,7 @@ window.WH = (() => {
     const gone = S.wood.orders.filter(o => o.until && now() >= o.until);
     if (!gone.length) return;
     S.wood.orders = S.wood.orders.filter(o => !gone.includes(o));
-    gone.forEach(o => toast(`⏰ «${o.set || "Замовлення"}» — не встигли, замовник пішов до іншого майстра`));
+    gone.forEach(o => toast(tt`⏰ «${o.set || tt`Замовлення`}» — не встигли, замовник пішов до іншого майстра`));
     if (S.woodOn) { fillOrders(); renderOrders(); }
     save();
   }

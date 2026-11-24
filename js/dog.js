@@ -15,14 +15,14 @@ const DOG_ART = ["gen-dog", "bone", "ui-crow"];          // аркуш sheet-dog
 window.PUA_MAP = window.PUA_MAP || {};
 PUA_MAP[String.fromCharCode(0xE548)] = { e: "🦴", img: DOG_ART.includes("bone") ? "items/bone.webp" : null };
 PUA_MAP[String.fromCharCode(0xE549)] = { e: "🐕", img: DOG_ART.includes("gen-dog") ? "items/gen-dog.webp" : "items/animal-dog.webp" };
-CHAINS.bone = { name: "Кісточка", nomerge: true, value: 3, items: [[String.fromCharCode(0xE548), "Кісточка"]] };
-GENS.dog = { icon: String.fromCharCode(0xE549), name: "Будка Бровка", chain: "bone", pet: true };
+CHAINS.bone = { name: tt`Кісточка`, nomerge: true, value: 3, items: [[String.fromCharCode(0xE548), tt`Кісточка`]] };
+GENS.dog = { icon: String.fromCharCode(0xE549), name: tt`Будка Бровка`, chain: "bone", pet: true };
 
-if (typeof UNLOCKS !== "undefined") UNLOCKS.push({ id: "dog", lvl: 12, icon: "🐕", title: "Собака Бровко",
-  text: "На дошці з'явилась будка Бровка. Перетягни на неї кісточку 🦴 — ситий Бровко проганяє ворон, що крадуть урожай, і приносить знахідки. Кісточки бувають у подарунках, а ще їх можна купити, тапнувши на будку.",
-  lines: [["stepan", "{name}, ворони геть знахабніли — тягнуть усе з городу! 🐦 Віддаю тобі свого Бровка. Тільки годуй кісточками — і він нікого до врожаю не підпустить 🐕"]] });
-if (typeof GUIDE_BASICS !== "undefined") GUIDE_BASICS.push(["🐕", "Собака Бровко",
-  "Будка на дошці. Перетягни на неї кісточку 🦴 (до 6 мисок). Ворона сідає на врожай і за 2 хв краде — ситий Бровко прожене її сам, голодний — ні (тоді тапни на предмет). Ситий Бровко ще й приносить знахідки. Кісточки — у подарунках або в будці за монети."]);
+if (typeof UNLOCKS !== "undefined") UNLOCKS.push({ id: "dog", lvl: 12, icon: "🐕", title: tt`Собака Бровко`,
+  text: tt`На дошці з'явилась будка Бровка. Перетягни на неї кісточку 🦴 — ситий Бровко проганяє ворон, що крадуть урожай, і приносить знахідки. Кісточки бувають у подарунках, а ще їх можна купити, тапнувши на будку.`,
+  lines: [["stepan", tt`{name}, ворони геть знахабніли — тягнуть усе з городу! 🐦 Віддаю тобі свого Бровка. Тільки годуй кісточками — і він нікого до врожаю не підпустить 🐕`]] });
+if (typeof GUIDE_BASICS !== "undefined") GUIDE_BASICS.push(["🐕", tt`Собака Бровко`,
+  tt`Будка на дошці. Перетягни на неї кісточку 🦴 (до 6 мисок). Ворона сідає на врожай і за 2 хв краде — ситий Бровко прожене її сам, голодний — ні (тоді тапни на предмет). Ситий Бровко ще й приносить знахідки. Кісточки — у подарунках або в будці за монети.`]);
 
 window.DOG = (() => {
   const on = () => window.UNL && UNL.on("dog");
@@ -47,30 +47,30 @@ window.DOG = (() => {
   function feed(n = DOG_BONE) {
     const s = st(); s.full = Math.min(DOG_MAX, s.full + n);
     sfx.merge(3); save(); renderInfo();
-    setTimeout(() => toast(`🐕 Хрум-хрум! Бровко ситий: ${bowls()}`), 200);
+    setTimeout(() => toast(tt`🐕 Хрум-хрум! Бровко ситий: ${bowls()}`), 200);
   }
   /* кісточку перетягнули на будку */
   function drop(a, b) {
     const A = S.board[a], B = S.board[b];
     if (!isDog(B) || !A || A.c !== "bone") return false;
-    if (st().full >= DOG_MAX) { sfx.nope(); toast("🐕 Бровко вже ситий — віддай кісточку пізніше"); renderBoard(); return true; }
+    if (st().full >= DOG_MAX) { sfx.nope(); toast(tt`🐕 Бровко вже ситий — віддай кісточку пізніше`); renderBoard(); return true; }
     S.board[a] = null; if (selected === a) selected = b;
     feed(); renderBoard();
     return true;
   }
   function buy(i) {
     const p = price();
-    if (!p) { sfx.nope(); toast("Кісточок на сьогодні вже не продають — завтра 🌙"); return; }
-    if (S.coins < p) { sfx.nope(); toast(`Бракує ${p - S.coins} 🪙`); return; }
-    if (st().full >= DOG_MAX) { sfx.nope(); toast("🐕 Бровко ситий — купиш, коли зголодніє"); return; }
+    if (!p) { sfx.nope(); toast(tt`Кісточок на сьогодні вже не продають — завтра 🌙`); return; }
+    if (S.coins < p) { sfx.nope(); toast(tt`Бракує ${p - S.coins} 🪙`); return; }
+    if (st().full >= DOG_MAX) { sfx.nope(); toast(tt`🐕 Бровко ситий — купиш, коли зголодніє`); return; }
     S.coins -= p; st().buys.n++; renderTop(); feed(); panel(i);
   }
   /* тап по будці */
   function panel(i) {
     const s = st(), p = price();
-    modal({ title: "Будка Бровка 🐕", html: `<div class="big-emoji">${GENS.dog.icon}</div><p>Ситість: <b>${bowls()}</b></p>` +
-      `<p class="hint-s">Ситий Бровко проганяє ворон (−1 миска) і приносить знахідки. Перетягни на будку кісточку 🦴 з дошки — або купи тут.${s.chased || s.stolen ? `<br>Прогнав ворон: ${s.chased} · вкрали: ${s.stolen}` : ""}</p>`,
-      buttons: [{ label: p ? `🦴 Купити кісточку · ${p} 🪙` : "🦴 Кісточок до завтра немає", disabled: !p || S.coins < p || s.full >= DOG_MAX, onClick: () => buy(i) }, { label: "Добре", cls: "ghost" }] });
+    modal({ title: tt`Будка Бровка 🐕`, html: tt`<div class="big-emoji">${GENS.dog.icon}</div><p>Ситість: <b>${bowls()}</b></p>` +
+      tt`<p class="hint-s">Ситий Бровко проганяє ворон (−1 миска) і приносить знахідки. Перетягни на будку кісточку 🦴 з дошки — або купи тут.${s.chased || s.stolen ? tt`<br>Прогнав ворон: ${s.chased} · вкрали: ${s.stolen}` : ""}</p>`,
+      buttons: [{ label: p ? tt`🦴 Купити кісточку · ${p} 🪙` : tt`🦴 Кісточок до завтра немає`, disabled: !p || S.coins < p || s.full >= DOG_MAX, onClick: () => buy(i) }, { label: tt`Добре`, cls: "ghost" }] });
   }
 
   /* ворона прилітає на врожай */
@@ -80,21 +80,21 @@ window.DOG = (() => {
     const i = pool[Math.floor(Math.random() * pool.length)], s = st();
     if (s.full > 0 && kennel() >= 0) {            // Бровко на варті
       s.full--; s.chased++; save(); renderInfo();
-      toast(`🐕 Гав-гав! Бровко прогнав ворону від ${itemIcon(b[i])}`); sfx.pop();
+      toast(tt`🐕 Гав-гав! Бровко прогнав ворону від ${itemIcon(b[i])}`); sfx.pop();
       return;
     }
     b[i].crow = now() + DOG_STEAL_MS; save(); renderBoard();
-    toast(`🐦 Ворона сіла на ${itemIcon(b[i])}! Тапни, щоб прогнати${kennel() >= 0 ? " — Бровко голодний" : ""}`);
+    toast(tt`🐦 Ворона сіла на ${itemIcon(b[i])}! Тапни, щоб прогнати${kennel() >= 0 ? tt` — Бровко голодний` : ""}`);
   }
   function shoo(i) {
     const it = S.board[i]; if (!it || !it.crow) return false;
-    delete it.crow; sfx.pop(); toast("Киш! 🐦 Ворона полетіла"); save(); renderBoard();
+    delete it.crow; sfx.pop(); toast(tt`Киш! 🐦 Ворона полетіла`); save(); renderBoard();
     return true;
   }
   function steal() {
     const b = mainB(), t = now(); let n = 0;
     b.forEach((x, i) => { if (x && x.crow && t >= x.crow) { b[i] = null; n++; } });
-    if (n) { st().stolen += n; save(); renderBoard(); renderOrders(); toast(`🐦 Ворона вкрала врожай${n > 1 ? " (" + n + ")" : ""}! Нагодуй Бровка — він вартуватиме`); }
+    if (n) { st().stolen += n; save(); renderBoard(); renderOrders(); toast(tt`🐦 Ворона вкрала врожай${n > 1 ? " (" + n + ")" : ""}! Нагодуй Бровка — він вартуватиме`); }
   }
   /* знахідка */
   function find() {
@@ -103,7 +103,7 @@ window.DOG = (() => {
     const it = r < 0.04 && CHAINS.rare ? { c: "rare", l: 0 } : r < 0.16 ? { c: "bone", l: 0 } : r < 0.36 ? { c: "chest", l: 0 } : r < 0.66 ? { c: "coin", l: 1 } : { c: "energy", l: 0 };
     const at = placeItem(it, k); if (at < 0) return;
     s.full--; spawnFrom.set(at, k); save(); renderBoard();
-    toast(`🐕 Бровко щось приніс: ${itemIcon(it)} ${itemName(it)}!`);
+    toast(tt`🐕 Бровко щось приніс: ${itemIcon(it)} ${itemName(it)}!`);
   }
 
   function tick() {
@@ -126,7 +126,7 @@ window.DOG = (() => {
     else if (b) b.remove();
   }
   function info() {
-    return `<b>Будка Бровка 🐕</b><small>Ситість ${bowls()} · перетягни кісточку 🦴 або тапни — купити</small>`;
+    return tt`<b>Будка Бровка 🐕</b><small>Ситість ${bowls()} · перетягни кісточку 🦴 або тапни — купити</small>`;
   }
   /* кісточка іноді в подарунках */
   function onChest(near) { if (on() && Math.random() < 0.25) { const at = placeItem({ c: "bone", l: 0 }, near); if (at >= 0) spawnFrom.set(at, near); } }

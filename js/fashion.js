@@ -11,14 +11,14 @@
 const FASH_COST = 10, FASH_DUP = 3;
 const FASH_W = [10, 10, 10, 10, 10, 5, 5, 2];          // вага речей: остання — найрідкісніша
 const FASHION = [
-  { id: "vinok", host: "olya", name: "Святковий віночок", icon: "🌸", bg: "#ffe0ea",
-    items: [["🌸", "Віночок зі стрічками"], ["👚", "Вишиванка"], ["🧥", "Оксамитова керсетка"], ["👗", "Плахта"], ["🎀", "Тканий пояс-крайка"], ["📿", "Коралове намисто"], ["👢", "Червоні чобітки"], ["🎗️", "Різнокольорові стрічки"]] },
-  { id: "kozak", host: "andriy", name: "Козацький стрій", icon: "🪕", bg: "#e3edff",
-    items: [["👕", "Сорочка-вишиванка"], ["👖", "Сині шаровари"], ["🎗️", "Червоний кушак"], ["🧥", "Жупан"], ["🧢", "Смушкова шапка"], ["👢", "Чоботи"], ["👜", "Шкіряна торба"], ["🪈", "Сопілка"]] },
-  { id: "nedilia", host: "halya", name: "Бабусин недільний", icon: "🧣", bg: "#fff0d6",
-    items: [["🧣", "Квітчаста хустка"], ["👚", "Біла сорочка"], ["👗", "Темна спідниця"], ["🥼", "Вишитий фартух"], ["🧥", "Гуцульський кептар"], ["📿", "Червоні коралі"], ["👞", "Недільні черевички"], ["🧺", "Кошик із рушником"]] },
-  { id: "yarmarok", host: "marichka", name: "Ярмаркове літо", icon: "👒", bg: "#e7f8dc",
-    items: [["👒", "Солом'яний бриль"], ["👗", "Сарафан у квіточку"], ["🎀", "Бантик у косу"], ["👡", "Сандалики"], ["🌼", "Ромашковий віночок"], ["🧺", "Ягідний кошичок"], ["🍭", "Півник на паличці"], ["🎈", "Повітряна кулька"]] }
+  { id: "vinok", host: "olya", name: tt`Святковий віночок`, icon: "🌸", bg: "#ffe0ea",
+    items: [["🌸", tt`Віночок зі стрічками`], ["👚", tt`Вишиванка`], ["🧥", tt`Оксамитова керсетка`], ["👗", tt`Плахта`], ["🎀", tt`Тканий пояс-крайка`], ["📿", tt`Коралове намисто`], ["👢", tt`Червоні чобітки`], ["🎗️", tt`Різнокольорові стрічки`]] },
+  { id: "kozak", host: "andriy", name: tt`Козацький стрій`, icon: "🪕", bg: "#e3edff",
+    items: [["👕", tt`Сорочка-вишиванка`], ["👖", tt`Сині шаровари`], ["🎗️", tt`Червоний кушак`], ["🧥", tt`Жупан`], ["🧢", tt`Смушкова шапка`], ["👢", tt`Чоботи`], ["👜", tt`Шкіряна торба`], ["🪈", tt`Сопілка`]] },
+  { id: "nedilia", host: "halya", name: tt`Бабусин недільний`, icon: "🧣", bg: "#fff0d6",
+    items: [["🧣", tt`Квітчаста хустка`], ["👚", tt`Біла сорочка`], ["👗", tt`Темна спідниця`], ["🥼", tt`Вишитий фартух`], ["🧥", tt`Гуцульський кептар`], ["📿", tt`Червоні коралі`], ["👞", tt`Недільні черевички`], ["🧺", tt`Кошик із рушником`]] },
+  { id: "yarmarok", host: "marichka", name: tt`Ярмаркове літо`, icon: "👒", bg: "#e7f8dc",
+    items: [["👒", tt`Солом'яний бриль`], ["👗", tt`Сарафан у квіточку`], ["🎀", tt`Бантик у косу`], ["👡", tt`Сандалики`], ["🌼", tt`Ромашковий віночок`], ["🧺", tt`Ягідний кошичок`], ["🍭", tt`Півник на паличці`], ["🎈", tt`Повітряна кулька`]] }
 ];
 const FASH_REWARD = { chest: 2, coins: 300, stars: 5, hearts: 3 };
 const FASH_ALL = { chest: 2, coins: 800, stars: 10 };
@@ -38,7 +38,7 @@ window.FASH = (() => {
   function add(n, why) {
     if (!on() || !n) return;
     st().thr += n; save();
-    if (why) setTimeout(() => toast(`🪢 +${n} клаптиків${why ? " — " + why : ""}`), 1800);
+    if (why) setTimeout(() => toast(tt`🪢 +${n} клаптиків${why ? " — " + why : ""}`), 1800);
     if (window.HUB) HUB.renderDot();
   }
   function onDeliver() { if (on()) { st().thr += 1; save(); } }
@@ -48,8 +48,8 @@ window.FASH = (() => {
   function pull() {
     const s = st(), c = coll(s.sel);
     if (!c || !known(c)) return;
-    if (got(c) >= 8) { sfx.nope(); toast("Колекцію вже зібрано — обери іншу"); return; }
-    if (s.thr < FASH_COST) { sfx.nope(); toast(`Треба ${FASH_COST} 🪢 — клаптики дають за замовлення й завдання`); return; }
+    if (got(c) >= 8) { sfx.nope(); toast(tt`Колекцію вже зібрано — обери іншу`); return; }
+    if (s.thr < FASH_COST) { sfx.nope(); toast(tt`Треба ${FASH_COST} 🪢 — клаптики дають за замовлення й завдання`); return; }
     s.thr -= FASH_COST;
     const h = s.have[c.id] = s.have[c.id] || {};
     // речі, яких ще немає, випадають утричі частіше — щоб колекцію можна було зібрати за кілька днів
@@ -64,11 +64,11 @@ window.FASH = (() => {
   }
   function reveal(c, i, fresh) {
     const rare = FASH_W[i] < 10;
-    modal({ title: fresh ? "Нова річ! ✨" : "Повтор",
+    modal({ title: fresh ? tt`Нова річ! ✨` : tt`Повтор`,
       html: `<div class="fs-reveal${rare ? " rare" : ""}" style="--bg:${c.bg}"><span>${fashIcon(c, i)}</span></div>` +
         `<p><b>${c.items[i][1]}</b><br><small>«${c.name}» · ${got(c)}/8</small></p>` +
-        (fresh ? (rare ? `<p class="hint-s">${FASH_W[i] <= 2 ? "Найрідкісніша річ колекції! 🌟" : "Рідкісна річ! ⭐"}</p>` : "") : `<p class="hint-s">Така вже є — повертаю ${FASH_DUP} 🪢</p>`),
-      buttons: [{ label: "Далі ›", onClick: () => { if (got(c) >= 8 && !st().done[c.id]) complete(c); else panel(); } }] });
+        (fresh ? (rare ? `<p class="hint-s">${FASH_W[i] <= 2 ? tt`Найрідкісніша річ колекції! 🌟` : tt`Рідкісна річ! ⭐`}</p>` : "") : tt`<p class="hint-s">Така вже є — повертаю ${FASH_DUP} 🪢</p>`),
+      buttons: [{ label: tt`Далі ›`, onClick: () => { if (got(c) >= 8 && !st().done[c.id]) complete(c); else panel(); } }] });
   }
   function complete(c) {
     const s = st(); s.done[c.id] = true; s.wear[c.host] = c.id;
@@ -78,24 +78,24 @@ window.FASH = (() => {
     save(); renderAll(); confetti(); sfx.level();
     const all = FASHION.every(x => s.done[x.id]);
     playDialog([[c.host, pick([
-      "Ой, яке ж гарне! Я в цьому вбранні — як на свято 🥹 Дякую тобі, {name}!",
-      "Подивись-но на мене! Тепер хоч на ярмарок, хоч на весілля 💃",
-      "Ніколи в мене такого стрóю не було… Ти — справжня чарівниця, {name} 💛"])]], () => modal({
-      title: "Колекцію зібрано! 👗",
-      html: `<div class="big-emoji">${c.icon}</div><p>«${c.name}» — повна! ${CHARS[c.host].name} тепер у новому строї${FASH_LOOKS.includes(c.host + "-" + c.id) ? " — подивись у дворику 🏡" : "."}</p>` +
+      tt`Ой, яке ж гарне! Я в цьому вбранні — як на свято 🥹 Дякую тобі, {name}!`,
+      tt`Подивись-но на мене! Тепер хоч на ярмарок, хоч на весілля 💃`,
+      tt`Ніколи в мене такого стрóю не було… Ти — справжня чарівниця, {name} 💛`])]], () => modal({
+      title: tt`Колекцію зібрано! 👗`,
+      html: tt`<div class="big-emoji">${c.icon}</div><p>«${c.name}» — повна! ${CHARS[c.host].name} тепер у новому строї${FASH_LOOKS.includes(c.host + "-" + c.id) ? tt` — подивись у дворику 🏡` : "."}</p>` +
         `<p class="rewards">💝 &nbsp; +${r.coins} 🪙 &nbsp; +${r.stars} ⭐ &nbsp; +${r.hearts} 💛</p>` +
-        (FASH_LOOKS.includes(c.host + "-" + c.id) ? "" : `<p class="hint-s">Мальована фігура в цьому строї з'явиться, щойно її намалюємо 🎨</p>`),
-      buttons: [{ label: all ? "Ще одна новина ›" : "Чудово! 💛", onClick: () => all && !s.allDone ? allDone() : panel() }] }));
+        (FASH_LOOKS.includes(c.host + "-" + c.id) ? "" : tt`<p class="hint-s">Мальована фігура в цьому строї з'явиться, щойно її намалюємо 🎨</p>`),
+      buttons: [{ label: all ? tt`Ще одна новина ›` : tt`Чудово! 💛`, onClick: () => all && !s.allDone ? allDone() : panel() }] }));
   }
   function allDone() {
     const s = st(); s.allDone = true; const r = FASH_ALL;
     placeItem({ c: "chest", l: r.chest }); S.coins += r.coins; S.stars += r.stars;
     save(); renderAll(); confetti(); sfx.level();
-    modal({ title: "Увесь гардероб зібрано! 🏆", html: `<div class="big-emoji">👗</div><p>Ти одягла все село! Тепер на кожне свято сусіди вбираються в твої строї.</p><p class="rewards">💝 &nbsp; +${r.coins} 🪙 &nbsp; +${r.stars} ⭐</p>`, buttons: [{ label: "Неймовірно! 💛" }] });
+    modal({ title: tt`Увесь гардероб зібрано! 🏆`, html: tt`<div class="big-emoji">👗</div><p>Ти одягла все село! Тепер на кожне свято сусіди вбираються в твої строї.</p><p class="rewards">💝 &nbsp; +${r.coins} 🪙 &nbsp; +${r.stars} ⭐</p>`, buttons: [{ label: tt`Неймовірно! 💛` }] });
   }
   function toggleWear(c) {
     const s = st(); s.wear[c.host] = s.wear[c.host] === c.id ? null : c.id;
-    save(); sfx.pop(); toast(s.wear[c.host] ? `👗 ${CHARS[c.host].name.split(" ").pop()} вбирається у «${c.name}»` : "Повсякденний одяг");
+    save(); sfx.pop(); toast(s.wear[c.host] ? tt`👗 ${shortName(CHARS[c.host].name)} вбирається у «${c.name}»` : tt`Повсякденний одяг`);
     if (window.renderStory) renderStory();
     panel();
   }
@@ -116,26 +116,26 @@ window.FASH = (() => {
       const k = known(x), n = got(x);
       return `<button class="fs-col${x.id === c.id ? " on" : ""}${k ? "" : " locked"}" data-id="${x.id}" style="--bg:${x.bg}">` +
         `<span class="fs-face">${k ? face(CHARS[x.host], "mini") : "🔒"}</span><b>${x.name}</b>` +
-        `<i class="dq-bar"><b style="width:${n / 8 * 100}%"></b></i><small>${s.done[x.id] ? "✅ зібрано" : n + "/8"}</small></button>`;
+        `<i class="dq-bar"><b style="width:${n / 8 * 100}%"></b></i><small>${s.done[x.id] ? tt`✅ зібрано` : n + "/8"}</small></button>`;
     }).join("");
     const h = s.have[c.id] || {};
     const items = c.items.map((it, i) => `<div class="fs-it${h[i] ? "" : " no"}${FASH_W[i] < 10 ? " r" + (FASH_W[i] <= 2 ? 3 : 2) : ""}"><span>${h[i] ? fashIcon(c, i) : "❔"}</span><small>${h[i] ? it[1] : FASH_W[i] <= 2 ? "★★★" : FASH_W[i] < 10 ? "★★" : "★"}</small></div>`).join("");
     const done = s.done[c.id], hasLook = FASH_LOOKS.includes(c.host + "-" + c.id);
-    modal({ title: "Гардероб сусідів 👗",
+    modal({ title: tt`Гардероб сусідів 👗`,
       html: `<div class="fs-cols">${tiles}</div>` +
-        `<div class="fs-cur" style="--bg:${c.bg}"><div class="fs-cur-h"><b>${c.icon} ${c.name}</b><small>для: ${CHARS[c.host].name}</small></div><div class="fs-items">${items}</div></div>` +
-        (done ? `<button class="btn small fs-wear" id="fsWear">${s.wear[c.host] === c.id ? "👕 Зняти стрій" : "👗 Вдягти стрій"}${hasLook ? "" : " (фігура — скоро)"}</button>`
-          : `<div class="fs-pull"><span class="fs-thr">🪢 <b>${s.thr}</b></span><button class="btn fs-go${s.thr >= FASH_COST ? "" : " dim"}" id="fsPull">Пошити річ · ${FASH_COST} 🪢</button></div>`) +
-        `<p class="hint-s">Клаптики 🪢: замовлення +1, завдання дня +5, тиждень +15, вилазки +5, подарунки й листи. Повтор повертає ${FASH_DUP} 🪢.</p>`,
-      buttons: [{ label: "Закрити", cls: "ghost" }] });
-    document.querySelectorAll(".fs-col").forEach(b => b.onclick = () => { const x = coll(b.dataset.id); if (!known(x)) { sfx.nope(); toast(`${CHARS[x.host].name} з'явиться в історії пізніше`); return; } sfx.pop(); panel(x.id); });
+        tt`<div class="fs-cur" style="--bg:${c.bg}"><div class="fs-cur-h"><b>${c.icon} ${c.name}</b><small>для: ${CHARS[c.host].name}</small></div><div class="fs-items">${items}</div></div>` +
+        (done ? `<button class="btn small fs-wear" id="fsWear">${s.wear[c.host] === c.id ? tt`👕 Зняти стрій` : tt`👗 Вдягти стрій`}${hasLook ? "" : tt` (фігура — скоро)`}</button>`
+          : tt`<div class="fs-pull"><span class="fs-thr">🪢 <b>${s.thr}</b></span><button class="btn fs-go${s.thr >= FASH_COST ? "" : " dim"}" id="fsPull">Пошити річ · ${FASH_COST} 🪢</button></div>`) +
+        tt`<p class="hint-s">Клаптики 🪢: замовлення +1, завдання дня +5, тиждень +15, вилазки +5, подарунки й листи. Повтор повертає ${FASH_DUP} 🪢.</p>`,
+      buttons: [{ label: tt`Закрити`, cls: "ghost" }] });
+    document.querySelectorAll(".fs-col").forEach(b => b.onclick = () => { const x = coll(b.dataset.id); if (!known(x)) { sfx.nope(); toast(tt`${CHARS[x.host].name} з'явиться в історії пізніше`); return; } sfx.pop(); panel(x.id); });
     const p = $("fsPull"); if (p) p.onclick = pull;
     const w = $("fsWear"); if (w) w.onclick = () => toggleWear(c);
   }
   function card() {
     if (!on()) return null;
     const s = st(), n = FASHION.reduce((a, c) => a + got(c), 0);
-    return { icon: "👗", title: "Гардероб сусідів", sub: `🪢 ${s.thr} клаптиків · ${n}/${FASHION.length * 8} речей`, btn: "Відкрити", act: "fashion", ready: ready() };
+    return { icon: "👗", title: tt`Гардероб сусідів`, sub: tt`🪢 ${s.thr} клаптиків · ${n}/${FASHION.length * 8} речей`, btn: tt`Відкрити`, act: "fashion", ready: ready() };
   }
   return { add, onDeliver, panel, card, ready, look };
 })();

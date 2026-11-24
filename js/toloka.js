@@ -7,10 +7,10 @@
    Стан: S.tol = { id (п'ятниця тижня), spoons, mine, got (етапів забрано), mult }
    ============================================================ */
 const TOL_THEMES = [
-  { name: "Сільський бенкет", icon: "🍲", what: "наготувати частування на все село" },
-  { name: "Свято врожаю",     icon: "🌾", what: "прикрасити площу снопами й гарбузами" },
-  { name: "Нова криниця",     icon: "🪣", what: "викопати й прикрасити нову криницю" },
-  { name: "Вечорниці",        icon: "🎻", what: "приготувати хату для вечорниць" }
+  { name: tt`Сільський бенкет`, icon: "🍲", what: tt`наготувати частування на все село` },
+  { name: tt`Свято врожаю`,     icon: "🌾", what: tt`прикрасити площу снопами й гарбузами` },
+  { name: tt`Нова криниця`,     icon: "🪣", what: tt`викопати й прикрасити нову криницю` },
+  { name: tt`Вечорниці`,        icon: "🎻", what: tt`приготувати хату для вечорниць` }
 ];
 const TOL_TARGET = 5000;
 const TOL_STAGES = [
@@ -67,12 +67,12 @@ window.TOLOKA = (() => {
       if (r.chest !== undefined) placeItem({ c: "chest", l: r.chest });
       if (r.energy) { regen(); S.energy += r.energy; }
       if (r.coins) S.coins += r.coins; if (r.stars) S.stars += r.stars;
-      if (r.cards) { if (window.UNL && UNL.on("album")) ALB.give(r.cards, "З толоки"); else S.coins += 30 * r.cards; }
+      if (r.cards) { if (window.UNL && UNL.on("album")) ALB.give(r.cards, tt`З толоки`); else S.coins += 30 * r.cards; }
       done.push(t.got);
     }
     if (done.length) {
       save(); renderAll();
-      if (!silent) { sfx.level(); toast(`🥄 Толока: етап ${done[done.length - 1]}/5 — нагорода вже на дошці!`); if (t.got === 5) confetti(); }
+      if (!silent) { sfx.level(); toast(tt`🥄 Толока: етап ${done[done.length - 1]}/5 — нагорода вже на дошці!`); if (t.got === 5) confetti(); }
     }
   }
 
@@ -80,7 +80,7 @@ window.TOLOKA = (() => {
   let spinning = false, angle = 0;
   function spin() {
     const t = st(); if (!t || spinning) return;
-    if (t.spoons < t.mult) { sfx.nope(); toast("Бракує ложок 🥄 — їх дають за замовлення сусідів"); return; }
+    if (t.spoons < t.mult) { sfx.nope(); toast(tt`Бракує ложок 🥄 — їх дають за замовлення сусідів`); return; }
     t.spoons -= t.mult;
     const k = rnd(TOL_WHEEL.length), seg = 360 / TOL_WHEEL.length;
     angle += 360 * 4 + (360 - (angle % 360)) - k * seg - seg / 2 + (Math.random() - 0.5) * seg * 0.6;
@@ -91,7 +91,7 @@ window.TOLOKA = (() => {
       const pts = TOL_WHEEL[k] * 10 * t.mult;
       t.mine += pts; save();
       sfx.coin(); if (TOL_WHEEL[k] >= 10) { sfx.level(); confetti(); }
-      toast(`🎡 ×${TOL_WHEEL[k]}${t.mult > 1 ? " ×" + t.mult : ""}: +${pts} балів у спільну скарбничку!`);
+      toast(tt`🎡 ×${TOL_WHEEL[k]}${t.mult > 1 ? " ×" + t.mult : ""}: +${pts} балів у спільну скарбничку!`);
       grantStages(t);
       panel(true);
     }, w ? 2300 : 50);
@@ -100,32 +100,32 @@ window.TOLOKA = (() => {
 
   function left() {
     const ms = winEnd(friStart()) - now(), t = Math.ceil(ms / 6e4), h = Math.floor(t / 60);
-    return h >= 24 ? Math.floor(h / 24) + " д " + (h % 24) + " год" : h + " год " + (t % 60) + " хв";
+    return h >= 24 ? Math.floor(h / 24) + tt` д ` + (h % 24) + tt` год` : h + tt` год ` + (t % 60) + tt` хв`;
   }
   function panel(keep) {
     const t = sync();
-    if (!t) { modal({ title: "Толока 🥄", html: `<div class="big-emoji">🥄</div><p>Толока буває щовихідних — з п'ятниці до понеділка. Наступна — через ${untilNext()}.</p>`, buttons: [{ label: "Добре" }] }); return; }
+    if (!t) { modal({ title: tt`Толока 🥄`, html: tt`<div class="big-emoji">🥄</div><p>Толока буває щовихідних — з п'ятниці до понеділка. Наступна — через ${untilNext()}.</p>`, buttons: [{ label: tt`Добре` }] }); return; }
     const th = theme(t.id), team = mates(t.id), total = teamPts(t), pct = Math.min(1, total / TOL_TARGET);
     const seg = 360 / TOL_WHEEL.length;
     const labels = TOL_WHEEL.map((v, i) => `<span style="transform:rotate(${i * seg + seg / 2}deg)"><b>${v}</b></span>`).join("");
     const stages = TOL_STAGES.map((s, i) => `<i class="${i < t.got ? "on" : ""}" style="left:${s.at * 100}%">${i < t.got ? "✓" : i === 4 ? "🎁" : i + 1}</i>`).join("");
-    const mateRows = [`<div class="tl-mate me"><span>🏡</span><b>Ти</b><em>${t.mine}</em></div>`].concat(team.map(m =>
-      `<div class="tl-mate"><span>${face(CHARS[m.who], "mini")}</span><b>${CHARS[m.who].name.split(" ").pop()}</b><em>${m.pts}</em></div>`)).join("");
-    modal({ title: `Толока: ${th.name} ${th.icon}`,
-      html: `<p class="tl-sub">Разом ${th.what}! До кінця: <b>${left()}</b></p>` +
+    const mateRows = [tt`<div class="tl-mate me"><span>🏡</span><b>Ти</b><em>${t.mine}</em></div>`].concat(team.map(m =>
+      `<div class="tl-mate"><span>${face(CHARS[m.who], "mini")}</span><b>${shortName(CHARS[m.who].name)}</b><em>${m.pts}</em></div>`)).join("");
+    modal({ title: tt`Толока: ${th.name} ${th.icon}`,
+      html: tt`<p class="tl-sub">Разом ${th.what}! До кінця: <b>${left()}</b></p>` +
         `<div class="tl-prog"><div class="tl-bar"><b style="width:${pct * 100}%"></b>${stages}</div><small>${total} / ${TOL_TARGET}</small></div>` +
         `<div class="tl-team">${mateRows}</div>` +
         `<div class="tl-wheel-wrap"><div class="tl-pin">▼</div><div class="tl-wheel" id="tolWheel" style="transform:rotate(${angle}deg)">${labels}</div>` +
         `<button class="tl-spin" id="tolSpin"><span>🥄</span><b>${t.mult}</b></button></div>` +
-        `<div class="tl-row"><span class="tl-sp">🥄 <b>${t.spoons}</b> ложок</span><span class="tl-mult">${[1, 2, 3].map(m => `<button class="tl-m${t.mult === m ? " on" : ""}" data-m="${m}">×${m}</button>`).join("")}</span></div>` +
-        `<p class="hint-s">Ложки 🥄 — за замовлення (+1, особливі +2) і завдання дня (+5). Крутиш колесо — бали в спільну скарбничку. ×2 і ×3 — більше ложок, більше балів.</p>`,
-      buttons: [{ label: "Закрити", cls: "ghost" }] });
+        tt`<div class="tl-row"><span class="tl-sp">🥄 <b>${t.spoons}</b> ложок</span><span class="tl-mult">${[1, 2, 3].map(m => `<button class="tl-m${t.mult === m ? " on" : ""}" data-m="${m}">×${m}</button>`).join("")}</span></div>` +
+        tt`<p class="hint-s">Ложки 🥄 — за замовлення (+1, особливі +2) і завдання дня (+5). Крутиш колесо — бали в спільну скарбничку. ×2 і ×3 — більше ложок, більше балів.</p>`,
+      buttons: [{ label: tt`Закрити`, cls: "ghost" }] });
     $("tolSpin").onclick = spin;
     document.querySelectorAll(".tl-m").forEach(b => b.onclick = () => setMult(+b.dataset.m));
   }
   function untilNext() {
     const n = friStart() + 7 * 864e5, ms = n - now(), d = Math.floor(ms / 864e5), h = Math.ceil(ms % 864e5 / 36e5);
-    return d ? d + " д " + h + " год" : h + " год";
+    return d ? d + tt` д ` + h + tt` год` : h + tt` год`;
   }
 
   function tick() {
@@ -135,17 +135,17 @@ window.TOLOKA = (() => {
     if (!t.intro && !busyUI() && !S.sideOn) {
       t.intro = true; save();
       const th = theme(t.id), m = mates(t.id);
-      playDialog([[m[0] ? m[0].who : "halya", `{name}, на вихідних — толока! ${th.icon} Збираємося разом ${th.what}. Ти з нами?`],
-        ["halya", "За кожне замовлення — ложка 🥄. Ложками крутиш колесо, а бали йдуть у спільну скарбничку. Що більше назбираємо — то щедріші гостинці всім!"]],
+      playDialog([[m[0] ? m[0].who : "halya", tt`{name}, на вихідних — толока! ${th.icon} Збираємося разом ${th.what}. Ти з нами?`],
+        ["halya", tt`За кожне замовлення — ложка 🥄. Ложками крутиш колесо, а бали йдуть у спільну скарбничку. Що більше назбираємо — то щедріші гостинці всім!`]],
         () => panel());
     }
   }
   function card() {
     if (!on()) return null;
     const t = sync();
-    if (!t) return { icon: "🥄", title: "Толока вихідного дня", sub: "Наступна — через " + untilNext(), btn: "", act: "" };
+    if (!t) return { icon: "🥄", title: tt`Толока вихідного дня`, sub: tt`Наступна — через ` + untilNext(), btn: "", act: "" };
     const th = theme(t.id);
-    return { icon: th.icon, title: "Толока: " + th.name, sub: `🥄 ${t.spoons} · етап ${t.got}/5 · ще ${left()}`, btn: "Крутити", act: "toloka", ready: t.spoons > 0 };
+    return { icon: th.icon, title: tt`Толока: ` + th.name, sub: tt`🥄 ${t.spoons} · етап ${t.got}/5 · ще ${left()}`, btn: tt`Крутити`, act: "toloka", ready: t.spoons > 0 };
   }
   return { add, onDeliver, panel, tick, card, ready: () => { const t = on() && sync(); return !!(t && t.spoons > 0); } };
 })();

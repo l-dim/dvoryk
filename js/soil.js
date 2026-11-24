@@ -17,13 +17,13 @@ const SOIL_IMG = (id, e) => SOIL_ART.includes(id) ? `<img class="e3d pnt" src="i
 
 window.PUA_MAP = window.PUA_MAP || {};
 PUA_MAP[String.fromCharCode(0xE540)] = { e: "🥀", img: SOIL_ART.includes("junk") ? "items/junk.webp" : null };
-CHAINS.junk = { name: "Брак", nomerge: true, trash: true, value: 1, items: [[String.fromCharCode(0xE540), "Бракований урожай"]] };
+CHAINS.junk = { name: tt`Брак`, nomerge: true, trash: true, value: 1, items: [[String.fromCharCode(0xE540), tt`Бракований урожай`]] };
 
-if (typeof UNLOCKS !== "undefined") UNLOCKS.push({ id: "soil", lvl: 9, icon: "🚜", title: "Втомлена земля",
-  text: "Город з часом втомлюється. Коли земля виснажиться, половина врожаю (а згодом і більше) виходитиме бракованою. Клич трактор 🚜 — він спаше город за монети, але все з дошки зникне, тож спершу віддай замовлення й сховай цінне.",
-  lines: [["stepan", "{name}, земля — як людина: працює-працює, а тоді втомлюється 🌾 Як побачиш, що родить брак — клич кума Миколу з трактором 🚜"]] });
-if (typeof GUIDE_BASICS !== "undefined") GUIDE_BASICS.push(["🚜", "Втомлена земля",
-  "Город виснажується від тапів. Коли сил лишиться чверть — на дошці з'явиться трактор 🚜. Виснажена земля дає 50–80% браку 🥀 (його можна лише викинути). Оранка коштує монети й прибирає з дошки все, крім генераторів, печі, павутиння, подарунків і скарбів. Свіжа земля перші 150 тапів частіше дає кращі предмети."]);
+if (typeof UNLOCKS !== "undefined") UNLOCKS.push({ id: "soil", lvl: 9, icon: "🚜", title: tt`Втомлена земля`,
+  text: tt`Город з часом втомлюється. Коли земля виснажиться, половина врожаю (а згодом і більше) виходитиме бракованою. Клич трактор 🚜 — він спаше город за монети, але все з дошки зникне, тож спершу віддай замовлення й сховай цінне.`,
+  lines: [["stepan", tt`{name}, земля — як людина: працює-працює, а тоді втомлюється 🌾 Як побачиш, що родить брак — клич кума Миколу з трактором 🚜`]] });
+if (typeof GUIDE_BASICS !== "undefined") GUIDE_BASICS.push(["🚜", tt`Втомлена земля`,
+  tt`Город виснажується від тапів. Коли сил лишиться чверть — на дошці з'явиться трактор 🚜. Виснажена земля дає 50–80% браку 🥀 (його можна лише викинути). Оранка коштує монети й прибирає з дошки все, крім генераторів, печі, павутиння, подарунків і скарбів. Свіжа земля перші 150 тапів частіше дає кращі предмети.`]);
 
 window.SOIL = (() => {
   const on = () => window.UNL && UNL.on("soil");
@@ -46,13 +46,13 @@ window.SOIL = (() => {
       s.fresh--;
       if (Math.random() < SOIL_FRESH_UP) item.l = Math.min(CHAINS[item.c].items.length - 1, item.l + 1);
     }
-    if (!s.warned && left() <= SOIL_WARN) { s.warned = true; later(() => playDialog([["stepan", `{name}, земля в городі вже втомлюється — сил лишилось ${pct()}% 🌾 Скоро почне родити брак. Як буде змога — клич трактор 🚜 (він на дошці, вгорі праворуч)`]])); }
+    if (!s.warned && left() <= SOIL_WARN) { s.warned = true; later(() => playDialog([["stepan", tt`{name}, земля в городі вже втомлюється — сил лишилось ${pct()}% 🌾 Скоро почне родити брак. Як буде змога — клич трактор 🚜 (він на дошці, вгорі праворуч)`]])); }
     if (!tired()) return item;
-    if (!s.told) { s.told = true; later(() => playDialog([["stepan", "Ну от, земля зовсім виснажилась 😟 Тепер половина врожаю буде бракована, а далі — ще гірше. Пора орати!"]], () => plowModal())); }
+    if (!s.told) { s.told = true; later(() => playDialog([["stepan", tt`Ну от, земля зовсім виснажилась 😟 Тепер половина врожаю буде бракована, а далі — ще гірше. Пора орати!`]], () => plowModal())); }
     s.bad++;
     if (Math.random() >= badP()) return item;
     s.jt = (s.jt || 0) + 1;
-    if (s.jt % 12 === 1) setTimeout(() => toast("🥀 Виснажена земля дала брак — пора спахати город 🚜"), 350);
+    if (s.jt % 12 === 1) setTimeout(() => toast(tt`🥀 Виснажена земля дала брак — пора спахати город 🚜`), 350);
     return { c: "junk", l: 0 };
   }
   function later(fn) { setTimeout(() => { if (busyUI()) setTimeout(() => later(fn), 1500); else fn(); }, 700); }
@@ -68,29 +68,29 @@ window.SOIL = (() => {
     const bd = $("board");                                  // у правий верхній кут самої дошки
     b.style.top = (bd.offsetTop - 14) + "px"; b.style.right = Math.max(0, wrap.clientWidth - bd.offsetLeft - bd.offsetWidth - 4) + "px";
     b.classList.toggle("tired", tired());
-    b.innerHTML = `<span class="sl-ic">${SOIL_IMG("ui-tractor", "🚜")}</span><small>${tired() ? "брак " + Math.round(badP() * 100) + "%" : "земля " + pct() + "%"}</small>`;
+    b.innerHTML = `<span class="sl-ic">${SOIL_IMG("ui-tractor", "🚜")}</span><small>${tired() ? tt`брак ` + Math.round(badP() * 100) + "%" : tt`земля ` + pct() + "%"}</small>`;
   }
   /* рядок у підказці генератора */
   function genInfo(it) {
     if (!on() || S.sideOn || !it || !GENS[it.g] || GENS[it.g].holiday || GENS[it.g].animal) return "";
     const s = st();
-    if (s.fresh > 0) return " · свіжа земля 🌱";
-    return tired() ? ` · земля виснажена — брак ${Math.round(badP() * 100)}%` : ` · земля ${pct()}%`;
+    if (s.fresh > 0) return tt` · свіжа земля 🌱`;
+    return tired() ? tt` · земля виснажена — брак ${Math.round(badP() * 100)}%` : tt` · земля ${pct()}%`;
   }
 
   function plowModal() {
     if (plowing) return;
-    if (S.sideOn) { toast("Трактор оре тільки город — повернись на город 🪴"); return; }
+    if (S.sideOn) { toast(tt`Трактор оре тільки город — повернись на город 🪴`); return; }
     const cost = SOIL_COST(S.level), s = st();
-    const state = tired() ? `<p><b>Земля виснажена</b> — зараз брак ${Math.round(badP() * 100)}% урожаю.</p>` : `<p>Сил у землі: <b>${pct()}%</b>.</p>`;
+    const state = tired() ? tt`<p><b>Земля виснажена</b> — зараз брак ${Math.round(badP() * 100)}% урожаю.</p>` : tt`<p>Сил у землі: <b>${pct()}%</b>.</p>`;
     modal({
-      title: "Спахати город 🚜",
-      html: `<div class="big-emoji">${SOIL_IMG(tired() ? "ui-soil-tired" : "ui-tractor", "🚜")}</div>${state}
+      title: tt`Спахати город 🚜`,
+      html: tt`<div class="big-emoji">${SOIL_IMG(tired() ? "ui-soil-tired" : "ui-tractor", "🚜")}</div>${state}
         <p>Кум Микола приїде трактором і спаше все — <b>з дошки зникнуть усі предмети</b>. Лишаться генератори, піч, павутиння, подарунки 🎁 і бабусині скарби, а монетки й енергія зберуться самі.</p>
         <p class="hint-s">Спершу віддай замовлення й сховай цінне у сховок 🗄️. Свіжа земля перші ${SOIL_FRESH} тапів частіше даватиме кращі предмети 🌱</p>`,
       buttons: [
-        { label: S.coins >= cost ? `🚜 Спахати за ${cost} 🪙` : `🚜 Треба ${cost} 🪙 (бракує ${cost - S.coins})`, disabled: S.coins < cost, onClick: plow },
-        { label: "Пізніше", cls: "ghost" }
+        { label: S.coins >= cost ? tt`🚜 Спахати за ${cost} 🪙` : tt`🚜 Треба ${cost} 🪙 (бракує ${cost - S.coins})`, disabled: S.coins < cost, onClick: plow },
+        { label: tt`Пізніше`, cls: "ghost" }
       ]
     });
   }
@@ -136,7 +136,7 @@ window.SOIL = (() => {
       const n = st().n + 1;
       S.soil = { used: 0, bad: 0, fresh: SOIL_FRESH, n, warned: false, told: false, jt: 0 };
       save(); renderAll(); confetti(); sfx.level();
-      playDialog([["stepan", `Земля — як пух! 🌱 Тепер усе, що посадиш, ростиме краще.${got.e || got.c ? ` А ще я зібрав, що валялось: ${got.e ? "+" + got.e + " ⚡ " : ""}${got.c ? "+" + got.c + " 🪙" : ""}` : ""}`]]);
+      playDialog([["stepan", tt`Земля — як пух! 🌱 Тепер усе, що посадиш, ростиме краще.${got.e || got.c ? tt` А ще я зібрав, що валялось: ${got.e ? "+" + got.e + " ⚡ " : ""}${got.c ? "+" + got.c + " 🪙" : ""}` : ""}`]]);
     }
     requestAnimationFrame(step);
   }

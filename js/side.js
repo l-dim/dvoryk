@@ -12,37 +12,37 @@
 const SIDE_DUR = 48 * 3600e3, SIDE_GAP = 24 * 3600e3;
 const SIDE_ART = ["side-jam-0", "side-jam-1", "side-jam-2", "side-jam-3", "side-jam-4", "side-shirt-0", "side-shirt-1", "side-shirt-2", "side-shirt-3", "side-shirt-4", "side-fair-0", "side-fair-1", "side-fair-2", "side-fair-3", "side-fair-4", "side-garden-0", "side-garden-1", "side-garden-2", "side-garden-3", "side-garden-4", "side-gen-jam", "side-gen-shirt", "side-gen-fair", "side-gen-garden", "side-fish-0", "side-fish-1", "side-fish-2", "side-fish-3", "side-fish-4", "side-mush-0", "side-mush-1", "side-mush-2", "side-mush-3", "side-mush-4", "side-gen-fish", "side-gen-mush"];                    // мальовані: "side-jam-0", "side-gen-jam"…
 const SIDE_KINDS = [
-  { id: "jam", short: "Варення", host: "halya", title: "Вишневе варення", gen: ["🪣", "Відро вишень"],
-    items: [["🍒", "Вишенька"], ["🥣", "Миска вишень"], ["🫕", "Казанок варення"], ["🫙", "Банка варення"], ["🥧", "Вишневий пиріг"]],
+  { id: "jam", short: tt`Варення`, host: "halya", title: tt`Вишневе варення`, gen: ["🪣", tt`Відро вишень`],
+    items: [["🍒", tt`Вишенька`], ["🥣", tt`Миска вишень`], ["🫕", tt`Казанок варення`], ["🫙", tt`Банка варення`], ["🥧", tt`Вишневий пиріг`]],
     goals: [{ l: 3, t: 2 }, { l: 4, t: 1 }],
-    ask: "{name}, вишні поспіли — аж гілки гнуться! 🍒 Допоможи наварити варення, поки не пообсипались. Дві банки й пиріг — і на всю зиму вистачить!",
-    thanks: "Ох і варення вийшло! Густе, запашне — як у моєї мами. А пиріг — тобі, з чаєм 💛" },
-  { id: "shirt", short: "Вишиванка", host: "marichka", title: "Вишиванка для Марічки", gen: ["🧺", "Кошик рукодільниці"],
-    items: [["🪡", "Голка з ниткою"], ["🧵", "Котушка ниток"], ["🧶", "Клубок вовни"], ["👚", "Сорочка-заготовка"], ["👗", "Вишиванка"]],
+    ask: tt`{name}, вишні поспіли — аж гілки гнуться! 🍒 Допоможи наварити варення, поки не пообсипались. Дві банки й пиріг — і на всю зиму вистачить!`,
+    thanks: tt`Ох і варення вийшло! Густе, запашне — як у моєї мами. А пиріг — тобі, з чаєм 💛` },
+  { id: "shirt", short: tt`Вишиванка`, host: "marichka", title: tt`Вишиванка для Марічки`, gen: ["🧺", tt`Кошик рукодільниці`],
+    items: [["🪡", tt`Голка з ниткою`], ["🧵", tt`Котушка ниток`], ["🧶", tt`Клубок вовни`], ["👚", tt`Сорочка-заготовка`], ["👗", tt`Вишиванка`]],
     goals: [{ l: 3, t: 2 }, { l: 4, t: 1 }],
-    ask: "{name}, у школі свято вишиванок, а в мене тільки стара, з якої я виросла 😢 Бабуся Галя каже, що разом ми встигнемо пошити нову!",
-    thanks: "Вона така гарна! Я найщасливіша дівчинка в усій школі! Дякую-дякую-дякую! 👗💛" },
-  { id: "fair", short: "Ярмарок", host: "andriy", title: "Ярмарок ласощів", gen: ["🛒", "Ярмарковий візок"],
-    items: [["🥜", "Горішки"], ["🍪", "Медяник"], ["🍭", "Півник на паличці"], ["🍫", "Шоколадна плитка"], ["🧺", "Кошик гостинців"]],
+    ask: tt`{name}, у школі свято вишиванок, а в мене тільки стара, з якої я виросла 😢 Бабуся Галя каже, що разом ми встигнемо пошити нову!`,
+    thanks: tt`Вона така гарна! Я найщасливіша дівчинка в усій школі! Дякую-дякую-дякую! 👗💛` },
+  { id: "fair", short: tt`Ярмарок`, host: "andriy", title: tt`Ярмарок ласощів`, gen: ["🛒", tt`Ярмарковий візок`],
+    items: [["🥜", tt`Горішки`], ["🍪", tt`Медяник`], ["🍭", tt`Півник на паличці`], ["🍫", tt`Шоколадна плитка`], ["🧺", tt`Кошик гостинців`]],
     goals: [{ l: 3, t: 2 }, { l: 4, t: 1 }],
-    ask: "{name}, у суботу ярмарок у районі! Хочу привезти найкращі ласощі в окрузі. Допоможеш наготувати? 🍪",
-    thanks: "Розкупили все за годину! Люди питали, хто це таке смачне робить. Я сказав — ми з тобою 😎" },
-  { id: "garden", short: "Квітник", host: "olya", title: "Квітник до свята", gen: ["🪴", "Ящик із розсадою"],
-    items: [["🌱", "Розсада"], ["🌼", "Ромашка"], ["🌷", "Тюльпан"], ["🌹", "Троянда"], ["💐", "Святковий букет"]],
+    ask: tt`{name}, у суботу ярмарок у районі! Хочу привезти найкращі ласощі в окрузі. Допоможеш наготувати? 🍪`,
+    thanks: tt`Розкупили все за годину! Люди питали, хто це таке смачне робить. Я сказав — ми з тобою 😎` },
+  { id: "garden", short: tt`Квітник`, host: "olya", title: tt`Квітник до свята`, gen: ["🪴", tt`Ящик із розсадою`],
+    items: [["🌱", tt`Розсада`], ["🌼", tt`Ромашка`], ["🌷", tt`Тюльпан`], ["🌹", tt`Троянда`], ["💐", tt`Святковий букет`]],
     goals: [{ l: 3, t: 2 }, { l: 4, t: 1 }],
-    ask: "{name}, у неділю день села, а клумба біля клубу — суцільний бур'ян 😩 Допоможи виростити квіти й зібрати букет для гостей!",
-    thanks: "Клумба — як із листівки! Голова сільради навіть сфотографувався біля неї 🌹" },
+    ask: tt`{name}, у неділю день села, а клумба біля клубу — суцільний бур'ян 😩 Допоможи виростити квіти й зібрати букет для гостей!`,
+    thanks: tt`Клумба — як із листівки! Голова сільради навіть сфотографувався біля неї 🌹` },
   /* вилазки — на них можна піти самій, коли захочеш (раз на добу кожна) */
-  { id: "fish", short: "Рибалка", host: "stepan", title: "Рибалка на ставку", gen: ["🎣", "Дідова вудка"], outing: true, icon: "🎣",
-    items: [["🪱", "Черв'ячок"], ["🐟", "Карасик"], ["🐠", "Окунь"], ["🐡", "Сом-вусань"], ["🪣", "Відро риби"]],
+  { id: "fish", short: tt`Рибалка`, host: "stepan", title: tt`Рибалка на ставку`, gen: ["🎣", tt`Дідова вудка`], outing: true, icon: "🎣",
+    items: [["🪱", tt`Черв'ячок`], ["🐟", tt`Карасик`], ["🐠", tt`Окунь`], ["🐡", tt`Сом-вусань`], ["🪣", tt`Відро риби`]],
     goals: [{ l: 2, t: 2 }, { l: 3, t: 1 }, { l: 4, t: 1 }],
-    ask: "{name}, на ставку кльов — аж вода кипить! 🎣 Ходімо, поки зорі не згасли. Складай рибку до рибки — що більший улов, то смачніша юшка!",
-    thanks: "Оце улов! Такого сома я з молодості не тягав 😄 Юшку зваримо на все село 💛" },
-  { id: "mush", short: "По гриби", host: "halya", title: "По гриби в ліс", gen: ["🌳", "Лісова галявина"], outing: true, icon: "🍄",
-    items: [["🍂", "Шурхіт листя"], ["🍄‍🟫", "Опеньки"], ["🍄", "Підосичник"], ["🧺", "Кошик грибів"], ["🍲", "Грибна юшка"]],
+    ask: tt`{name}, на ставку кльов — аж вода кипить! 🎣 Ходімо, поки зорі не згасли. Складай рибку до рибки — що більший улов, то смачніша юшка!`,
+    thanks: tt`Оце улов! Такого сома я з молодості не тягав 😄 Юшку зваримо на все село 💛` },
+  { id: "mush", short: tt`По гриби`, host: "halya", title: tt`По гриби в ліс`, gen: ["🌳", tt`Лісова галявина`], outing: true, icon: "🍄",
+    items: [["🍂", tt`Шурхіт листя`], ["🍄‍🟫", tt`Опеньки`], ["🍄", tt`Підосичник`], ["🧺", tt`Кошик грибів`], ["🍲", tt`Грибна юшка`]],
     goals: [{ l: 2, t: 2 }, { l: 3, t: 1 }, { l: 4, t: 1 }],
-    ask: "{name}, після дощу гриби лізуть — тільки встигай! 🍄 Бери кошика. Під кожним листочком щось ховається — складай докупи, назбираємо повний кошик!",
-    thanks: "Повнісінький кошик! Насушу на зиму, а юшку — зараз, поки гаряча 🍲💛" }
+    ask: tt`{name}, після дощу гриби лізуть — тільки встигай! 🍄 Бери кошика. Під кожним листочком щось ховається — складай докупи, назбираємо повний кошик!`,
+    thanks: tt`Повнісінький кошик! Насушу на зиму, а юшку — зараз, поки гаряча 🍲💛` }
 ];
 const OUT_DUR = 24 * 3600e3, OUT_GAP = 20 * 3600e3;
 const OUT_REWARD = { chest: 0, stars: 2, coins: 90, hearts: 1, bonus: 25 };   // bonus — 🪙 за кожен зайвий найбільший улов
@@ -69,7 +69,7 @@ window.SIDE = (() => {
   const chainId = () => "side_" + S.side.kind;
   const isSideItem = it => !!it && (it.g ? !!(GENS[it.g] && GENS[it.g].side) : !!(CHAINS[it.c] && (CHAINS[it.c].side || CHAINS[it.c].collect)));
   const left = () => Math.max(0, S.side.until - now());
-  const hm = ms => { const t = Math.ceil(ms / 6e4), h = Math.floor(t / 60), m = t % 60; return h >= 24 ? Math.floor(h / 24) + "д " + (h % 24) + "г" : h ? h + "г " + m + "хв" : m + "хв"; };
+  const hm = ms => { const t = Math.ceil(ms / 6e4), h = Math.floor(t / 60), m = t % 60; return h >= 24 ? Math.floor(h / 24) + tt`д ` + (h % 24) + tt`г` : h ? h + tt`г ` + m + tt`хв` : m + tt`хв`; };
 
   /* ---------- перемикання дошок ---------- */
   function enter() {
@@ -102,13 +102,13 @@ window.SIDE = (() => {
   function intro(k, mid) {
     const r = k.reward || (k.outing ? OUT_REWARD : SIDE_REWARD), top = k.goals[k.goals.length - 1].l;
     playDialog([[k.host, k.ask]], () => modal({
-      title: (k.trip ? "Поїздка: " : "Пригода: ") + k.title,
+      title: (k.trip ? tt`Поїздка: ` : tt`Пригода: `) + k.title,
       html: `<div class="big-emoji">${CHAINS[chainId()].items[top][0]}</div>` +
-        `<p>Окрема дошка з генератором ${GENS[S.side.board[mid].g].icon}. Зроби: ` +
-        k.goals.map(g => `<b>${g.t} × ${CHAINS[chainId()].items[g.l][0]} ${CHAINS[chainId()].items[g.l][1]}</b>`).join(" і ") +
-        `.</p><p>Час: <b>${k.dur ? Math.round(k.dur / 864e5) + " дні" : k.outing ? "доба" : "2 дні"}</b>. Нагорода: ${CHAINS.chest.items[r.chest][0]} · +${r.stars} ⭐ · +${r.coins} 🪙 · 💛${k.souv ? ` · сувенір ${k.souv[0]} у дворик` : ""}</p>` + (k.note ? `<p class="hint-s">${k.note}</p>` : "") +
-        (k.outing ? `<p class="hint-s">Що більший улов, то краще: кожен зайвий ${CHAINS[chainId()].items[top][0]} понад ціль — ще +${r.bonus} 🪙.</p>` : ""),
-      buttons: [{ label: k.trip ? "Їдемо! ✨" : "До пригоди! ✨", onClick: enter }, { label: "Пізніше", cls: "ghost" }]
+        tt`<p>Окрема дошка з генератором ${GENS[S.side.board[mid].g].icon}. Зроби: ` +
+        k.goals.map(g => `<b>${g.t} × ${CHAINS[chainId()].items[g.l][0]} ${CHAINS[chainId()].items[g.l][1]}</b>`).join(tt` і `) +
+        tt`.</p><p>Час: <b>${k.dur ? Math.round(k.dur / 864e5) + tt` дні` : k.outing ? tt`доба` : tt`2 дні`}</b>. Нагорода: ${CHAINS.chest.items[r.chest][0]} · +${r.stars} ⭐ · +${r.coins} 🪙 · 💛${k.souv ? tt` · сувенір ${k.souv[0]} у дворик` : ""}</p>` + (k.note ? `<p class="hint-s">${k.note}</p>` : "") +
+        (k.outing ? tt`<p class="hint-s">Що більший улов, то краще: кожен зайвий ${CHAINS[chainId()].items[top][0]} понад ціль — ще +${r.bonus} 🪙.</p>` : ""),
+      buttons: [{ label: k.trip ? tt`Їдемо! ✨` : tt`До пригоди! ✨`, onClick: enter }, { label: tt`Пізніше`, cls: "ghost" }]
     }));
   }
   /* вилазка: рибалка чи гриби — коли захочеш, якщо зараз немає іншої пригоди */
@@ -116,8 +116,8 @@ window.SIDE = (() => {
   function goOut(id) {
     const k = SIDE_KINDS.find(x => x.id === id);
     if (!k) return;
-    if (S.side) { sfx.nope(); toast(S.side.kind === id ? "Ти вже там — тапни кнопку пригоди під дошкою" : "Спершу заверши поточну пригоду 🙂"); return; }
-    if (!canGo(id)) { sfx.nope(); toast("Сьогодні вже ходили — наступного разу за " + hm(S.outNext[id] - now())); return; }
+    if (S.side) { sfx.nope(); toast(S.side.kind === id ? tt`Ти вже там — тапни кнопку пригоди під дошкою` : tt`Спершу заверши поточну пригоду 🙂`); return; }
+    if (!canGo(id)) { sfx.nope(); toast(tt`Сьогодні вже ходили — наступного разу за ` + hm(S.outNext[id] - now())); return; }
     const board = Array(N).fill(null), mid = Math.floor(ROWS / 2) * COLS + Math.floor(COLS / 2);
     board[mid] = { g: "side_" + k.id, gl: 1 };
     [mid - 1, mid + 1, mid - COLS, mid + COLS].forEach(i => { board[i] = { c: "side_" + k.id, l: 0 }; });
@@ -141,8 +141,8 @@ window.SIDE = (() => {
       placeItem({ c: "chest", l: r.chest }); S.stars += r.stars; S.coins += r.coins;
       if (window.PATH) PATH.add(PATH_PTS.side);
       if (window.MEDAL) MEDAL.count("outing");
-      if (window.FASH) FASH.add(5, "з пригоди");
-      if (window.CONTEST) CONTEST.give(3, k.id === "mush" ? ["veg"] : k.id === "jam" || k.id === "garden" ? ["berry"] : null, 2, "З пригоди");
+      if (window.FASH) FASH.add(5, tt`з пригоди`);
+      if (window.CONTEST) CONTEST.give(3, k.id === "mush" ? ["veg"] : k.id === "jam" || k.id === "garden" ? ["berry"] : null, 2, tt`З пригоди`);
       if (S.fr && FRIENDS[k.host]) S.fr[k.host] = Math.min(FRIEND_STEPS[2], (S.fr[k.host] || 0) + r.hearts);
       if (k.souv && window.TRIPS) TRIPS.souvenir(k);
       confetti(); sfx.level();
@@ -152,10 +152,10 @@ window.SIDE = (() => {
     S.side = null;
     save(); renderAll(); renderButton();
     const ch0 = CHAINS.chest.items[R.chest][0];
-    if (ok) playDialog([[k.host, k.thanks]], () => modal({ title: k.trip ? "Гарно відпочили! 🎉" : k.outing ? "Вилазка вдалася! 🎉" : "Пригоду завершено! 🎉", html: `<div class="big-emoji">${k.outing ? k.icon : "📦"}</div><p class="rewards">${ch0} &nbsp; +${R.stars} ⭐ &nbsp; +${R.coins} 🪙 &nbsp; +${R.hearts} 💛</p>` +
-      (k.souv ? `<p class="rewards">Сувенір у дворик: ${k.souv[0]} ${k.souv[1]}</p><p class="hint-s">Знайдеш його в «Двір на свій смак» 🎨</p>` : "") +
-      (bonus ? `<p class="rewards">${k.trip ? "Ще й понад план" : "Рекордний улов"}: +${bonus} 🪙</p>` : ""), buttons: [{ label: "Дякую! 💛" }] }));
-    else modal({ title: "Пригода минула ⏰", html: `<div class="big-emoji">${CHARS[k.host].icon}</div><p>«${k.title}» — не встигли цього разу. Нічого, ${k.trip ? "поїдемо ще — за тиждень" : k.outing ? "завтра знову можна" : "наступна пригода — вже скоро"}!</p>`, buttons: [{ label: "Добре" }] });
+    if (ok) playDialog([[k.host, k.thanks]], () => modal({ title: k.trip ? tt`Гарно відпочили! 🎉` : k.outing ? tt`Вилазка вдалася! 🎉` : tt`Пригоду завершено! 🎉`, html: `<div class="big-emoji">${k.outing ? k.icon : "📦"}</div><p class="rewards">${ch0} &nbsp; +${R.stars} ⭐ &nbsp; +${R.coins} 🪙 &nbsp; +${R.hearts} 💛</p>` +
+      (k.souv ? tt`<p class="rewards">Сувенір у дворик: ${k.souv[0]} ${k.souv[1]}</p><p class="hint-s">Знайдеш його в «Двір на свій смак» 🎨</p>` : "") +
+      (bonus ? `<p class="rewards">${k.trip ? tt`Ще й понад план` : tt`Рекордний улов`}: +${bonus} 🪙</p>` : ""), buttons: [{ label: tt`Дякую! 💛` }] }));
+    else modal({ title: tt`Пригода минула ⏰`, html: tt`<div class="big-emoji">${CHARS[k.host].icon}</div><p>«${k.title}» — не встигли цього разу. Нічого, ${k.trip ? tt`поїдемо ще — за тиждень` : k.outing ? tt`завтра знову можна` : tt`наступна пригода — вже скоро`}!</p>`, buttons: [{ label: tt`Добре` }] });
   }
 
   /* ---------- цілі пригоди ---------- */
@@ -164,7 +164,7 @@ window.SIDE = (() => {
     const g = S.side.goals[i];
     if (!g || g.n >= g.t) return;
     const at = findItem(g.l);
-    if (at < 0) { sfx.nope(); toast("Спершу створи " + itemName({ c: chainId(), l: g.l })); return; }
+    if (at < 0) { sfx.nope(); toast(tt`Спершу створи ` + itemName({ c: chainId(), l: g.l })); return; }
     const card = document.querySelector(`.order[data-goal="${i}"]`);
     flyFrom(at, card); S.board[at] = null; if (selected === at) selected = -1;
     g.n++; sfx.deliver();
@@ -174,17 +174,17 @@ window.SIDE = (() => {
     if (kind().outing) {        // вилазку можна продовжити — на рекордний улов
       S.side.done = true; save(); renderOrders();
       const top = CHAINS[chainId()].items[kind().goals[kind().goals.length - 1].l][0];
-      setTimeout(() => toast(`Ціль є! ${kind().trip ? "Можна ще" : "Лови ще"} — кожне зайве ${top} +${(kind().reward || OUT_REWARD).bonus} 🪙. Або тисни «Додому»`), 600);
+      setTimeout(() => toast(tt`Ціль є! ${kind().trip ? tt`Можна ще` : tt`Лови ще`} — кожне зайве ${top} +${(kind().reward || OUT_REWARD).bonus} 🪙. Або тисни «Додому»`), 600);
     } else setTimeout(() => finish(true), 700);
   }
   function renderGoals(box) {
     const k = kind(), cid = chainId();
     const host = document.createElement("div");
     host.className = "order side-host pic";
-    host.innerHTML = `<div class="o-who"><span class="o-name">${CHARS[k.host].name.split(" ").pop()}</span></div>` +
+    host.innerHTML = `<div class="o-who"><span class="o-name">${shortName(CHARS[k.host].name)}</span></div>` +
       `<div class="o-body"><div class="o-pic">${PORTRAITS_FULL.includes(k.host) || PORTRAITS.includes(k.host) ? `<img src="portraits/${k.host}.webp" alt="">` : CHARS[k.host].icon}</div>` +
       `<div class="side-info"><span class="side-time">⏰ ${hm(left())}</span></div></div><div class="side-title">${k.short || k.title}</div>` +
-      (k.outing && S.side.done ? `<button class="o-btn side-home">Додому ✓</button>` : "");
+      (k.outing && S.side.done ? tt`<button class="o-btn side-home">Додому ✓</button>` : "");
     const hb = host.querySelector(".side-home"); if (hb) hb.onclick = () => finish(true);
     if (k.outing && S.side.done) host.classList.add("ready");
     box.appendChild(host);
@@ -193,11 +193,11 @@ window.SIDE = (() => {
       const el = document.createElement("div");
       el.className = "order side-goal" + (have && !done ? " ready" : "");
       el.dataset.goal = i;
-      el.innerHTML = `<div class="o-who"><span class="o-name">Мета ${i + 1}</span></div>` +
+      el.innerHTML = tt`<div class="o-who"><span class="o-name">Мета ${i + 1}</span></div>` +
         `<div class="o-items"><span class="o-item${have ? " have" : ""}">${CHAINS[cid].items[g.l][0]}</span></div>` +
-        (done ? `<div class="o-rew">✅ ${g.t}/${g.t}</div>` : have ? `<button class="o-btn">Віддати ${g.n}/${g.t}</button>` : `<div class="o-rew">${g.n}/${g.t}</div>`);
+        (done ? `<div class="o-rew">✅ ${g.t}/${g.t}</div>` : have ? tt`<button class="o-btn">Віддати ${g.n}/${g.t}</button>` : `<div class="o-rew">${g.n}/${g.t}</div>`);
       const b = el.querySelector(".o-btn"); if (b) b.onclick = () => giveGoal(i);
-      el.onclick = e => { if (!e.target.closest(".o-btn")) toast(`${CHAINS[cid].items[g.l][0]} ${CHAINS[cid].items[g.l][1]} — потрібно ${g.t}, уже ${g.n}`); };
+      el.onclick = e => { if (!e.target.closest(".o-btn")) toast(tt`${CHAINS[cid].items[g.l][0]} ${CHAINS[cid].items[g.l][1]} — потрібно ${g.t}, уже ${g.n}`); };
       box.appendChild(el);
     });
     document.querySelectorAll(".tile").forEach(t => { const it = S.board[+t.dataset.i]; t.classList.toggle("needed", !!it && S.side.goals.some(g => g.n < g.t && it.c === cid && it.l === g.l)); });
@@ -211,11 +211,11 @@ window.SIDE = (() => {
     if (!S.side || S.woodOn) return;
     const k = kind();
     b.classList.toggle("on", !!S.sideOn);
-    b.innerHTML = S.sideOn ? `<span class="sd-ic">🪴</span><small>Город</small>`
+    b.innerHTML = S.sideOn ? tt`<span class="sd-ic">🪴</span><small>Город</small>`
       : `<span class="sd-ic">${CHAINS[chainId()].items[0][0]}</span><small>${hm(left())}</small>`;
   }
   function toggle() {
-    if (S.woodOn) { sfx.nope(); toast("Спершу вийди з майстерні 🪚"); return; }
+    if (S.woodOn) { sfx.nope(); toast(tt`Спершу вийди з майстерні 🪚`); return; }
     S.sideOn ? leave() : enter(); renderButton(); }
 
   /* ---------- щосекунди ---------- */

@@ -8,26 +8,26 @@
      чи монет. Повна нагорода — за всю ціль, половина — за 60%.
    Стан: S.rareNext, S.flash = { kind, t, n, until, done }, S.flashNext
    ============================================================ */
-CHAINS.rare = { name: "Бабусині скарби", rare: true, vals: [15, 35, 80, 180, 400, 900, 2000], items: [
-  ["📿", "Коралове намисто"], ["🥄", "Розписна ложка"], ["💍", "Бабусин перстень"], ["🏺", "Розписний глечик"],
-  ["🕰️", "Годинник із зозулею"], ["💎", "Дорогоцінний камінь"], ["👑", "Родинна реліквія"] ] };
+CHAINS.rare = { name: tt`Бабусині скарби`, rare: true, vals: [15, 35, 80, 180, 400, 900, 2000], items: [
+  ["📿", tt`Коралове намисто`], ["🥄", tt`Розписна ложка`], ["💍", tt`Бабусин перстень`], ["🏺", tt`Розписний глечик`],
+  ["🕰️", tt`Годинник із зозулею`], ["💎", tt`Дорогоцінний камінь`], ["👑", tt`Родинна реліквія`] ] };
 /* мальовані скарби: символи приватної зони Unicode → items/rare-<l>.webp (щоб не плутати з іншими 💍 🕰️ у грі) */
 window.PUA_MAP = window.PUA_MAP || {};
 CHAINS.rare.items = CHAINS.rare.items.map(([e, name], l) => { const c = String.fromCharCode(0xE200 + l); PUA_MAP[c] = { e, img: "items/rare-" + l + ".webp" }; return [c, name]; });
 const RARE_ICON = `<img class="e3d pnt" src="items/ui-rare.webp" alt="">`;
 const RARE_DROP = [1 / 700, 1 / 3000];                  // рів.1 ≈ раз на кілька днів, рів.2 ≈ раз на тиждень-два
-CHARS.collector = { key: "collector", icon: "🧐", name: "Колекціонер Орест", from: 999,
-  ask: ["Шукаю одну річ для колекції… Заплачу, як ніхто в окрузі 🧐", "Кажуть, у вашому дворику бувають справжні скарби?", "Я терплячий. Але така річ — на вагу золота!"],
-  thanks: ["Неймовірно! Саме такої бракувало моїй колекції 🧐✨", "Оце знахідка! Тримайте — заслужили сповна", "Ваш дворик — справжня скарбниця!"] };
+CHARS.collector = { key: "collector", icon: "🧐", name: tt`Колекціонер Орест`, from: 999,
+  ask: [tt`Шукаю одну річ для колекції… Заплачу, як ніхто в окрузі 🧐`, tt`Кажуть, у вашому дворику бувають справжні скарби?`, tt`Я терплячий. Але така річ — на вагу золота!`],
+  thanks: [tt`Неймовірно! Саме такої бракувало моїй колекції 🧐✨`, tt`Оце знахідка! Тримайте — заслужили сповна`, tt`Ваш дворик — справжня скарбниця!`] };
 PORTRAITS.push("collector");                            // мальований портрет portraits/collector.webp
 PORTRAIT_FACE.collector = [35.5, 23.1, 205];
 const COLLECTOR = { waitH: 168, gapH: [72, 144], firstMin: 10 };   // чекає тиждень, приходить раз на 3–6 днів
 const FLASH_DUR = 90 * 60e3, FLASH_GAP = [24, 48];      // год між викликами
 const FLASH_KINDS = [
-  { k: "tap",     icon: "🪴", text: "Тапни генератори",          t: lvl => 130 + lvl * 2 },
-  { k: "merge",   icon: "✨", text: "Зроби злиттів",              t: lvl => 120 + lvl * 2 },
-  { k: "deliver", icon: "🧺", text: "Віддай замовлень",           t: lvl => 9 + Math.floor(lvl / 10) },
-  { k: "high",    icon: "🏅", text: "Створи предметів 5+ рівня",  t: lvl => 8 + Math.floor(lvl / 8) }
+  { k: "tap",     icon: "🪴", text: tt`Тапни генератори`,          t: lvl => 130 + lvl * 2 },
+  { k: "merge",   icon: "✨", text: tt`Зроби злиттів`,              t: lvl => 120 + lvl * 2 },
+  { k: "deliver", icon: "🧺", text: tt`Віддай замовлень`,           t: lvl => 9 + Math.floor(lvl / 10) },
+  { k: "high",    icon: "🏅", text: tt`Створи предметів 5+ рівня`,  t: lvl => 8 + Math.floor(lvl / 8) }
 ];
 const FLASH_FULL = { chest: 2, rare: 1, stars: 5 }, FLASH_HALF = { chest: 0, coins: 60 };
 
@@ -35,7 +35,7 @@ window.RARE = (() => {
   const now = () => window.DVORYK_NOW || Date.now();
   const on = () => window.UNL && UNL.on("rare");
   const busyUI = () => $("modal").classList.contains("show") || $("dialog").classList.contains("show");
-  const hm = ms => { const t = Math.max(0, Math.ceil(ms / 6e4)), h = Math.floor(t / 60); return h >= 24 ? Math.floor(h / 24) + " д " + (h % 24) + " год" : h ? h + " год " + (t % 60) + " хв" : (t % 60) + " хв"; };
+  const hm = ms => { const t = Math.max(0, Math.ceil(ms / 6e4)), h = Math.floor(t / 60); return h >= 24 ? Math.floor(h / 24) + tt` д ` + (h % 24) + tt` год` : h ? h + tt` год ` + (t % 60) + tt` хв` : (t % 60) + tt` хв`; };
 
   /* ---------- знахідка при тапі ---------- */
   function onTap(near) {
@@ -46,7 +46,7 @@ window.RARE = (() => {
     const at = placeItem({ c: "rare", l }, near);
     if (at >= 0) { spawnFrom.set(at, near); setTimeout(() => sparkle(at, "✨", 10), 250); }
     sfx.level();
-    setTimeout(() => toast(`💎 Рідкісна знахідка: ${CHAINS.rare.items[l][0]} ${CHAINS.rare.items[l][1]}! Два однакові — ще цінніша річ`), 300);
+    setTimeout(() => toast(tt`💎 Рідкісна знахідка: ${CHAINS.rare.items[l][0]} ${CHAINS.rare.items[l][1]}! Два однакові — ще цінніша річ`), 300);
   }
 
   /* ---------- колекціонер ---------- */
@@ -72,15 +72,15 @@ window.RARE = (() => {
     if (now() < S.rareNext) return;
     const o = rareOrder(); S.orders.unshift(o); S.rareNext = 0;
     renderOrders(); save();
-    const want = o.items.map(it => `${CHAINS.rare.items[it.l][0]} «${CHAINS.rare.items[it.l][1]}»`).join(" і ");
-    playDialog([["collector", o.pair ? `Добридень! Цього разу мені потрібна пара для вітрини 🧐 ${want} — разом! Чекатиму десять днів і заплачу по-царськи.`
-      : `Добридень! Я — Орест, збираю старовину 🧐 Мені б ${want}. Чекатиму тиждень — і заплачу щедро!`]]);
+    const want = o.items.map(it => `${CHAINS.rare.items[it.l][0]} «${CHAINS.rare.items[it.l][1]}»`).join(tt` і `);
+    playDialog([["collector", o.pair ? tt`Добридень! Цього разу мені потрібна пара для вітрини 🧐 ${want} — разом! Чекатиму десять днів і заплачу по-царськи.`
+      : tt`Добридень! Я — Орест, збираю старовину 🧐 Мені б ${want}. Чекатиму тиждень — і заплачу щедро!`]]);
   }
   function onDeliver(o) {
     if (!o.rare) return;
     placeItem({ c: "chest", l: o.rchest || 1 });
     S.rareNext = now() + (COLLECTOR.gapH[0] + rnd(COLLECTOR.gapH[1] - COLLECTOR.gapH[0])) * 3600e3;
-    setTimeout(() => toast(`🧐 Колекціонер залишив ${CHAINS.chest.items[o.rchest || 1][0]} — на дошці!`), 900);
+    setTimeout(() => toast(tt`🧐 Колекціонер залишив ${CHAINS.chest.items[o.rchest || 1][0]} — на дошці!`), 900);
   }
   function onExpire(o) { if (o.rare) S.rareNext = now() + (COLLECTOR.gapH[0] + rnd(COLLECTOR.gapH[1] - COLLECTOR.gapH[0])) * 3600e3; }
 
@@ -91,13 +91,13 @@ window.RARE = (() => {
     const k = pick(FLASH_KINDS);
     S.flash = { kind: k.k, t: k.t(S.level), n: 0, until: now() + FLASH_DUR, over: false };
     save(); renderButton();
-    playDialog([["halya", `{name}, ярмарок у районі! Купці дають лише півтори години ⏳ ${k.text.toLowerCase()}: ${S.flash.t}. Встигнемо — буде скриня-сюрприз і рідкісна знахідка!`]], panel);
+    playDialog([["halya", tt`{name}, ярмарок у районі! Купці дають лише півтори години ⏳ ${k.text.toLowerCase()}: ${S.flash.t}. Встигнемо — буде скриня-сюрприз і рідкісна знахідка!`]], panel);
   }
   function track(k, n = 1) {
     const f = fl(); if (!f || f.kind !== k || now() >= f.until) return;
     f.n = Math.min(f.t, f.n + n);
     if (f.n >= f.t) finish(true);
-    else { renderButton(); if (f.n === Math.ceil(f.t * 0.6)) toast("⏳ 60% виклику! Половина нагороди вже твоя — тисни далі за повною"); }
+    else { renderButton(); if (f.n === Math.ceil(f.t * 0.6)) toast(tt`⏳ 60% виклику! Половина нагороди вже твоя — тисни далі за повною`); }
   }
   function grant(r) {
     const p = [];
@@ -115,29 +115,29 @@ window.RARE = (() => {
     const txt = won ? grant(FLASH_FULL) : half ? grant(FLASH_HALF) : "";
     save(); renderAll(); renderButton();
     if (won) { confetti(); sfx.level(); }
-    modal({ title: won ? "Виклик виконано! ⏳🏆" : half ? "Майже встигли ⏳" : "Час минув ⏳",
+    modal({ title: won ? tt`Виклик виконано! ⏳🏆` : half ? tt`Майже встигли ⏳` : tt`Час минув ⏳`,
       html: `<div class="big-emoji">${won ? "🏆" : kind(f).icon}</div><p>${kind(f).text}: <b>${f.n} / ${f.t}</b></p>` +
-        (txt ? `<p class="rewards">${txt}</p>` : `<p>Цього разу не вийшло. Наступний виклик — за кілька годин!</p>`) +
-        (half ? `<p class="hint-s">За повну ціль були б 💝, рідкісна знахідка й +5 ⭐</p>` : ""),
-      buttons: [{ label: won ? "Ура! 💛" : "Добре" }] });
+        (txt ? `<p class="rewards">${txt}</p>` : tt`<p>Цього разу не вийшло. Наступний виклик — за кілька годин!</p>`) +
+        (half ? tt`<p class="hint-s">За повну ціль були б 💝, рідкісна знахідка й +5 ⭐</p>` : ""),
+      buttons: [{ label: won ? tt`Ура! 💛` : tt`Добре` }] });
   }
   function panel() {
     const f = fl();
-    if (!f) { modal({ title: "Виклик на час ⏳", html: `<div class="big-emoji">⏳</div><p>Наступний виклик — за ${hm((S.flashNext || 0) - now())}.</p>`, buttons: [{ label: "Добре" }] }); return; }
+    if (!f) { modal({ title: tt`Виклик на час ⏳`, html: tt`<div class="big-emoji">⏳</div><p>Наступний виклик — за ${hm((S.flashNext || 0) - now())}.</p>`, buttons: [{ label: tt`Добре` }] }); return; }
     const k = kind(f), half = Math.ceil(f.t * 0.6);
-    modal({ title: "Виклик на час ⏳",
-      html: `<div class="fl-head"><span class="fl-ic">${k.icon}</span><span><b>${k.text}: ${f.t}</b><small>лишилось <b id="flLeft">${hm(f.until - now())}</b></small></span></div>` +
+    modal({ title: tt`Виклик на час ⏳`,
+      html: tt`<div class="fl-head"><span class="fl-ic">${k.icon}</span><span><b>${k.text}: ${f.t}</b><small>лишилось <b id="flLeft">${hm(f.until - now())}</b></small></span></div>` +
         `<div class="fl-bar"><b style="width:${f.n / f.t * 100}%"></b><i style="left:60%"></i><span>${f.n} / ${f.t}</span></div>` +
         `<p class="fl-rew"><span>60% (${half}): 🎁 +${FLASH_HALF.coins} 🪙</span><span>100%: 💝 ${CHAINS.rare.items[FLASH_FULL.rare][0]} +${FLASH_FULL.stars} ⭐</span></p>` +
-        `<p class="hint-s">Енергії самої шкали тут не вистачить — докупи ⚡ у крамничці, розбуди генератори чи випий чаю ☕</p>`,
-      buttons: [{ label: "⚡ Енергія", onClick: () => showNoEnergyInfo() }, { label: "Закрити", cls: "ghost" }] });
+        tt`<p class="hint-s">Енергії самої шкали тут не вистачить — докупи ⚡ у крамничці, розбуди генератори чи випий чаю ☕</p>`,
+      buttons: [{ label: tt`⚡ Енергія`, onClick: () => showNoEnergyInfo() }, { label: tt`Закрити`, cls: "ghost" }] });
   }
   function renderButton() {
     const b = $("flashBtn"); if (!b) return;
     const f = fl();
     b.hidden = !f || S.sideOn;
     if (!f) return;
-    $("flTime").textContent = hm(f.until - now()).replace(" год ", "г ").replace(" хв", "хв");
+    $("flTime").textContent = hm(f.until - now()).replace(" год ", tt`г `).replace(" хв", tt`хв`);
     $("flBar").style.width = (f.n / f.t * 100) + "%";
   }
   function flashTick() {
@@ -157,9 +157,9 @@ window.RARE = (() => {
     if (!on()) return [];
     const got = CHAINS.rare.items.map((x, l) => S.collection["rare:" + l] ? x[0] : "❔").join("");
     const o = S.orders.find(x => x.rare);
-    const out = [{ icon: RARE_ICON, title: "Бабусині скарби", sub: `${got} · знахідки з генераторів, два однакові → цінніша`, btn: "", act: "" },
-      { icon: face(CHARS.collector, "mini"), title: "Колекціонер Орест", sub: o ? `чекає ${o.items.map(it => CHAINS.rare.items[it.l][0]).join(" + ")} ще ${hm(o.until - now())}` : `прийде за ${hm((S.rareNext || now()) - now())}`, btn: "", act: "" }];
-    if (UNL.on("flash")) { const f = fl(); out.unshift({ icon: "⏳", title: "Виклик на час", sub: f ? `${kind(f).text}: ${f.n}/${f.t} · ${hm(f.until - now())}` : `наступний за ${hm((S.flashNext || now()) - now())}`, btn: f ? "Відкрити" : "", act: f ? "flash" : "", ready: !!f }); }
+    const out = [{ icon: RARE_ICON, title: tt`Бабусині скарби`, sub: tt`${got} · знахідки з генераторів, два однакові → цінніша`, btn: "", act: "" },
+      { icon: face(CHARS.collector, "mini"), title: tt`Колекціонер Орест`, sub: o ? tt`чекає ${o.items.map(it => CHAINS.rare.items[it.l][0]).join(" + ")} ще ${hm(o.until - now())}` : tt`прийде за ${hm((S.rareNext || now()) - now())}`, btn: "", act: "" }];
+    if (UNL.on("flash")) { const f = fl(); out.unshift({ icon: "⏳", title: tt`Виклик на час`, sub: f ? `${kind(f).text}: ${f.n}/${f.t} · ${hm(f.until - now())}` : tt`наступний за ${hm((S.flashNext || now()) - now())}`, btn: f ? tt`Відкрити` : "", act: f ? "flash" : "", ready: !!f }); }
     return out;
   }
   return { onTap, onDeliver, onExpire, track, tick, panel, cards, renderButton };

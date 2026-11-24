@@ -19,7 +19,7 @@ window.ECON = (() => {
     return Math.round(base * Math.pow(PRICE_STEP, day().n[kind] || 0) / 5) * 5;
   }
   function bought(kind) { if (!on("prices")) return; const d = day(); d.n[kind] = (d.n[kind] || 0) + 1; save(); }
-  const upNote = (kind, base) => on("prices") && (day().n[kind] || 0) ? ` (сьогодні вже ×${(price(kind, base) / base).toFixed(1)})` : "";
+  const upNote = (kind, base) => on("prices") && (day().n[kind] || 0) ? tt` (сьогодні вже ×${(price(kind, base) / base).toFixed(1)})` : "";
 
   /* ---------- продаж ---------- */
   function soldToday() { if (!S.sold || S.sold.day !== today()) S.sold = { day: today(), n: 0 }; return S.sold.n; }
@@ -57,7 +57,7 @@ window.ECON = (() => {
     const t = STORY[chIdx].tasks[k], x = taskExtra(chIdx, k), m = [];
     if (S.stars < t.cost) m.push((t.cost - S.stars) + " ⭐");
     if (x && x.coins && S.coins < x.coins) m.push((x.coins - S.coins) + " 🪙");
-    if (x && x.item && findItem(x.item) < 0) m.push(itemIcon(x.item) + " " + itemName(x.item) + " на дошці");
+    if (x && x.item && findItem(x.item) < 0) m.push(itemIcon(x.item) + " " + itemName(x.item) + tt` на дошці`);
     return m.join(", ");
   }
   /* списати додаткову плату (після перевірки) */

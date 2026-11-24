@@ -21,6 +21,7 @@
 <!-- ===== Стартовий екран ===== -->
 <div id="start" class="start">
   <div class="start-card">
+    <div class="start-lang" id="startLangBox"></div>
     <div class="start-art">🏡<span>🌷</span><span>🐱</span></div>
     <h1>Затишний дворик</h1>
     <p class="start-sub">Город, випічка, квіти й добрі сусіди.<br>Об'єднуй, готуй, прикрашай 💛</p>
@@ -29,7 +30,7 @@
     <label class="name-lbl">Обери, ким ти будеш</label>
     <div id="heroPick"></div>
     <button id="startBtn" class="btn big">Почати 🌷</button>
-    <p id="installHint" class="install" hidden>
+    <p id="installHint" class="install" data-t hidden>
       Щоб гра відкривалась як застосунок: натисни <b>«Поділитися»</b> <span class="share-ic">⬆︎</span> внизу Safari → <b>«На початковий екран»</b>
     </p>
   </div>
@@ -141,6 +142,7 @@
 <div id="confetti" class="confetti"></div>
 
 <script src="js/native.js"></script>
+<script src="js/i18n.js"></script>
 <script>window.DVORYK_3D = true; /* 3D-іконки Fluent Emoji 3D */</script>
 <script src="js/emoji3d.js"></script>
 <script src="js/data.js"></script>

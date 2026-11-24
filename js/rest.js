@@ -17,7 +17,7 @@ window.REST = (() => {
   const budget = () => { const L = S.level || 1; return Math.round(L <= 8 ? 60 : Math.max(30, 60 - (L - 8) * 1.5)) * 60e3; };
   const st = () => (S.play = S.play || { used: 0, at: 0 });
   const rate = () => budget() / REST_FULL_MS;                 // скільки гри повертає 1 мс відпочинку
-  const mins = ms => { const m = Math.max(1, Math.ceil(ms / 6e4)); return m >= 60 ? Math.floor(m / 60) + " год" + (m % 60 ? " " + (m % 60) + " хв" : "") : m + " хв"; };
+  const mins = ms => { const m = Math.max(1, Math.ceil(ms / 6e4)); return m >= 60 ? Math.floor(m / 60) + tt` год` + (m % 60 ? " " + (m % 60) + tt` хв` : "") : m + tt` хв`; };
 
   /* відпочинок від останньої дії (якщо пауза довша за 3 хв) */
   function settle(t = now()) {
@@ -43,7 +43,7 @@ window.REST = (() => {
     const l = budget() - p.used;
     if (!p.warned && l > 0 && l <= REST_WARN) {
       p.warned = true;
-      setTimeout(() => toast(`☕ Ще ${mins(l)} — і господині час перепочити`), 500);
+      setTimeout(() => toast(tt`☕ Ще ${mins(l)} — і господині час перепочити`), 500);
     }
   }
   /* чи можна тапнути генератор */
@@ -58,14 +58,14 @@ window.REST = (() => {
   function tiredModal() {
     sfx.nope();
     modal({
-      title: "Час перепочити ☕",
-      html: `<div class="big-emoji">🫖</div>
-        <p>${P("Ти так захопилась", "Ти так захопився")} — ${mins(budget())} гри поспіль! Господині треба перепочити, генераторам — теж.</p>
+      title: tt`Час перепочити ☕`,
+      html: tt`<div class="big-emoji">🫖</div>
+        <p>${P(tt`Ти так захопилась`, tt`Ти так захопився`)} — ${mins(budget())} гри поспіль! Господині треба перепочити, генераторам — теж.</p>
         <p>Знову тапати можна буде за <b id="rsBack">${mins(backIn())}</b>, а сили повністю повернуться за <b id="rsFull">${mins(fullIn())}</b>.</p>
         <p class="hint-s">Поки відпочиваєш — можна об'єднати й віддати те, що вже є на дошці.</p>`,
       buttons: [
-        ...(window.PAY ? [{ label: "☕ Друге дихання · 49 ₴", cls: "ghost", onClick: () => PAY.buy("rest60") }] : []),
-        { label: "Добре, відпочину 💤" }
+        ...(window.PAY ? [{ label: tt`☕ Друге дихання · 49 ₴`, cls: "ghost", onClick: () => PAY.buy("rest60") }] : []),
+        { label: tt`Добре, відпочину 💤` }
       ]
     });
     clearInterval(tick);
@@ -78,8 +78,8 @@ window.REST = (() => {
   /* рядок для вікна енергії */
   function line() {
     const p = settle();
-    if (p.tired || p.used >= budget()) return `<p class="hint-s">☕ Зараз час перепочити — знову тапати можна за <b>${mins(backIn())}</b>.</p>`;
-    return `<p class="hint-s">☕ Грати поспіль: ще <b>${mins(left())}</b> із ${mins(budget())}, потім — перепочинок.</p>`;
+    if (p.tired || p.used >= budget()) return tt`<p class="hint-s">☕ Зараз час перепочити — знову тапати можна за <b>${mins(backIn())}</b>.</p>`;
+    return tt`<p class="hint-s">☕ Грати поспіль: ще <b>${mins(left())}</b> із ${mins(budget())}, потім — перепочинок.</p>`;
   }
   /* «Друге дихання» */
   function refill(min) { const p = settle(); p.used = Math.max(0, p.used - min * 60e3); p.tired = false; p.warned = false; save(); }

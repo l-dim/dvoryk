@@ -17,18 +17,18 @@
 const CRAFT_ART = [...["clay", "forge", "amber", "electro"].flatMap(c => [0, 1, 2, 3, 4, 5, 6].map(l => `${c}-${l}`).concat("gen-" + c)), "shards", "inclusion"];   // усі мальовані
 window.PUA_MAP = window.PUA_MAP || {};
 const CRAFT_LIST = [
-  { id: "clay", at: 20, gen: ["🏺", "Гончарний круг"], name: "Кераміка", base: 0xE490,
-    items: [["🟤", "Грудка глини"], ["☕", "Горнятко"], ["🥣", "Полив'яна миска"], ["🍯", "Макітра"], ["🫖", "Куманець"], ["🏮", "Розписна ваза"], ["🧱", "Кахляна грубка"]],
-    line: "Я тут подумав{a}… а давай і посуд ліпити? 🏺 Поставив{a} гончарний круг — горнятка, макітри, а там і кахляна грубка! Тільки обережно: глина при злитті іноді тріскає." },
-  { id: "forge", at: 32, gen: ["⚒️", "Кузня"], name: "Кузня", base: 0xE4A0,
-    items: [["🔩", "Цвях"], ["🧲", "Підкова на щастя"], ["🗝️", "Кований ключ"], ["🔪", "Ніж"], ["🪝", "Кований гак"], ["🔱", "Кований тризуб"], ["🚪", "Кована хвіртка"]],
-    line: "Сюрприз! ⚒️ У нас тепер своя кузня! Тільки горн треба гріти — кидай у нього тріски, бруски й кривий брак із верстака. Холодна кузня не кує!" },
-  { id: "amber", at: 45, gen: ["⛏️", "Бурштинова копанка"], name: "Бурштин", base: 0xE4B0, vals: [2, 14, 30, 65, 140, 300, 650],
-    items: [["🪨", "Порода з бурштином"], ["🟠", "Крихта бурштину"], ["🔶", "Бурштинова грудка"], ["💎", "Шліфований бурштин"], ["💍", "Перстень із бурштином"], ["📿", "Бурштинове намисто"], ["👑", "Бурштинова діадема"]],
-    line: "Знаєш, що в нашому піску? Бурштин! ☀️ Я викопав{a} копанку — злий породу, і буде крихта, а з крихти — персні й намиста. Жила, правда, швидко вичерпується…" },
-  { id: "electro", at: 60, gen: ["🛠️", "Радіомайстерня"], name: "Електроніка", base: 0xE4C0, vals: [3, 9, 20, 42, 90, 190, 400],
-    items: [["🔌", "Дріт із вилкою"], ["💡", "Лампочка"], ["🔋", "Батарейка"], ["🔦", "Ліхтарик"], ["☎️", "Дисковий телефон"], ["📻", "Лампове радіо"], ["📺", "Ламповий телевізор"]],
-    line: "Слухай, у сусідів стільки старої техніки — радіо, телефони… А давай лагодити й збирати! 🛠️ Я облаштував{a} радіомайстерню. Тільки кожну річ треба перевіряти — бо буває й коротке замикання 💥" }
+  { id: "clay", at: 20, gen: ["🏺", tt`Гончарний круг`], name: tt`Кераміка`, base: 0xE490,
+    items: [["🟤", tt`Грудка глини`], ["☕", tt`Горнятко`], ["🥣", tt`Полив'яна миска`], ["🍯", tt`Макітра`], ["🫖", tt`Куманець`], ["🏮", tt`Розписна ваза`], ["🧱", tt`Кахляна грубка`]],
+    line: tt`Я тут подумав{a}… а давай і посуд ліпити? 🏺 Поставив{a} гончарний круг — горнятка, макітри, а там і кахляна грубка! Тільки обережно: глина при злитті іноді тріскає.` },
+  { id: "forge", at: 32, gen: ["⚒️", tt`Кузня`], name: tt`Кузня`, base: 0xE4A0,
+    items: [["🔩", tt`Цвях`], ["🧲", tt`Підкова на щастя`], ["🗝️", tt`Кований ключ`], ["🔪", tt`Ніж`], ["🪝", tt`Кований гак`], ["🔱", tt`Кований тризуб`], ["🚪", tt`Кована хвіртка`]],
+    line: tt`Сюрприз! ⚒️ У нас тепер своя кузня! Тільки горн треба гріти — кидай у нього тріски, бруски й кривий брак із верстака. Холодна кузня не кує!` },
+  { id: "amber", at: 45, gen: ["⛏️", tt`Бурштинова копанка`], name: tt`Бурштин`, base: 0xE4B0, vals: [2, 14, 30, 65, 140, 300, 650],
+    items: [["🪨", tt`Порода з бурштином`], ["🟠", tt`Крихта бурштину`], ["🔶", tt`Бурштинова грудка`], ["💎", tt`Шліфований бурштин`], ["💍", tt`Перстень із бурштином`], ["📿", tt`Бурштинове намисто`], ["👑", tt`Бурштинова діадема`]],
+    line: tt`Знаєш, що в нашому піску? Бурштин! ☀️ Я викопав{a} копанку — злий породу, і буде крихта, а з крихти — персні й намиста. Жила, правда, швидко вичерпується…` },
+  { id: "electro", at: 60, gen: ["🛠️", tt`Радіомайстерня`], name: tt`Електроніка`, base: 0xE4C0, vals: [3, 9, 20, 42, 90, 190, 400],
+    items: [["🔌", tt`Дріт із вилкою`], ["💡", tt`Лампочка`], ["🔋", tt`Батарейка`], ["🔦", tt`Ліхтарик`], ["☎️", tt`Дисковий телефон`], ["📻", tt`Лампове радіо`], ["📺", tt`Ламповий телевізор`]],
+    line: tt`Слухай, у сусідів стільки старої техніки — радіо, телефони… А давай лагодити й збирати! 🛠️ Я облаштував{a} радіомайстерню. Тільки кожну річ треба перевіряти — бо буває й коротке замикання 💥` }
 ];
 CRAFT_LIST.forEach((cr, k) => {
   const art = id => CRAFT_ART.includes(id) ? `items/${id}.webp` : null;
@@ -38,9 +38,9 @@ CRAFT_LIST.forEach((cr, k) => {
   PUA_MAP[g] = { e: cr.gen[0], img: art("gen-" + cr.id) };
   GENS["w_" + cr.id] = { icon: g, name: cr.gen[1], chain: cr.id, side: true };
 });
-CHAINS.shards = { name: "Черепки", side: true, woody: true, nomerge: true, value: 1, items: [[String.fromCharCode(0xE481), "Черепки"]] };
+CHAINS.shards = { name: tt`Черепки`, side: true, woody: true, nomerge: true, value: 1, items: [[String.fromCharCode(0xE481), tt`Черепки`]] };
 PUA_MAP[String.fromCharCode(0xE481)] = { e: "🧩", img: CRAFT_ART.includes("shards") ? "items/shards.webp" : null };
-CHAINS.inclusion = { name: "Скарб", side: true, woody: true, nomerge: true, value: 220, items: [[String.fromCharCode(0xE482), "Бурштин із комашкою"]] };
+CHAINS.inclusion = { name: tt`Скарб`, side: true, woody: true, nomerge: true, value: 220, items: [[String.fromCharCode(0xE482), tt`Бурштин із комашкою`]] };
 PUA_MAP[String.fromCharCode(0xE482)] = { e: "🐞", img: CRAFT_ART.includes("inclusion") ? "items/inclusion.webp" : null };
 /* лише деревина точить інструмент, сохне й гризе шашіль */
 CHAINS.wood.timber = CHAINS.carve.timber = true;
@@ -54,8 +54,8 @@ const VEIN = 30, DIG_MIN = 120, DIG_COINS = 150, INCL_P = 1 / 500;
 window.CRAFT = (() => {
   const now = () => window.DVORYK_NOW || Date.now();
   const busyUI = () => $("modal").classList.contains("show") || $("dialog").classList.contains("show");
-  const gx = s => s.replace(/\{a\}/g, LOVE.who() && LOVE.who().startsWith("man") ? "" : "ла");
-  const hm = ms => { const t = Math.max(1, Math.ceil(ms / 6e4)); return t >= 60 ? Math.floor(t / 60) + " год " + (t % 60) + " хв" : t + " хв"; };
+  const gx = s => s.replace(/\{a\}/g, LOVE.who() && LOVE.who().startsWith("man") ? "" : tt`ла`);
+  const hm = ms => { const t = Math.max(1, Math.ceil(ms / 6e4)); return t >= 60 ? Math.floor(t / 60) + tt` год ` + (t % 60) + tt` хв` : t + tt` хв`; };
   function hint(flag, lines) {
     if (!S.wood || S.wood["seen_" + flag]) return;
     S.wood["seen_" + flag] = true; save();
@@ -72,9 +72,9 @@ window.CRAFT = (() => {
     w.gens.push(cr.id); (w.since = w.since || {})[cr.id] = w.done;
     placeItem({ g: "w_" + cr.id, gl: 1 });
     save(); renderAll(); confetti(); sfx.level();
-    playDialog([[LOVE.who(), gx(cr.line)]], () => modal({ title: `Нове ремесло: ${cr.name}! 🎉`,
-      html: `<div class="big-emoji">${GENS["w_" + cr.id].icon}</div><p><b>${cr.gen[1]}</b> — уже в майстерні.</p><p class="rewards">${CHAINS[cr.id].items.map(x => x[0]).join(" → ")}</p>`,
-      buttons: [{ label: "До роботи! 💪" }] }));
+    playDialog([[LOVE.who(), gx(cr.line)]], () => modal({ title: tt`Нове ремесло: ${cr.name}! 🎉`,
+      html: tt`<div class="big-emoji">${GENS["w_" + cr.id].icon}</div><p><b>${cr.gen[1]}</b> — уже в майстерні.</p><p class="rewards">${CHAINS[cr.id].items.map(x => x[0]).join(" → ")}</p>`,
+      buttons: [{ label: tt`До роботи! 💪` }] }));
     return true;
   }
   function onDeliver() { setTimeout(() => { if (!busyUI()) unlock(); }, 1800); }
@@ -85,8 +85,8 @@ window.CRAFT = (() => {
     const it = S.board[i];
     if (!it || !it.g) return true;
     if (it.g === "w_forge" && heat(it) <= 0) {
-      sfx.nope(); hint("cold", [[LOVE.who(), "Горн охолов 🥶 Перетягни на кузню тріску, брусок чи кривий брак із верстака — розпалимо!"]]);
-      toast("🔥 Кузня холодна — перетягни на неї деревину з верстака"); return false;
+      sfx.nope(); hint("cold", [[LOVE.who(), tt`Горн охолов 🥶 Перетягни на кузню тріску, брусок чи кривий брак із верстака — розпалимо!`]]);
+      toast(tt`🔥 Кузня холодна — перетягни на неї деревину з верстака`); return false;
     }
     if (it.g === "w_amber") {
       if (it.digUntil && !digging(it)) { delete it.digUntil; it.vein = 0; }
@@ -102,22 +102,22 @@ window.CRAFT = (() => {
       if (Math.random() < INCL_P) {
         const at = placeItem({ c: "inclusion", l: 0 }, i);
         if (at >= 0) { spawnFrom.set(at, i); setTimeout(() => sparkle(at, "✨", 10), 250); }
-        setTimeout(() => toast("🐞 Бурштин із комашкою! Рідкісний скарб — за нього дадуть 220 🪙"), 300);
+        setTimeout(() => toast(tt`🐞 Бурштин із комашкою! Рідкісний скарб — за нього дадуть 220 🪙`), 300);
       }
       if (it.vein >= VEIN) {
         it.digUntil = now() + DIG_MIN * 60e3; it.vein = 0;
-        hint("vein", [[LOVE.who(), "Жилу вибрали до крихти ⛏️ Нову доведеться покопати — пару годин. Або покличемо копачів, але за гроші."]]);
-        toast("⛏️ Жила вичерпана — копаємо нову");
+        hint("vein", [[LOVE.who(), tt`Жилу вибрали до крихти ⛏️ Нову доведеться покопати — пару годин. Або покличемо копачів, але за гроші.`]]);
+        toast(tt`⛏️ Жила вичерпана — копаємо нову`);
       }
     }
   }
   const digPrice = () => (window.ECON ? ECON.price("dig", DIG_COINS) : DIG_COINS);
   function digModal(i) {
     const it = S.board[i];
-    modal({ title: "Жила вичерпана ⛏️",
-      html: `<div class="big-emoji">${GENS[it.g].icon}</div><p>Бурштину тут більше нема. Нову жилу відкопаємо за <b>${hm(it.digUntil - now())}</b>.</p><p class="hint-s">Копачі знайдуть нову одразу.</p>`,
-      buttons: [{ label: `Найняти копачів · ${digPrice()} 🪙`, disabled: S.coins < digPrice(), onClick: () => { S.coins -= digPrice(); window.ECON && ECON.bought("dig"); delete it.digUntil; it.vein = 0; sfx.coin(); toast("⛏️ Нова жила!"); renderBoard(); renderTop(); renderInfo(); save(); } },
-        { label: "Почекаю", cls: "ghost" }] });
+    modal({ title: tt`Жила вичерпана ⛏️`,
+      html: tt`<div class="big-emoji">${GENS[it.g].icon}</div><p>Бурштину тут більше нема. Нову жилу відкопаємо за <b>${hm(it.digUntil - now())}</b>.</p><p class="hint-s">Копачі знайдуть нову одразу.</p>`,
+      buttons: [{ label: tt`Найняти копачів · ${digPrice()} 🪙`, disabled: S.coins < digPrice(), onClick: () => { S.coins -= digPrice(); window.ECON && ECON.bought("dig"); delete it.digUntil; it.vein = 0; sfx.coin(); toast(tt`⛏️ Нова жила!`); renderBoard(); renderTop(); renderInfo(); save(); } },
+        { label: tt`Почекаю`, cls: "ghost" }] });
   }
 
   /* ---------- паливо для кузні: перетягнути деревину на горн ---------- */
@@ -125,13 +125,13 @@ window.CRAFT = (() => {
     const A = S.board[a], B = S.board[b];
     if (A && B && !A.g && !B.g && B.short && A.c === "electro" && A.l === 0) {      // дріт лагодить замикання
       delete B.short; delete B.untested; S.board[a] = null; selected = b;
-      sfx.merge(B.l); sparkle(b, "✨", 6); popIdx.add(b); toast("🔌 Полагоджено — працює!");
+      sfx.merge(B.l); sparkle(b, "✨", 6); popIdx.add(b); toast(tt`🔌 Полагоджено — працює!`);
       renderBoard(); renderInfo(); renderOrders(); save(); return true;
     }
     if (!A || A.g || !B || B.g !== "w_forge") return false;
     const v = FUEL[A.c + ":" + A.l];
-    if (!v) { sfx.nope(); toast("🔥 У горн — тільки деревину: тріску, брусок, гілочку чи кривий брак"); renderBoard(); return true; }
-    if (heat(B) >= HEAT_MAX) { sfx.nope(); toast("🔥 Горн і так розпечений"); renderBoard(); return true; }
+    if (!v) { sfx.nope(); toast(tt`🔥 У горн — тільки деревину: тріску, брусок, гілочку чи кривий брак`); renderBoard(); return true; }
+    if (heat(B) >= HEAT_MAX) { sfx.nope(); toast(tt`🔥 Горн і так розпечений`); renderBoard(); return true; }
     B.heat = Math.min(HEAT_MAX, heat(B) + v);
     S.board[a] = null; if (selected === a) selected = b;
     sfx.pop(); popIdx.add(b); sparkle(b, "🔥", 6); floatAt(b, "+" + v + " 🔥");
@@ -144,13 +144,13 @@ window.CRAFT = (() => {
     const it = S.board[b];
     if (it && it.c === "electro" && nl >= TEST_AT) {
       it.untested = true;
-      hint("test", [[LOVE.who(), "Техніку перед тим, як віддати, треба перевірити ❔ Тапни на виріб — і побачимо, чи працює. Якщо замкне 💥 — перетягни на нього дріт, полагодимо."]]);
+      hint("test", [[LOVE.who(), tt`Техніку перед тим, як віддати, треба перевірити ❔ Тапни на виріб — і побачимо, чи працює. Якщо замкне 💥 — перетягни на нього дріт, полагодимо.`]]);
       return;
     }
     if (!it || it.c !== "clay" || nl < CRACK_AT || Math.random() >= CRACK_P) return;
     S.board[b] = { c: "shards", l: 0 };
-    setTimeout(() => { sfx.nope(); toast("💥 Тріснуло! Лишились черепки…"); }, 200);
-    hint("crack", [[LOVE.who(), "Ох, тріснуло 😢 Так буває з глиною — великі речі іноді лускають при злитті. Черепки продай або викинь."]]);
+    setTimeout(() => { sfx.nope(); toast(tt`💥 Тріснуло! Лишились черепки…`); }, 200);
+    hint("crack", [[LOVE.who(), tt`Ох, тріснуло 😢 Так буває з глиною — великі речі іноді лускають при злитті. Черепки продай або викинь.`]]);
   }
 
   /* ---------- перевірка електроніки ---------- */
@@ -158,18 +158,18 @@ window.CRAFT = (() => {
   function testModal(i) {
     const it = S.board[i];
     if (it.short) {
-      modal({ title: "Коротке замикання 💥", html: `<div class="big-emoji">${itemIcon(it)}</div><p>«${itemName(it)}» не працює.</p><p class="hint-s">Перетягни на нього <b>${CHAINS.electro.items[0][0]} ${CHAINS.electro.items[0][1].toLowerCase()}</b> — і полагодиш.</p>`, buttons: [{ label: "Добре" }] });
+      modal({ title: tt`Коротке замикання 💥`, html: tt`<div class="big-emoji">${itemIcon(it)}</div><p>«${itemName(it)}» не працює.</p><p class="hint-s">Перетягни на нього <b>${CHAINS.electro.items[0][0]} ${CHAINS.electro.items[0][1].toLowerCase()}</b> — і полагодиш.</p>`, buttons: [{ label: tt`Добре` }] });
       return;
     }
-    modal({ title: "Перевірити виріб 🧪", html: `<div class="big-emoji">${itemIcon(it)}</div><p>«${itemName(it)}» — ще не перевірено, тож віддати чи злити поки не можна.</p><p class="hint-s">Буває, що замикає (${Math.round(SHORT_P * 100)}%) — тоді знадобиться дріт.</p>`,
-      buttons: [{ label: "🧪 Перевірити · 1 ⚡", onClick: () => test(i) }, { label: "Пізніше", cls: "ghost" }] });
+    modal({ title: tt`Перевірити виріб 🧪`, html: tt`<div class="big-emoji">${itemIcon(it)}</div><p>«${itemName(it)}» — ще не перевірено, тож віддати чи злити поки не можна.</p><p class="hint-s">Буває, що замикає (${Math.round(SHORT_P * 100)}%) — тоді знадобиться дріт.</p>`,
+      buttons: [{ label: tt`🧪 Перевірити · 1 ⚡`, onClick: () => test(i) }, { label: tt`Пізніше`, cls: "ghost" }] });
   }
   function test(i) {
     const it = S.board[i]; if (!it || !it.untested) return;
     if (!spendEnergy(1)) return;
     delete it.untested;
-    if (Math.random() < SHORT_P) { it.short = true; sfx.nope(); toast("💥 Замикання! Перетягни на виріб дріт 🔌"); }
-    else { sfx.merge(it.l); sparkle(i, "✨", 6); toast("✅ Працює!"); }
+    if (Math.random() < SHORT_P) { it.short = true; sfx.nope(); toast(tt`💥 Замикання! Перетягни на виріб дріт 🔌`); }
+    else { sfx.merge(it.l); sparkle(i, "✨", 6); toast(tt`✅ Працює!`); }
     popIdx.add(i); renderBoard(); renderInfo(); renderOrders(); renderTop(); save();
   }
   const tileKey = it => (it && it.untested ? ":u" : "") + (it && it.short ? ":x" : "");
@@ -183,13 +183,13 @@ window.CRAFT = (() => {
   }
 
   function genInfo(it) {
-    if (it.g === "w_forge") return ` · 🔥 жар ${heat(it)}/${HEAT_MAX}`;
-    if (it.g === "w_amber") return digging(it) ? ` · ⛏️ нова жила за ${hm(it.digUntil - now())}` : ` · жила ${VEIN - (it.vein || 0)}/${VEIN}`;
+    if (it.g === "w_forge") return tt` · 🔥 жар ${heat(it)}/${HEAT_MAX}`;
+    if (it.g === "w_amber") return digging(it) ? tt` · ⛏️ нова жила за ${hm(it.digUntil - now())}` : tt` · жила ${VEIN - (it.vein || 0)}/${VEIN}`;
     return "";
   }
   function cardSub() {
     const n = next();
-    return n ? ` · далі: ${n.name.toLowerCase()} (${n.at} виробів)` : "";
+    return n ? tt` · далі: ${n.name.toLowerCase()} (${n.at} виробів)` : "";
   }
   function tick() { if (S && S.started && S.woodOn && !busyUI()) unlock(); }
   return { canTap, afterTap, feed, onMerged, onDeliver, genInfo, cardSub, tick, unusable, testModal, tileKey, decorate, list: CRAFT_LIST };

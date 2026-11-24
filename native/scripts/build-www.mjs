@@ -9,8 +9,8 @@ const SRC = join(here, "..", "..");        // корінь гри (dvoryk/)
 const OUT = join(here, "..", "www");
 
 const FILES = ["index.html", "style.css", "farm.css", "manifest.webmanifest"];
-const DIRS = ["js", "items", "e3d", "icons", "models", "portraits", "vendor"];
-const SKIP = /(^|\/)(\.DS_Store|License\.txt)$|\.(md|txt|swift|sh)$/i;
+const DIRS = ["js", "lang", "items", "e3d", "icons", "models", "portraits", "vendor"];
+const SKIP = /(^|\/)(\.DS_Store|License\.txt|todo-[a-z]+\.json)$|\.(md|txt|swift|sh)$/i;
 
 rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT, { recursive: true });

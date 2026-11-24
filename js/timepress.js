@@ -16,7 +16,7 @@ window.TP = (() => {
   const now = () => window.DVORYK_NOW || Date.now();
   const on = id => window.UNL && UNL.on(id);
   const busyUI = () => $("modal").classList.contains("show") || $("dialog").classList.contains("show");
-  const hm = ms => { const t = Math.max(0, Math.ceil(ms / 6e4)), h = Math.floor(t / 60); return h >= 24 ? Math.floor(h / 24) + " д " + (h % 24) + " год" : h ? h + " год " + (t % 60) + " хв" : (t % 60) + " хв"; };
+  const hm = ms => { const t = Math.max(0, Math.ceil(ms / 6e4)), h = Math.floor(t / 60); return h >= 24 ? Math.floor(h / 24) + tt` д ` + (h % 24) + tt` год` : h ? h + tt` год ` + (t % 60) + tt` хв` : (t % 60) + tt` хв`; };
   const plain = o => !o.until && !o.paw && !o.rare && !o.ev && !o.catUntil;
 
   /* ---------- терпіння ---------- */
@@ -36,7 +36,7 @@ window.TP = (() => {
       const had = !!(S.fr && S.fr[o.ch]);
       if (had) S.fr[o.ch] = Math.max(0, S.fr[o.ch] - 1);
       const m = ["stepan", "andriy", "ivan", "taras", "cat"].includes(o.ch);
-      toast(`😤 ${CHARS[o.ch].name.split(" ").pop()} не ${m ? "дочекався" : "дочекалась"} замовлення й ${m ? "пішов" : "пішла"}…${had ? " −1 💛" : ""}`);
+      toast(tt`😤 ${shortName(CHARS[o.ch].name)} не ${m ? tt`дочекався` : tt`дочекалась`} замовлення й ${m ? tt`пішов` : tt`пішла`}…${had ? " −1 💛" : ""}`);
     });
     fillOrders(); renderOrders(); save();
   }
@@ -70,7 +70,7 @@ window.TP = (() => {
     const g = big(); if (!g || g.started) return;
     g.started = true; g.until = now() + BIG_DUR; save();
     sfx.level(); renderButton();
-    playDialog([["halya", `Почали, {name}! Три години — і обидві ділянки разом: ${CHAINS[g.a.c].items[0][0]} і ${CHAINS[g.b.c].items[0][0]}. Тапай обидва генератори, енергії не шкодуй! ⏳`]], panel);
+    playDialog([["halya", tt`Почали, {name}! Три години — і обидві ділянки разом: ${CHAINS[g.a.c].items[0][0]} і ${CHAINS[g.b.c].items[0][0]}. Тапай обидва генератори, енергії не шкодуй! ⏳`]], panel);
   }
   function grant(r) {
     const p = [];
@@ -88,24 +88,24 @@ window.TP = (() => {
     const txt = won ? grant(BIG_FULL) : half ? grant(BIG_HALF) : "";
     save(); renderAll(); renderButton();
     if (won) { confetti(); sfx.level(); }
-    modal({ title: won ? "Великий виклик подолано! 🏆" : half ? "Майже! ⏳" : "Час вийшов ⏳",
+    modal({ title: won ? tt`Великий виклик подолано! 🏆` : half ? tt`Майже! ⏳` : tt`Час вийшов ⏳`,
       html: `<div class="big-emoji">${won ? "🏆" : "⏳"}</div><p>${CHAINS[g.a.c].items[0][0]} ${g.a.n}/${g.a.t} &nbsp; · &nbsp; ${CHAINS[g.b.c].items[0][0]} ${g.b.n}/${g.b.t}</p>` +
-        (txt ? `<p class="rewards">${txt}</p>` : `<p>Наступного тижня — новий виклик!</p>`),
-      buttons: [{ label: won ? "Ура! 💛" : "Добре" }] });
+        (txt ? `<p class="rewards">${txt}</p>` : tt`<p>Наступного тижня — новий виклик!</p>`),
+      buttons: [{ label: won ? tt`Ура! 💛` : tt`Добре` }] });
   }
-  const row = x => `<div class="bg-row"><span class="bg-ic">${CHAINS[x.c].items[BIG_MIN_L][0]}</span><span class="bg-mid"><b>${CHAINS[x.c].name}: ${x.t} предметів ${BIG_MIN_L + 1}+ рівня</b>` +
+  const row = x => tt`<div class="bg-row"><span class="bg-ic">${CHAINS[x.c].items[BIG_MIN_L][0]}</span><span class="bg-mid"><b>${CHAINS[x.c].name}: ${x.t} предметів ${BIG_MIN_L + 1}+ рівня</b>` +
     `<i class="dq-bar"><b style="width:${x.n / x.t * 100}%"></b></i><small>${x.n}/${x.t}</small></span></div>`;
   function panel() {
     const g = big(); if (!g) return;
-    const st = g.over ? `<p class="dq-when">Цього тижня вже був. Новий — з понеділка.</p>`
-      : g.started ? `<p class="dq-when">Лишилось: <b>${hm(g.until - now())}</b></p>`
-      : `<p class="dq-when">Готова? Таймер на <b>3 години</b> почнеться, щойно натиснеш «Почати».</p>`;
-    modal({ title: "Великий виклик тижня 🏆",
+    const st = g.over ? tt`<p class="dq-when">Цього тижня вже був. Новий — з понеділка.</p>`
+      : g.started ? tt`<p class="dq-when">Лишилось: <b>${hm(g.until - now())}</b></p>`
+      : tt`<p class="dq-when">Готова? Таймер на <b>3 години</b> почнеться, щойно натиснеш «Почати».</p>`;
+    modal({ title: tt`Великий виклик тижня 🏆`,
       html: st + row(g.a) + row(g.b) +
         `<p class="fl-rew"><span>60%: 📦 +${BIG_HALF.coins} 🪙</span><span>100%: 💝 ${CHAINS.rare ? CHAINS.rare.items[BIG_FULL.rare][0] : ""} +${BIG_FULL.stars} ⭐ +${BIG_FULL.coins} 🪙</span></p>` +
-        `<p class="hint-s">Рахуються злиття в предмети ${BIG_MIN_L + 1}-го рівня й вище з обох генераторів. Без докупівлі енергії й розбудження генераторів — не встигнути.</p>`,
-      buttons: [...(!g.started && !g.over ? [{ label: "Почати! ⏳", onClick: startBig }] : []),
-        ...(g.started && !g.over ? [{ label: "⚡ Енергія", onClick: () => showNoEnergyInfo() }] : []), { label: "Закрити", cls: "ghost" }] });
+        tt`<p class="hint-s">Рахуються злиття в предмети ${BIG_MIN_L + 1}-го рівня й вище з обох генераторів. Без докупівлі енергії й розбудження генераторів — не встигнути.</p>`,
+      buttons: [...(!g.started && !g.over ? [{ label: tt`Почати! ⏳`, onClick: startBig }] : []),
+        ...(g.started && !g.over ? [{ label: tt`⚡ Енергія`, onClick: () => showNoEnergyInfo() }] : []), { label: tt`Закрити`, cls: "ghost" }] });
   }
   function renderButton() {
     const b = $("bigBtn"); if (!b) return;
@@ -113,7 +113,7 @@ window.TP = (() => {
     b.hidden = !r || S.sideOn;
     if (!r) return;
     const g = S.big;
-    $("bgTime").textContent = hm(g.until - now()).replace(" год ", "г ").replace(" хв", "хв");
+    $("bgTime").textContent = hm(g.until - now()).replace(" год ", tt`г `).replace(" хв", tt`хв`);
     $("bgBar").style.width = ((g.a.n + g.b.n) / (g.a.t + g.b.t) * 100) + "%";
   }
   function bigTick() {
@@ -125,8 +125,8 @@ window.TP = (() => {
   function card() {
     if (!on("bigflash")) return null;
     const g = big();
-    return { icon: "🏆", title: "Великий виклик тижня", sub: g.over ? "цього тижня вже був" : g.started ? `${g.a.n + g.b.n}/${g.a.t + g.b.t} · ще ${hm(g.until - now())}` : `${CHAINS[g.a.c].items[0][0]} + ${CHAINS[g.b.c].items[0][0]} · 3 години, почни, коли зручно`,
-      btn: g.over ? "" : g.started ? "Відкрити" : "Почати", act: g.over ? "" : "big", ready: !g.over && !g.started };
+    return { icon: "🏆", title: tt`Великий виклик тижня`, sub: g.over ? tt`цього тижня вже був` : g.started ? tt`${g.a.n + g.b.n}/${g.a.t + g.b.t} · ще ${hm(g.until - now())}` : tt`${CHAINS[g.a.c].items[0][0]} + ${CHAINS[g.b.c].items[0][0]} · 3 години, почни, коли зручно`,
+      btn: g.over ? "" : g.started ? tt`Відкрити` : tt`Почати`, act: g.over ? "" : "big", ready: !g.over && !g.started };
   }
 
   function tick() { if (!S || !S.started) return; patienceTick(); bigTick(); timers(); }

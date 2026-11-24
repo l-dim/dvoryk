@@ -8,16 +8,16 @@
    Стан у S.wd: { id, intro, n:{сусід:замовлень}, dressed:{}, sick:{}, frost, warned }
    ============================================================ */
 const WARDROBE = {
-  halya:    { e: "🧣", name: "Вовняна хустка",        orders: 4, item: { c: "bake",   l: 5 }, coins: 120 },
-  stepan:   { e: "🥾", name: "Теплі чоботи",          orders: 4, item: { c: "veg",    l: 6 }, coins: 150 },
-  olya:     { e: "🧤", name: "Рукавички",             orders: 4, item: { c: "veg",    l: 5 }, coins: 100 },
-  marichka: { e: "🧢", name: "Шапка з помпоном",      orders: 4, item: { c: "fruit",  l: 3 }, coins: 80 },
-  andriy:   { e: "🧦", name: "Вовняні шкарпетки",     orders: 4, item: { c: "dairy",  l: 2 }, coins: 100 },
-  liza:     { e: "🧥", name: "Пухнасте пальто",       orders: 4, item: { c: "flower", l: 4 }, coins: 180 },
-  cat:      { e: "🧶", name: "Светрик для котика",    orders: 3, item: { c: "sweet",  l: 3 }, coins: 60 },
-  ivan:     { e: "🧥", name: "Кожух листоноші",       orders: 4, item: { c: "tea",    l: 3 }, coins: 150 },
-  taras:    { e: "🧣", name: "Довгий шарф",           orders: 4, item: { c: "bake",   l: 6 }, coins: 100 },
-  iryna:    { e: "🧤", name: "Теплі рукавички",       orders: 4, item: { c: "flower", l: 5 }, coins: 120 }
+  halya:    { e: "🧣", name: tt`Вовняна хустка`,        orders: 4, item: { c: "bake",   l: 5 }, coins: 120 },
+  stepan:   { e: "🥾", name: tt`Теплі чоботи`,          orders: 4, item: { c: "veg",    l: 6 }, coins: 150 },
+  olya:     { e: "🧤", name: tt`Рукавички`,             orders: 4, item: { c: "veg",    l: 5 }, coins: 100 },
+  marichka: { e: "🧢", name: tt`Шапка з помпоном`,      orders: 4, item: { c: "fruit",  l: 3 }, coins: 80 },
+  andriy:   { e: "🧦", name: tt`Вовняні шкарпетки`,     orders: 4, item: { c: "dairy",  l: 2 }, coins: 100 },
+  liza:     { e: "🧥", name: tt`Пухнасте пальто`,       orders: 4, item: { c: "flower", l: 4 }, coins: 180 },
+  cat:      { e: "🧶", name: tt`Светрик для котика`,    orders: 3, item: { c: "sweet",  l: 3 }, coins: 60 },
+  ivan:     { e: "🧥", name: tt`Кожух листоноші`,       orders: 4, item: { c: "tea",    l: 3 }, coins: 150 },
+  taras:    { e: "🧣", name: tt`Довгий шарф`,           orders: 4, item: { c: "bake",   l: 6 }, coins: 100 },
+  iryna:    { e: "🧤", name: tt`Теплі рукавички`,       orders: 4, item: { c: "flower", l: 5 }, coins: 120 }
 };
 
 window.WD = (() => {
@@ -50,14 +50,14 @@ window.WD = (() => {
   }
   const readyAny = () => !!st() && Object.keys(WARDROBE).some(k => known(k) && canGive(k));
   const daysLeft = () => { const s = season(); return Math.max(0, Math.ceil((s.frost - now()) / 864e5)); };
-  const plural = n => n % 10 === 1 && n % 100 !== 11 ? "день" : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? "дні" : "днів";
+  const days = n => plural(n, "день", "дні", "днів");
 
   /* ---------- події ---------- */
   function onDeliver(o) {
     const w = st();
     if (!w || season().phase !== "prep" || !WARDROBE[o.ch] || w.dressed[o.ch]) return;
     w.n[o.ch] = (w.n[o.ch] || 0) + 1;
-    if (canGive(o.ch)) setTimeout(() => toast(`${WARDROBE[o.ch].e} Можна видати: ${WARDROBE[o.ch].name} — у завданнях 📋`), 1800);
+    if (canGive(o.ch)) setTimeout(() => toast(tt`${WARDROBE[o.ch].e} Можна видати: ${WARDROBE[o.ch].name} — у завданнях 📋`), 1800);
   }
   function give(who) {
     if (!canGive(who)) return;
@@ -72,10 +72,10 @@ window.WD = (() => {
     playDialog([[who, pick(THANKS_WARM)]], () => window.QUEST && QUEST.panel("winter"));
   }
   const THANKS_WARM = [
-    "Ой, як тепло! Тепер мені жодні морози не страшні 💛",
-    "Дякую, {name}! Це найтепліший подарунок у моєму житті 🥹",
-    "Яке м'якеньке! Сьогодні ж у ньому й піду 😊",
-    "Тепер можна хоч на ковзанку, хоч колядувати до ранку! ❄️"
+    tt`Ой, як тепло! Тепер мені жодні морози не страшні 💛`,
+    tt`Дякую, {name}! Це найтепліший подарунок у моєму житті 🥹`,
+    tt`Яке м'якеньке! Сьогодні ж у ньому й піду 😊`,
+    tt`Тепер можна хоч на ковзанку, хоч колядувати до ранку! ❄️`
   ];
   function frost() {
     const w = st();
@@ -87,14 +87,14 @@ window.WD = (() => {
     const dressed = Object.keys(WARDROBE).filter(k => known(k) && w.dressed[k]);
     const faces = list => list.map(k => face(CHARS[k], "mini")).join(" ");
     modal({
-      title: "Прийшли морози ❄️",
+      title: tt`Прийшли морози ❄️`,
       html: `<div class="big-emoji">🌨️</div>` +
-        (dressed.length ? `<p>Тепло вдягнені: ${dressed.length}</p><p class="wd-faces">${faces(dressed)}</p>` : "") +
-        (sick.length ? `<p>Змерзли й пішли на лікарняний до 1 березня: ${sick.length}</p><p class="wd-faces sick">${faces(sick)}</p>`
-                     : `<p><b>Ніхто не змерз!</b> Ти всіх вдягнула вчасно 💛</p>`),
-      buttons: [{ label: sick.length ? "Одужуйте 🤒" : "Ура! 🧣", onClick: () => playDialog(sick.length
-        ? [["halya", sick.length > 3 ? "Ой, пів села злягло… Нічого, понесемо їм малинового чаю 🍵" : "Шкода, що не всіх устигли вдягнути. Але до весни одужають 💛"]]
-        : [["halya", "Усе село тепло вдягнене! Тепер нам жодна зима не страшна ❄️💛"]]) }]
+        (dressed.length ? tt`<p>Тепло вдягнені: ${dressed.length}</p><p class="wd-faces">${faces(dressed)}</p>` : "") +
+        (sick.length ? tt`<p>Змерзли й пішли на лікарняний до 1 березня: ${sick.length}</p><p class="wd-faces sick">${faces(sick)}</p>`
+                     : tt`<p><b>Ніхто не змерз!</b> Ти всіх вдягнула вчасно 💛</p>`),
+      buttons: [{ label: sick.length ? tt`Одужуйте 🤒` : tt`Ура! 🧣`, onClick: () => playDialog(sick.length
+        ? [["halya", sick.length > 3 ? tt`Ой, пів села злягло… Нічого, понесемо їм малинового чаю 🍵` : tt`Шкода, що не всіх устигли вдягнути. Але до весни одужають 💛`]]
+        : [["halya", tt`Усе село тепло вдягнене! Тепер нам жодна зима не страшна ❄️💛`]]) }]
     });
   }
 
@@ -108,9 +108,9 @@ window.WD = (() => {
     if (s.phase === "prep" && !w.intro) {
       w.intro = true; save();
       playDialog([
-        ["halya", "{name}, синоптики обіцяють люті морози з 15 грудня! ❄️ А в наших сусідів — ні шапок, ні рукавиць…"],
-        ["olya", "Хто змерзне — той до весни зляже. Торік у мене так півсела з нежиттю ходило 🤧"],
-        ["halya", "Пошиймо кожному теплу річ! Віддай сусідові кілька його замовлень, принеси матеріал — і плати за тканину. Деталі — у завданнях 📋, вкладка «Зима»."]
+        ["halya", tt`{name}, синоптики обіцяють люті морози з 15 грудня! ❄️ А в наших сусідів — ні шапок, ні рукавиць…`],
+        ["olya", tt`Хто змерзне — той до весни зляже. Торік у мене так півсела з нежиттю ходило 🤧`],
+        ["halya", tt`Пошиймо кожному теплу річ! Віддай сусідові кілька його замовлень, принеси матеріал — і плати за тканину. Деталі — у завданнях 📋, вкладка «Зима».`]
       ], () => window.QUEST && QUEST.panel("winter"));
       return;
     }
@@ -119,7 +119,7 @@ window.WD = (() => {
       const left = daysLeft(), key = String(left), naked = Object.keys(WARDROBE).filter(k => known(k) && !w.dressed[k]).length;
       if (naked && [7, 3, 1].includes(left) && w.warned !== key) {
         w.warned = key; save();
-        toast(`❄️ До морозів ${left} ${plural(left)}! Ще не вдягнені: ${naked}`);
+        toast(tt`❄️ До морозів ${left} ${days(left)}! Ще не вдягнені: ${naked}`);
       }
     }
   }
@@ -127,25 +127,25 @@ window.WD = (() => {
   /* ---------- вкладка «Зима» ---------- */
   function html() {
     const s = season(), w = st();
-    if (!s || !w) return `<p class="hint-s">Зимова шафа відкривається щороку з 15 листопада.</p>`;
+    if (!s || !w) return tt`<p class="hint-s">Зимова шафа відкривається щороку з 15 листопада.</p>`;
     const rows = Object.keys(WARDROBE).filter(known).map(k => {
       const g = WARDROBE[k], it = needItem(k), n = Math.min(w.n[k] || 0, g.orders);
       let right, sub;
-      if (w.dressed[k]) { right = `<span class="wd-ok">✅</span>`; sub = `Тепло вдягнений 💛`; }
-      else if (w.sick[k]) { right = `<span class="wd-ok">🤒</span>`; sub = `На лікарняному до 1 березня`; }
+      if (w.dressed[k]) { right = `<span class="wd-ok">✅</span>`; sub = tt`Тепло вдягнений 💛`; }
+      else if (w.sick[k]) { right = `<span class="wd-ok">🤒</span>`; sub = tt`На лікарняному до 1 березня`; }
       else {
         const haveItem = findOnBoard(it) >= 0, haveCoins = S.coins >= g.coins, ordOk = n >= g.orders;
-        sub = `<span class="${ordOk ? "ok" : ""}">замовлення ${n}/${g.orders}</span> · <span class="${haveItem ? "ok" : ""}">${itemIcon(it)}</span> · <span class="${haveCoins ? "ok" : ""}">${g.coins}🪙</span>`;
-        right = s.phase === "prep" ? `<button class="s-btn wd-give${canGive(k) ? "" : " dim"}" data-who="${k}">Видати</button>` : "";
+        sub = tt`<span class="${ordOk ? "ok" : ""}">замовлення ${n}/${g.orders}</span> · <span class="${haveItem ? "ok" : ""}">${itemIcon(it)}</span> · <span class="${haveCoins ? "ok" : ""}">${g.coins}🪙</span>`;
+        right = s.phase === "prep" ? tt`<button class="s-btn wd-give${canGive(k) ? "" : " dim"}" data-who="${k}">Видати</button>` : "";
       }
       return `<div class="wd-row${w.sick[k] ? " sick" : w.dressed[k] ? " done" : ""}"><span class="wd-ava">${face(CHARS[k], "mini")}<i>${g.e}</i></span>` +
-        `<span class="wd-mid"><b>${g.name} — ${CHARS[k].name.split(" ").pop()}</b><small>${sub}</small></span>${right}</div>`;
+        `<span class="wd-mid"><b>${g.name} — ${shortName(CHARS[k].name)}</b><small>${sub}</small></span>${right}</div>`;
     }).join("");
     const head = s.phase === "prep"
-      ? `<p class="dq-when">До морозів: <b>${daysLeft()} ${plural(daysLeft())}</b> (15 грудня)</p>`
-      : `<p class="dq-when">Морози тривають до <b>1 березня</b> ❄️</p>`;
+      ? tt`<p class="dq-when">До морозів: <b>${daysLeft()} ${days(daysLeft())}</b> (15 грудня)</p>`
+      : tt`<p class="dq-when">Морози тривають до <b>1 березня</b> ❄️</p>`;
     return head + `<div class="wd-list">${rows}</div>` +
-      (s.phase === "prep" ? `<p class="dq-hint">Віддай сусідові його замовлення, принеси предмет із дошки й заплати за тканину — і видай теплу річ. Хто лишиться без неї, той злягне до весни 🤒</p>` : "");
+      (s.phase === "prep" ? tt`<p class="dq-hint">Віддай сусідові його замовлення, принеси предмет із дошки й заплати за тканину — і видай теплу річ. Хто лишиться без неї, той злягне до весни 🤒</p>` : "");
   }
   function bind() {
     document.querySelectorAll(".wd-give").forEach(b => b.onclick = () => {
@@ -153,10 +153,10 @@ window.WD = (() => {
       if (canGive(k)) { give(k); return; }
       const w = st(), g = WARDROBE[k], it = needItem(k);
       const miss = [];
-      if ((w.n[k] || 0) < g.orders) miss.push(`ще ${g.orders - (w.n[k] || 0)} замовл. від ${CHARS[k].name.split(" ").pop()}`);
-      if (findOnBoard(it) < 0) miss.push(`${itemIcon(it)} ${itemName(it)} на дошці`);
+      if ((w.n[k] || 0) < g.orders) miss.push(tt`ще ${g.orders - (w.n[k] || 0)} замовл. від ${shortName(CHARS[k].name)}`);
+      if (findOnBoard(it) < 0) miss.push(tt`${itemIcon(it)} ${itemName(it)} на дошці`);
       if (S.coins < g.coins) miss.push(`${g.coins - S.coins} 🪙`);
-      sfx.nope(); toast("Бракує: " + miss.join(", "));
+      sfx.nope(); toast(tt`Бракує: ` + miss.join(", "));
     });
   }
   const active = () => !!season();

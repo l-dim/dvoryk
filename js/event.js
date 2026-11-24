@@ -19,7 +19,7 @@ window.EV = (() => {
   function daysLeft() {
     const ms = win().end - now();
     const d = Math.floor(ms / 864e5), h = Math.floor(ms % 864e5 / 36e5);
-    return d >= 1 ? d + " дн" : h >= 1 ? h + " год" : Math.max(1, Math.ceil(ms / 6e4)) + " хв";
+    return d >= 1 ? d + tt` дн` : h >= 1 ? h + tt` год` : Math.max(1, Math.ceil(ms / 6e4)) + tt` хв`;
   }
   function nextMilestone() { return EVENT.milestones[st() ? st().got : 0]; }
 
@@ -39,7 +39,7 @@ window.EV = (() => {
       placeItem({ g: EVENT.gen });
       save(); renderAll(); renderButton();
       playDialog(EVENT.story.intro, () => {
-        modal({ title: EVENT.title + " 🎁", html: panelHtml(), buttons: [{ label: "Почнімо! " + PT() }] });
+        modal({ title: EVENT.title + " 🎁", html: panelHtml(), buttons: [{ label: tt`Почнімо! ` + PT() }] });
       });
       return;
     }
@@ -64,10 +64,10 @@ window.EV = (() => {
     S.coins += coins;
     fillOrders(); save(); renderAll(); renderButton();
     modal({
-      title: "Свято минуло " + PT(),
-      html: `<div class="big-emoji">🎁</div><p>Зібрано <b>${e.pts} ${PT()}</b> і отримано ${e.got} з ${EVENT.milestones.length} нагород.</p>` +
-        (n ? `<p class="hint-s">Залишки подарунків (${n} шт.) обміняно на ${coins} 🪙</p>` : ""),
-      buttons: [{ label: "Дякую 💛", onClick: () => playDialog(EVENT.story.ending) }]
+      title: tt`Свято минуло ` + PT(),
+      html: tt`<div class="big-emoji">🎁</div><p>Зібрано <b>${e.pts} ${PT()}</b> і отримано ${e.got} з ${EVENT.milestones.length} нагород.</p>` +
+        (n ? tt`<p class="hint-s">Залишки подарунків (${n} шт.) обміняно на ${coins} 🪙</p>` : ""),
+      buttons: [{ label: tt`Дякую 💛`, onClick: () => playDialog(EVENT.story.ending) }]
     });
   }
 
@@ -120,9 +120,9 @@ window.EV = (() => {
     save(); renderAll(); renderButton();
     confetti(); sfx.level();
     modal({
-      title: e.got === EVENT.milestones.length ? "Свято зібрано! 🎉" : "Нагорода свята! " + PT(),
-      html: `<div class="big-emoji">🎁</div><p>Зібрано ${m.pts} ${PT()} — тримай:</p><p class="rewards">${rewardText(r)}</p>`,
-      buttons: [{ label: "Дякую! 💛", onClick: () => {
+      title: e.got === EVENT.milestones.length ? tt`Свято зібрано! 🎉` : tt`Нагорода свята! ` + PT(),
+      html: tt`<div class="big-emoji">🎁</div><p>Зібрано ${m.pts} ${PT()} — тримай:</p><p class="rewards">${rewardText(r)}</p>`,
+      buttons: [{ label: tt`Дякую! 💛`, onClick: () => {
         const next = () => setTimeout(grantMilestones, 300);
         if (m.story) playDialog(EVENT.story[m.story], next); else next();
       } }]
@@ -150,13 +150,13 @@ window.EV = (() => {
         `<span class="ev-rw">${rewardText(m.reward)}</span><span class="ev-ok">${got ? "✅" : "🔒"}</span></div>`;
     }).join("");
     const m = e && nextMilestone();
-    return `<p>${EVENT.desc || "Допоможи Ірині й Марічці зібрати подарунки для сільських дітей! Тапай скриньку, об'єднуй подарунки й віддавай їм."}</p>
-      <p class="ev-sum"><b>${e ? e.pts : 0} ${PT()}</b>${m ? ` · до наступної нагороди ще ${m.pts - e.pts} ${PT()}` : " · усі нагороди зібрано! 🎉"}<br><small>До кінця свята: ${daysLeft()}</small></p>
+    return tt`<p>${EVENT.desc || tt`Допоможи Ірині й Марічці зібрати подарунки для сільських дітей! Тапай скриньку, об'єднуй подарунки й віддавай їм.`}</p>
+      <p class="ev-sum"><b>${e ? e.pts : 0} ${PT()}</b>${m ? tt` · до наступної нагороди ще ${m.pts - e.pts} ${PT()}` : tt` · усі нагороди зібрано! 🎉`}<br><small>До кінця свята: ${daysLeft()}</small></p>
       <div class="ev-list">${rows}</div>`;
   }
   function panel() {
     modal({ title: EVENT.title + " 🎁", html: panelHtml(),
-      buttons: [{ label: "Зрозуміло" }, { label: "📜 Історія свята", cls: "ghost", onClick: () => playDialog(EVENT.story.intro) }] });
+      buttons: [{ label: tt`Зрозуміло` }, { label: tt`📜 Історія свята`, cls: "ghost", onClick: () => playDialog(EVENT.story.intro) }] });
   }
 
   return { tick, maybeOrder, onDeliver, renderButton, panel, active, finish };

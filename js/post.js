@@ -10,34 +10,34 @@
    ============================================================ */
 const POST_WAIT = 3 * 864e5, POST_GAP_H = [6, 12], POST_TRANSIT_H = [6, 16], POST_MAX = 3, POST_PAY = 1.6;
 const POST_CHAINS = {
-  dairy:   { min: 4, max: 6, ask: "Хочу справжнього домашнього сиру — у місті такого не знайдеш!" },
-  milk:    { min: 2, max: 4, ask: "Діти просять сільського молочка — пришліть, будь ласка!" },
-  cheese:  { min: 2, max: 4, ask: "Шукаю козячий сир від господині, а не з магазину" },
-  wool:    { min: 2, max: 4, ask: "В'яжу светри — потрібна добра овеча вовна" },
-  wood:    { min: 3, max: 5, ask: "Потрібні дерев'яні заготовки для майстерні" },
-  carve:   { min: 2, max: 4, ask: "Шукаю різьблену дерев'яну річ на подарунок" },
-  clay:    { min: 2, max: 4, ask: "Колекціоную глиняний посуд ручної роботи" },
-  forge:   { min: 2, max: 4, ask: "Потрібні ковані речі для дачі" },
-  amber:   { min: 2, max: 4, ask: "Мрію про прикрасу з живого бурштину" },
-  electro: { min: 2, max: 4, ask: "Кажуть, у вашій майстерні все лагодять — допоможете?" }
+  dairy:   { min: 4, max: 6, ask: tt`Хочу справжнього домашнього сиру — у місті такого не знайдеш!` },
+  milk:    { min: 2, max: 4, ask: tt`Діти просять сільського молочка — пришліть, будь ласка!` },
+  cheese:  { min: 2, max: 4, ask: tt`Шукаю козячий сир від господині, а не з магазину` },
+  wool:    { min: 2, max: 4, ask: tt`В'яжу светри — потрібна добра овеча вовна` },
+  wood:    { min: 3, max: 5, ask: tt`Потрібні дерев'яні заготовки для майстерні` },
+  carve:   { min: 2, max: 4, ask: tt`Шукаю різьблену дерев'яну річ на подарунок` },
+  clay:    { min: 2, max: 4, ask: tt`Колекціоную глиняний посуд ручної роботи` },
+  forge:   { min: 2, max: 4, ask: tt`Потрібні ковані речі для дачі` },
+  amber:   { min: 2, max: 4, ask: tt`Мрію про прикрасу з живого бурштину` },
+  electro: { min: 2, max: 4, ask: tt`Кажуть, у вашій майстерні все лагодять — допоможете?` }
 };
-const POST_PEOPLE = [["Оксана", "Київ", 1], ["Богдана", "Львів", 1], ["Пан Ігор", "Одеса"], ["Марта", "Тернопіль", 1], ["Дмитро", "Дніпро"],
-  ["Соломія", "Ужгород", 1], ["Олег", "Полтава"], ["Христина", "Чернівці", 1], ["Назар", "Вінниця"], ["Ганна", "Харків", 1], ["Пані Леся", "Луцьк", 1], ["Роман", "Житомир"]];
-const POST_THANKS = ["Усе дійшло ціле, дякую! Найкраща господиня в країні ⭐⭐⭐⭐⭐", "Розпакували всією родиною — у захваті! Замовлю ще 💛",
-  "Якість — неймовірна. Порадила всім подругам!", "Дуже швидко й з любов'ю запаковано. Дякую! ⭐⭐⭐⭐⭐", "Саме те, що треба було! Щиро дякую 🙏"];
+const POST_PEOPLE = [[tt`Оксана`, tt`Київ`, 1], [tt`Богдана`, tt`Львів`, 1], [tt`Пан Ігор`, tt`Одеса`], [tt`Марта`, tt`Тернопіль`, 1], [tt`Дмитро`, tt`Дніпро`],
+  [tt`Соломія`, tt`Ужгород`, 1], [tt`Олег`, tt`Полтава`], [tt`Христина`, tt`Чернівці`, 1], [tt`Назар`, tt`Вінниця`], [tt`Ганна`, tt`Харків`, 1], [tt`Пані Леся`, tt`Луцьк`, 1], [tt`Роман`, tt`Житомир`]];
+const POST_THANKS = [tt`Усе дійшло ціле, дякую! Найкраща господиня в країні ⭐⭐⭐⭐⭐`, tt`Розпакували всією родиною — у захваті! Замовлю ще 💛`,
+  tt`Якість — неймовірна. Порадила всім подругам!`, tt`Дуже швидко й з любов'ю запаковано. Дякую! ⭐⭐⭐⭐⭐`, tt`Саме те, що треба було! Щиро дякую 🙏`];
 
-if (typeof UNLOCKS !== "undefined") UNLOCKS.push({ id: "post", lvl: 12, icon: "📮", title: "Посилки поштою",
-  text: "Люди з інших міст замовляють твої вироби: домашній сир і молочне, дерев'яні й ковані речі, кераміку, бурштин, електроніку. Збери замовлене й відправ через листоношу Івана — оплата прийде, щойно посилка доїде. Шукай у «Подіях».",
-  lines: [["ivan", "{name}, мені тепер з усієї країни листи йдуть — і всі про тебе! 📮 Хочуть твоїх виробів. Збирай — а я відправлю посилкою"]] });
-if (typeof GUIDE_BASICS !== "undefined") GUIDE_BASICS.push(["📮", "Посилки поштою",
-  "У «Подіях» — замовлення з інших міст (сир і молочне, дерев'яні, ковані, гончарні вироби, бурштин, електроніка — з того, що в тебе вже є). Знайди вироби на городі чи в майстерні й тисни «Відправити». Посилка їде кілька годин, тоді приходить оплата й відгук. Більше відгуків — щедріша оплата."]);
+if (typeof UNLOCKS !== "undefined") UNLOCKS.push({ id: "post", lvl: 12, icon: "📮", title: tt`Посилки поштою`,
+  text: tt`Люди з інших міст замовляють твої вироби: домашній сир і молочне, дерев'яні й ковані речі, кераміку, бурштин, електроніку. Збери замовлене й відправ через листоношу Івана — оплата прийде, щойно посилка доїде. Шукай у «Подіях».`,
+  lines: [["ivan", tt`{name}, мені тепер з усієї країни листи йдуть — і всі про тебе! 📮 Хочуть твоїх виробів. Збирай — а я відправлю посилкою`]] });
+if (typeof GUIDE_BASICS !== "undefined") GUIDE_BASICS.push(["📮", tt`Посилки поштою`,
+  tt`У «Подіях» — замовлення з інших міст (сир і молочне, дерев'яні, ковані, гончарні вироби, бурштин, електроніка — з того, що в тебе вже є). Знайди вироби на городі чи в майстерні й тисни «Відправити». Посилка їде кілька годин, тоді приходить оплата й відгук. Більше відгуків — щедріша оплата.`]);
 
 window.POST = (() => {
   const on = () => window.UNL && UNL.on("post");
   const now = () => window.DVORYK_NOW || Date.now();
   const st = () => (S.post = S.post || { orders: [], sent: [], next: 0, reviews: 0, seq: 0 });
   const rndIn = ([a, b]) => a + Math.random() * (b - a);
-  const hm = ms => { const t = Math.max(0, Math.ceil(ms / 6e4)), h = Math.floor(t / 60); return h >= 24 ? Math.floor(h / 24) + " д " + (h % 24) + " год" : h ? h + " год " + (t % 60) + " хв" : (t % 60) + " хв"; };
+  const hm = ms => { const t = Math.max(0, Math.ceil(ms / 6e4)), h = Math.floor(t / 60); return h >= 24 ? Math.floor(h / 24) + tt` д ` + (h % 24) + tt` год` : h ? h + tt` год ` + (t % 60) + tt` хв` : (t % 60) + tt` хв`; };
   const busyUI = () => $("modal").classList.contains("show") || $("dialog").classList.contains("show");
   /* дошки: город і майстерня (де б ти зараз не була) */
   const mainB = () => S.main || S.board;
@@ -75,7 +75,7 @@ window.POST = (() => {
     const got = findAll(o);
     if (!got) {
       const miss = o.items.filter((it, k) => { const prev = o.items.slice(0, k).filter(x => x.c === it.c && x.l === it.l).length; let n = 0; boards().forEach(b => b.forEach(x => { if (x && !x.g && x.c === it.c && x.l === it.l) n++; })); return n <= prev; });
-      sfx.nope(); toast("Бракує: " + miss.map(it => itemIcon(it) + " " + itemName(it)).join(", ")); return;
+      sfx.nope(); toast(tt`Бракує: ` + miss.map(it => itemIcon(it) + " " + itemName(it)).join(", ")); return;
     }
     got.forEach(({ b, i }) => { b[i] = null; });
     if (selected >= 0 && !S.board[selected]) selected = -1;
@@ -83,7 +83,7 @@ window.POST = (() => {
     s.sent.push({ who: o.who, city: o.city, coins: o.coins, stars: o.stars, arrive: now() + rndIn(POST_TRANSIT_H) * 3600e3 * (window.REB && REB.has("bridge") ? 0.5 : 1) });   // міст — удвічі швидше
     if (window.QUEST) QUEST.track("deliver");
     sfx.deliver(); save(); renderAll();
-    toast(`📦 Посилку для ${o.who} (${o.city}) відправлено! Оплата — щойно доїде`);
+    toast(tt`📦 Посилку для ${o.who} (${o.city}) відправлено! Оплата — щойно доїде`);
     panel();
   }
 
@@ -99,18 +99,18 @@ window.POST = (() => {
       S.coins += coins; S.stars += stars;
       save(); renderTop();
       const p = arrived[0];
-      playDialog([["ivan", `Посилка дійшла! ${p.who} з міста ${p.city} пише: «${POST_THANKS[Math.floor(Math.random() * POST_THANKS.length)]}» 📮 Оплата вже у тебе: +${coins} 🪙 +${stars} ⭐`]]);
+      playDialog([["ivan", tt`Посилка дійшла! ${p.who} з міста ${p.city} пише: «${POST_THANKS[Math.floor(Math.random() * POST_THANKS.length)]}» 📮 Оплата вже у тебе: +${coins} 🪙 +${stars} ⭐`]]);
       sfx.coin();
     }
     // прострочені замовлення
     const gone = s.orders.filter(o => t >= o.until);
-    if (gone.length) { s.orders = s.orders.filter(o => !gone.includes(o)); toast(`📮 ${gone[0].who} (${gone[0].city}) ${gone[0].f ? "не дочекалась і скасувала" : "не дочекався й скасував"} замовлення`); save(); }
+    if (gone.length) { s.orders = s.orders.filter(o => !gone.includes(o)); toast(tt`📮 ${gone[0].who} (${gone[0].city}) ${gone[0].f ? tt`не дочекалась і скасувала` : tt`не дочекався й скасував`} замовлення`); save(); }
     // нові замовлення
     if (!s.next) { s.next = t + 20 * 60e3; save(); return; }
     if (t >= s.next && s.orders.length < POST_MAX) {
       const o = makeOrder();
       s.next = t + rndIn(POST_GAP_H) * 3600e3;
-      if (o) { s.orders.push(o); toast(`📮 Нове замовлення поштою: ${o.who} (${o.city}) — ${o.items.map(itemIcon).join(" ")}`); }
+      if (o) { s.orders.push(o); toast(tt`📮 Нове замовлення поштою: ${o.who} (${o.city}) — ${o.items.map(itemIcon).join(" ")}`); }
       save();
     }
   }
@@ -121,27 +121,27 @@ window.POST = (() => {
       const ok = !!findAll(o);
       return `<div class="wd-row${ok ? " done" : ""}"><span class="wd-ava">📦</span><span class="wd-mid"><b>${o.who} · ${o.city}</b>` +
         `<small>«${o.ask}»</small><small>${o.items.map(it => itemIcon(it) + " " + itemName(it)).join(" + ")} · +${o.coins} 🪙 +${o.stars} ⭐ · ⏰ ${hm(o.until - now())}</small></span>` +
-        `<button class="s-btn post-send${ok ? "" : " dim"}" data-id="${o.id}">Відправити</button></div>`;
+        tt`<button class="s-btn post-send${ok ? "" : " dim"}" data-id="${o.id}">Відправити</button></div>`;
     }).join("");
-    const way = s.sent.map(p => `<div class="wd-row"><span class="wd-ava">🚚</span><span class="wd-mid"><b>${p.who} · ${p.city}</b><small>у дорозі ще ${hm(p.arrive - now())} · оплата +${p.coins} 🪙</small></span></div>`).join("");
+    const way = s.sent.map(p => tt`<div class="wd-row"><span class="wd-ava">🚚</span><span class="wd-mid"><b>${p.who} · ${p.city}</b><small>у дорозі ще ${hm(p.arrive - now())} · оплата +${p.coins} 🪙</small></span></div>`).join("");
     modal({
-      title: "Посилки поштою 📮",
-      html: (cs.length ? "" : `<p class="hint-s">Замовляють домашній сир і молочне, дерев'яні, ковані, гончарні вироби, бурштин і електроніку. Щойно в тебе з'явиться курник, хлів чи майстерня — підуть і замовлення.</p>`) +
-        (rows ? `<div class="wd-list">${rows}</div>` : `<p>Поки нових замовлень немає — наступне прийде за <b>${hm(Math.max(0, s.next - now()))}</b>.</p>`) +
-        (way ? `<p class="dq-when">У дорозі</p><div class="wd-list">${way}</div>` : "") +
-        `<p class="hint-s">Відгуків: <b>${s.reviews}</b>${s.reviews ? ` · за них платять щедріше: +${Math.round(bonus() * 100)}%` : ""}. Вироби беруться з городу або з майстерні.</p>`,
-      buttons: [{ label: "Готово", cls: "ghost" }]
+      title: tt`Посилки поштою 📮`,
+      html: (cs.length ? "" : tt`<p class="hint-s">Замовляють домашній сир і молочне, дерев'яні, ковані, гончарні вироби, бурштин і електроніку. Щойно в тебе з'явиться курник, хлів чи майстерня — підуть і замовлення.</p>`) +
+        (rows ? `<div class="wd-list">${rows}</div>` : tt`<p>Поки нових замовлень немає — наступне прийде за <b>${hm(Math.max(0, s.next - now()))}</b>.</p>`) +
+        (way ? tt`<p class="dq-when">У дорозі</p><div class="wd-list">${way}</div>` : "") +
+        tt`<p class="hint-s">Відгуків: <b>${s.reviews}</b>${s.reviews ? tt` · за них платять щедріше: +${Math.round(bonus() * 100)}%` : ""}. Вироби беруться з городу або з майстерні.</p>`,
+      buttons: [{ label: tt`Готово`, cls: "ghost" }]
     });
     document.querySelectorAll(".post-send").forEach(b => b.onclick = () => send(+b.dataset.id));
   }
 
   function card() {
-    if (!on()) return { icon: "📮", title: "Посилки поштою", sub: `відкриється на ${window.PACE ? PACE.lvl("post") : 12} рівні`, locked: true };
+    if (!on()) return { icon: "📮", title: tt`Посилки поштою`, sub: tt`відкриється на ${window.PACE ? PACE.lvl("post") : 12} рівні`, locked: true };
     const s = st(), ready = s.orders.some(o => findAll(o));
     const sub = s.orders.length || s.sent.length
-      ? [s.orders.length ? `замовлень: ${s.orders.length}` : "", s.sent.length ? `у дорозі: ${s.sent.length}` : "", s.reviews ? `відгуків: ${s.reviews}` : ""].filter(Boolean).join(" · ")
-      : chains().length ? "нове замовлення прийде за " + hm(Math.max(0, s.next - now())) : "потрібен курник, хлів чи майстерня";
-    return { icon: "📮", title: "Посилки поштою", sub: sub + (ready ? " · є що відправити!" : ""), btn: "Відкрити", act: "post", ready };
+      ? [s.orders.length ? tt`замовлень: ${s.orders.length}` : "", s.sent.length ? tt`у дорозі: ${s.sent.length}` : "", s.reviews ? tt`відгуків: ${s.reviews}` : ""].filter(Boolean).join(" · ")
+      : chains().length ? tt`нове замовлення прийде за ` + hm(Math.max(0, s.next - now())) : tt`потрібен курник, хлів чи майстерня`;
+    return { icon: "📮", title: tt`Посилки поштою`, sub: sub + (ready ? tt` · є що відправити!` : ""), btn: tt`Відкрити`, act: "post", ready };
   }
   return { tick, panel, card, send, chains, makeOrder };
 })();

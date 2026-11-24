@@ -138,18 +138,18 @@
   function resolveConflict(r) {
     waiting = true; setState("conflict");
     whenIdle(() => {
-      const here = hasGame() ? `рівень ${S.level}, розділ ${Math.min(S.chapter, STORY.length - 1) + 1}` : "нова гра";
-      const there = `рівень ${r.level || 1}, розділ ${(r.chapter || 0) + 1}`;
+      const here = hasGame() ? tt`рівень ${S.level}, розділ ${Math.min(S.chapter, STORY.length - 1) + 1}` : tt`нова гра`;
+      const there = tt`рівень ${r.level || 1}, розділ ${(r.chapter || 0) + 1}`;
       const when = r.updated_at ? new Date(r.updated_at).toLocaleString("uk-UA", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }) : "";
       modal({
-        title: "Два різні збереження ☁️",
-        html: `<p>У хмарі є прогрес з іншого пристрою, і він відрізняється від цього.</p>
+        title: tt`Два різні збереження ☁️`,
+        html: tt`<p>У хмарі є прогрес з іншого пристрою, і він відрізняється від цього.</p>
           <p>📱 <b>Цей телефон:</b> ${here}</p>
           <p>☁️ <b>Хмара:</b> ${there}${when ? ` <span class="hint-s">(${when})</span>` : ""}</p>
           <p class="hint-s">Інший варіант не пропаде — ми зберігаємо кілька попередніх версій.</p>`,
         buttons: [
-          { label: "☁️ Взяти з хмари", onClick: takeCloud },
-          { label: "📱 Залишити цей телефон", cls: "ghost", onClick: () => { waiting = false; push({ force: true }); } }
+          { label: tt`☁️ Взяти з хмари`, onClick: takeCloud },
+          { label: tt`📱 Залишити цей телефон`, cls: "ghost", onClick: () => { waiting = false; push({ force: true }); } }
         ]
       });
     });
@@ -165,7 +165,7 @@
       reloadAfterSave();
     } catch (e) {
       waiting = false; setState("err");
-      toast("Не вдалося завантажити з хмари 🙈 Спробуй пізніше");
+      toast(tt`Не вдалося завантажити з хмари 🙈 Спробуй пізніше`);
     }
   }
   /* не перебиваємо вікна гри (історія, щоденний подарунок, стартовий екран) */
@@ -211,7 +211,7 @@
     if (!meta.s) return { signed: false };
     const c = claims(meta.s.at);
     const prov = ((c.app_metadata && c.app_metadata.providers) || []).filter(p => p !== "anonymous");
-    const via = prov.map(p => ({ apple: "Apple", google: "Google" })[p] || p).join(" і ");
+    const via = prov.map(p => ({ apple: "Apple", google: "Google" })[p] || p).join(tt` і `);
     return { signed: !c.is_anonymous && prov.length > 0, anon: !!c.is_anonymous, email: c.email || "", via };
   }
 
@@ -301,7 +301,7 @@
       }
       await adopt(await round("signin"), "signin");
     } catch (e) {
-      if (!canceled(e)) toast("Не вдалося увійти 🙈 Перевір інтернет і спробуй ще раз");
+      if (!canceled(e)) toast(tt`Не вдалося увійти 🙈 Перевір інтернет і спробуй ще раз`);
     } finally {
       signing = false;
       document.querySelectorAll("[data-signin]").forEach(b => (b.disabled = false));
@@ -316,7 +316,7 @@
     if (meta.off) delete meta.off;
     if (same || mode === "link") {
       writeMeta(); setState(meta.last ? "ok" : "new");
-      toast("Готово 💛 Тепер гру можна відкрити на іншому телефоні");
+      toast(tt`Готово 💛 Тепер гру можна відкрити на іншому телефоні`);
       if (!checked && hasGame()) check();
       return;
     }
@@ -327,7 +327,7 @@
     const rows = await call("/rest/v1/saves?select=rev,level,chapter,updated_at,device");
     const r = rows && rows[0];
     if (!r) {
-      setState("new"); toast("Вхід виконано 💛");
+      setState("new"); toast(tt`Вхід виконано 💛`);
       if (hasGame()) push(); else checked = false;
       return;
     }
@@ -349,7 +349,7 @@
     clearTimeout(timer); timer = null;
     meta = { dirty: true, rev: 0 }; writeMeta();
     checked = false; waiting = false; setState("new");
-    toast("Вихід з акаунта виконано");
+    toast(tt`Вихід з акаунта виконано`);
     check();
   }
   /* вебверсія: повернулись зі сторінки входу Google */
@@ -369,7 +369,7 @@
       }
       await adopt(await exchangeCode(r.code, pend.verifier), pend.mode);
     } catch (e) {
-      if (!canceled(e)) toast("Не вдалося увійти 🙈 Спробуй ще раз");
+      if (!canceled(e)) toast(tt`Не вдалося увійти 🙈 Спробуй ще раз`);
     }
     return true;
   }
@@ -379,13 +379,13 @@
     if (!startBtn || document.getElementById("startSignin") || meta.off) return;
     const b = document.createElement("button");
     b.id = "startSignin"; b.className = "btn ghost small";
-    b.textContent = "Вже граєш на іншому телефоні? Увійти";
+    b.textContent = tt`Вже граєш на іншому телефоні? Увійти`;
     b.onclick = () => {
       modal({
-        title: "Увійти ☁️",
-        html: `<p>Увійди тим самим акаунтом, що й на іншому телефоні — і гра продовжиться з того місця.</p>
+        title: tt`Увійти ☁️`,
+        html: tt`<p>Увійди тим самим акаунтом, що й на іншому телефоні — і гра продовжиться з того місця.</p>
           <div class="set-backup">${signinButtons()}</div>`,
-        buttons: [{ label: "Скасувати", cls: "ghost" }]
+        buttons: [{ label: tt`Скасувати`, cls: "ghost" }]
       });
       bindSignin(() => { if (account().signed) document.getElementById("modal").classList.remove("show"); });
     };
@@ -399,32 +399,32 @@
     if (box) { box.innerHTML = boxHtml(); bindSettings(); }
   }
   function statusText() {
-    if (state === "off") return "Хмару вимкнено — прогрес зберігається лише на цьому пристрої.";
-    if (state === "conflict") return "У хмарі інша версія гри — вибери, яку залишити.";
-    if (state === "err") return "Немає звʼязку з хмарою — збережемо, щойно зʼявиться інтернет.";
+    if (state === "off") return tt`Хмару вимкнено — прогрес зберігається лише на цьому пристрої.`;
+    if (state === "conflict") return tt`У хмарі інша версія гри — вибери, яку залишити.`;
+    if (state === "err") return tt`Немає звʼязку з хмарою — збережемо, щойно зʼявиться інтернет.`;
     if (meta.last) {
       const t = new Date(meta.last).toLocaleString("uk-UA", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
-      return `Прогрес зберігається в хмарі ☁️ Востаннє: ${t}.`;
+      return tt`Прогрес зберігається в хмарі ☁️ Востаннє: ${t}.`;
     }
-    return "Підключаємось до хмари…";
+    return tt`Підключаємось до хмари…`;
   }
   const APPLE_LOGO = '<svg viewBox="0 0 17 20" aria-hidden="true"><path d="M14.1 10.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9C3.6 4.8 2 5.8 1.1 7.4c-1.8 3.2-.5 7.9 1.3 10.5.9 1.3 1.9 2.7 3.2 2.6 1.3-.1 1.8-.8 3.3-.8 1.6 0 2 .8 3.4.8 1.4 0 2.3-1.3 3.1-2.6 1-1.5 1.4-2.9 1.4-3 0 0-2.7-1-2.7-4.3zM11.6 3c.7-.9 1.2-2 1-3.1-1 0-2.2.7-2.9 1.5-.6.7-1.2 1.9-1 3 1.1.1 2.2-.6 2.9-1.4z"/></svg>';
   const esc = t => String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
   function signinButtons() {
-    return (canApple ? `<button class="btn small apple" data-signin="apple">${APPLE_LOGO}Увійти через Apple</button>` : "") +
-      `<button class="btn ghost small" data-signin="google">Увійти через Google</button>`;
+    return (canApple ? tt`<button class="btn small apple" data-signin="apple">${APPLE_LOGO}Увійти через Apple</button>` : "") +
+      tt`<button class="btn ghost small" data-signin="google">Увійти через Google</button>`;
   }
   function boxHtml() {
-    let h = `<b>Хмара ☁️</b><p class="hint-s">${statusText()}</p>`;
-    if (state === "off") return h + `<button class="btn ghost small" id="cloudOn">☁️ Увімкнути хмару</button>`;
+    let h = tt`<b>Хмара ☁️</b><p class="hint-s">${statusText()}</p>`;
+    if (state === "off") return h + tt`<button class="btn ghost small" id="cloudOn">☁️ Увімкнути хмару</button>`;
     const a = account();
     if (a.signed) {
-      h += `<p class="hint-s">👤 Акаунт ${a.via}${a.email ? ` (${esc(a.email)})` : ""} — гру можна відкрити на будь-якому телефоні.</p>
+      h += tt`<p class="hint-s">👤 Акаунт ${a.via}${a.email ? ` (${esc(a.email)})` : ""} — гру можна відкрити на будь-якому телефоні.</p>
         <button class="btn ghost small" id="cloudOut">Вийти з акаунта</button>`;
     } else {
-      h += `<p class="hint-s">Увійди, щоб не загубити гру й відкрити її на іншому телефоні.</p>` + signinButtons();
+      h += tt`<p class="hint-s">Увійди, щоб не загубити гру й відкрити її на іншому телефоні.</p>` + signinButtons();
     }
-    if (meta.s) h += `<button class="btn ghost small" id="cloudDel">🗑 Видалити акаунт і дані з хмари</button>`;
+    if (meta.s) h += tt`<button class="btn ghost small" id="cloudDel">🗑 Видалити акаунт і дані з хмари</button>`;
     return h;
   }
   function bindSignin(after) {
@@ -436,13 +436,13 @@
     const del = $c("cloudDel"), on = $c("cloudOn"), out = $c("cloudOut");
     if (on) on.onclick = enable;
     if (out) out.onclick = () => {
-      if (confirm("Вийти з акаунта? Гра на цьому пристрої залишиться, а хмара почне нову копію.")) signOut();
+      if (confirm(tt`Вийти з акаунта? Гра на цьому пристрої залишиться, а хмара почне нову копію.`)) signOut();
     };
     if (del) del.onclick = async () => {
-      if (!confirm("Видалити акаунт і всі збереження з хмари? Цього не скасувати. Гра на цьому пристрої залишиться.")) return;
+      if (!confirm(tt`Видалити акаунт і всі збереження з хмари? Цього не скасувати. Гра на цьому пристрої залишиться.`)) return;
       del.disabled = true;
-      try { await deleteAccount(); toast("Акаунт і хмарні дані видалено"); }
-      catch (e) { del.disabled = false; toast("Не вдалося видалити 🙈 Перевір інтернет і спробуй ще раз"); }
+      try { await deleteAccount(); toast(tt`Акаунт і хмарні дані видалено`); }
+      catch (e) { del.disabled = false; toast(tt`Не вдалося видалити 🙈 Перевір інтернет і спробуй ще раз`); }
     };
     bindSignin();
   }

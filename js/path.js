@@ -7,22 +7,22 @@
          S.trophies = [ емодзі сезонних прикрас ]
    ============================================================ */
 const PATH_SEASONS = [
-  { name: "Зимова стежка",        icon: "❄️", prize: "⛄", prizeName: "Сніговик" },
-  { name: "Стежка тепла",         icon: "💛", prize: "🕯️", prizeName: "Стрітенська свічка" },
-  { name: "Весняна стежка",       icon: "🌷", prize: "🌷", prizeName: "Клумба тюльпанів" },
-  { name: "Великодня стежка",     icon: "🥚", prize: "🧺", prizeName: "Великодній кошик" },
-  { name: "Квітуча стежка",       icon: "🌸", prize: "🌸", prizeName: "Квітуча гілка" },
-  { name: "Вишнева стежка",       icon: "🍒", prize: "🍒", prizeName: "Вишенька в саду" },
-  { name: "Соняшникова стежка",   icon: "🌻", prize: "🌻", prizeName: "Соняшник до неба" },
-  { name: "Жнивна стежка",        icon: "🌾", prize: "🌾", prizeName: "Святковий сніп" },
-  { name: "Садова стежка",        icon: "🍐", prize: "🍐", prizeName: "Грушка-дичка" },
-  { name: "Гарбузова стежка",     icon: "🎃", prize: "🎃", prizeName: "Гарбуз-велетень" },
-  { name: "Осіння стежка",        icon: "🍂", prize: "🍁", prizeName: "Осінній вінок" },
-  { name: "Святкова стежка",      icon: "🎄", prize: "🎄", prizeName: "Ялинка у дворі" }
+  { name: tt`Зимова стежка`,        icon: "❄️", prize: "⛄", prizeName: tt`Сніговик` },
+  { name: tt`Стежка тепла`,         icon: "💛", prize: "🕯️", prizeName: tt`Стрітенська свічка` },
+  { name: tt`Весняна стежка`,       icon: "🌷", prize: "🌷", prizeName: tt`Клумба тюльпанів` },
+  { name: tt`Великодня стежка`,     icon: "🥚", prize: "🧺", prizeName: tt`Великодній кошик` },
+  { name: tt`Квітуча стежка`,       icon: "🌸", prize: "🌸", prizeName: tt`Квітуча гілка` },
+  { name: tt`Вишнева стежка`,       icon: "🍒", prize: "🍒", prizeName: tt`Вишенька в саду` },
+  { name: tt`Соняшникова стежка`,   icon: "🌻", prize: "🌻", prizeName: tt`Соняшник до неба` },
+  { name: tt`Жнивна стежка`,        icon: "🌾", prize: "🌾", prizeName: tt`Святковий сніп` },
+  { name: tt`Садова стежка`,        icon: "🍐", prize: "🍐", prizeName: tt`Грушка-дичка` },
+  { name: tt`Гарбузова стежка`,     icon: "🎃", prize: "🎃", prizeName: tt`Гарбуз-велетень` },
+  { name: tt`Осіння стежка`,        icon: "🍂", prize: "🍁", prizeName: tt`Осінній вінок` },
+  { name: tt`Святкова стежка`,      icon: "🎄", prize: "🎄", prizeName: tt`Ялинка у дворі` }
 ];
 const PATH_LEVELS = 30, PATH_COST = 35, PATH_INF = 50;
 const PATH_PTS = { order: 2, special: 3, daily: 10, week: 30, side: 15 };
-const MONTHS_GEN = ["січня", "лютого", "березня", "квітня", "травня", "червня", "липня", "серпня", "вересня", "жовтня", "листопада", "грудня"];
+const MONTHS_GEN = [tt`січня`, tt`лютого`, tt`березня`, tt`квітня`, tt`травня`, tt`червня`, tt`липня`, tt`серпня`, tt`вересня`, tt`жовтня`, tt`листопада`, tt`грудня`];
 
 window.PATH = (() => {
   const now = () => window.DVORYK_NOW || Date.now();
@@ -51,12 +51,12 @@ window.PATH = (() => {
   }
   function rewText(r) {
     const p = [];
-    if (r.trophy) p.push(season().prizeName + " у дворик");
+    if (r.trophy) p.push(season().prizeName + tt` у дворик`);
     if (r.chest !== undefined) p.push(CHAINS.chest.items[r.chest][1]);
-    if (r.gen) p.push("+ генератор");
+    if (r.gen) p.push(tt`+ генератор`);
     if (r.coins) p.push("+" + r.coins + " 🪙");
     if (r.energy) p.push("+" + r.energy + " ⚡");
-    if (r.cards) p.push(window.UNL && UNL.on("album") ? r.cards + " листівки" : "+" + 30 * r.cards + " 🪙");
+    if (r.cards) p.push(window.UNL && UNL.on("album") ? r.cards + tt` листівки` : "+" + 30 * r.cards + " 🪙");
     if (r.stars) p.push("+" + r.stars + " ⭐");
     return p.join(" ");
   }
@@ -65,7 +65,7 @@ window.PATH = (() => {
     if (r.gen) MECH.maybeGenCopy(1);
     if (r.coins) S.coins += r.coins;
     if (r.energy) { regen(); S.energy += r.energy; }
-    if (r.cards) { if (window.UNL && UNL.on("album")) ALB.give(r.cards, "Зі стежки"); else S.coins += 30 * r.cards; }
+    if (r.cards) { if (window.UNL && UNL.on("album")) ALB.give(r.cards, tt`Зі стежки`); else S.coins += 30 * r.cards; }
     if (r.stars) S.stars += r.stars;
     if (r.trophy) { S.trophies = S.trophies || []; const e = (seasonObj || season()).prize; if (!S.trophies.includes(e)) S.trophies.push(e); }
   }
@@ -97,8 +97,8 @@ window.PATH = (() => {
     const p = S.path, before = reached(p), bInf = infReached(p);
     p.pts += n;
     save();
-    if (reached(p) > before) setTimeout(() => toast(`${season().icon} Стежка: рівень ${reached(p)}! Нагорода — у 📋`), 1500);
-    else if (infReached(p) > bInf) setTimeout(() => toast(`${season().icon} Стежка: ще один подарунок 🎁 — у 📋`), 1500);
+    if (reached(p) > before) setTimeout(() => toast(tt`${season().icon} Стежка: рівень ${reached(p)}! Нагорода — у 📋`), 1500);
+    else if (infReached(p) > bInf) setTimeout(() => toast(tt`${season().icon} Стежка: ще один подарунок 🎁 — у 📋`), 1500);
     if (window.QUEST) QUEST.renderButton();
   }
   function onDeliver(o) { add(o.paw || o.urgent || o.dish || o.ev ? PATH_PTS.special : PATH_PTS.order); }
@@ -112,8 +112,8 @@ window.PATH = (() => {
     save(); renderAll(); sfx.coin();
     if (r.trophy) {
       confetti(); sfx.level();
-      modal({ title: "Стежку пройдено! 🏆", html: `<div class="big-emoji">${season().prize}</div><p>«${season().prizeName}» тепер прикрашає твій дворик 🏡</p><p class="rewards">💝 &nbsp; +${r.coins} 🪙</p><p class="hint-s">А кроки й далі приносять подарунки 🎁 — кожні ${PATH_INF}.</p>`,
-        buttons: [{ label: "Ура! 💛", onClick: () => QUEST.panel("path") }] });
+      modal({ title: tt`Стежку пройдено! 🏆`, html: tt`<div class="big-emoji">${season().prize}</div><p>«${season().prizeName}» тепер прикрашає твій дворик 🏡</p><p class="rewards">💝 &nbsp; +${r.coins} 🪙</p><p class="hint-s">А кроки й далі приносять подарунки 🎁 — кожні ${PATH_INF}.</p>`,
+        buttons: [{ label: tt`Ура! 💛`, onClick: () => QUEST.panel("path") }] });
       return;
     }
     toast(`${rewIcon(r)} ${rewText(r)}`);
@@ -126,7 +126,7 @@ window.PATH = (() => {
     while (p.inf < infReached(p)) { p.inf++; placeItem({ c: "chest", l: 0 }); n++; }
     save(); renderAll(); sfx.coin(); confetti();
     if (p.got < reached(p)) { claim(p.got + 1); return; }   // трофей — окремим вікном
-    toast(`${season().icon} Забрано нагород: ${n}`);
+    toast(tt`${season().icon} Забрано нагород: ${n}`);
     QUEST.panel("path");
   }
 
@@ -145,19 +145,19 @@ window.PATH = (() => {
       const n = k + 1, r = reward(n), got = n <= p.got, can = n > p.got && n <= R, big = r.chest !== undefined || r.trophy;
       return `<div class="ph-row${got ? " got" : can ? " can" : n <= R ? " open" : ""}${big ? " big" : ""}${r.trophy ? " trophy" : ""}" data-n="${n}">` +
         `<span class="ph-n">${n}</span><span class="ph-ic">${rewIcon(r)}</span><span class="ph-t">${rewText(r)}</span>` +
-        (got ? `<span class="ph-ok">✅</span>` : can ? `<button class="s-btn ph-go" data-n="${n}">Забрати</button>` : `<span class="ph-lock">🔒</span>`) + `</div>`;
+        (got ? `<span class="ph-ok">✅</span>` : can ? tt`<button class="s-btn ph-go" data-n="${n}">Забрати</button>` : `<span class="ph-lock">🔒</span>`) + `</div>`;
     }).join("");
     const infCan = p.inf < infReached(p);
-    const inf = `<div class="ph-row inf${infCan ? " can" : ""}"><span class="ph-n">∞</span><span class="ph-ic">🎁</span><span class="ph-t">Після 30-го — подарунок кожні ${PATH_INF} кроків${p.inf ? ` (уже ${p.inf})` : ""}</span>` +
-      (infCan ? `<button class="s-btn ph-inf">Забрати</button>` : `<span class="ph-lock">🔒</span>`) + `</div>`;
+    const inf = tt`<div class="ph-row inf${infCan ? " can" : ""}"><span class="ph-n">∞</span><span class="ph-ic">🎁</span><span class="ph-t">Після 30-го — подарунок кожні ${PATH_INF} кроків${p.inf ? tt` (уже ${p.inf})` : ""}</span>` +
+      (infCan ? tt`<button class="s-btn ph-inf">Забрати</button>` : `<span class="ph-lock">🔒</span>`) + `</div>`;
     const many = (R - p.got) + (infReached(p) - p.inf) > 1;
-    return `<div class="ph-head"><span class="ph-big">${s.icon}</span><span><b>${s.name}</b><small>до ${endD.getDate()} ${MONTHS_GEN[endD.getMonth()]} · ще ${dl} ${dl === 1 ? "день" : dl < 5 ? "дні" : "днів"}</small></span>` +
-      `<span class="ph-lvl"><b>${R}</b><small>рівень</small></span></div>` +
-      `<div class="ph-bar"><i style="width:${inLvl / need * 100}%"></i><span>${inLvl}/${need} кроків</span></div>` +
-      `<p class="dq-hint">Кроки: замовлення +${PATH_PTS.order} (особливі +${PATH_PTS.special}) · завдання дня +${PATH_PTS.daily} · тиждень +${PATH_PTS.week} · пригода +${PATH_PTS.side}</p>` +
-      (many ? `<button class="btn dq-claim ph-all">Забрати все 🎁</button>` : "") +
+    return tt`<div class="ph-head"><span class="ph-big">${s.icon}</span><span><b>${s.name}</b><small>до ${endD.getDate()} ${MONTHS_GEN[endD.getMonth()]} · ще ${dl} ${dl === 1 ? tt`день` : dl < 5 ? tt`дні` : tt`днів`}</small></span>` +
+      tt`<span class="ph-lvl"><b>${R}</b><small>рівень</small></span></div>` +
+      tt`<div class="ph-bar"><i style="width:${inLvl / need * 100}%"></i><span>${inLvl}/${need} кроків</span></div>` +
+      tt`<p class="dq-hint">Кроки: замовлення +${PATH_PTS.order} (особливі +${PATH_PTS.special}) · завдання дня +${PATH_PTS.daily} · тиждень +${PATH_PTS.week} · пригода +${PATH_PTS.side}</p>` +
+      (many ? tt`<button class="btn dq-claim ph-all">Забрати все 🎁</button>` : "") +
       `<div class="ph-list" id="phList">${rows}${inf}</div>` +
-      `<p class="dq-hint">Головна нагорода — ${s.prize} «${s.prizeName}» у твій дворик. Щомісяця — нова стежка.</p>`;
+      tt`<p class="dq-hint">Головна нагорода — ${s.prize} «${s.prizeName}» у твій дворик. Щомісяця — нова стежка.</p>`;
   }
   function bind() {
     document.querySelectorAll(".ph-go").forEach(b => b.onclick = () => { $("modal").classList.remove("show"); claim(+b.dataset.n); });
@@ -173,8 +173,8 @@ window.PATH = (() => {
     if (!st()) { roll(); if (window.QUEST) QUEST.renderButton(); }
     if (pendingEnd && !busyUI()) {
       const e = pendingEnd; pendingEnd = null;
-      modal({ title: e.so.name + " завершилась", html: `<div class="big-emoji">${e.so.icon}</div><p>Незабрані нагороди вже чекають на тебе:</p><p class="rewards">${e.parts.join(" ")}</p><p class="hint-s">Починається «${season().name}» ${season().icon}</p>`,
-        buttons: [{ label: "До нової стежки ›", onClick: () => QUEST.panel("path") }] });
+      modal({ title: e.so.name + tt` завершилась`, html: tt`<div class="big-emoji">${e.so.icon}</div><p>Незабрані нагороди вже чекають на тебе:</p><p class="rewards">${e.parts.join(" ")}</p><p class="hint-s">Починається «${season().name}» ${season().icon}</p>`,
+        buttons: [{ label: tt`До нової стежки ›`, onClick: () => QUEST.panel("path") }] });
     }
   }
   function init() { if (on() && !st()) roll(); }

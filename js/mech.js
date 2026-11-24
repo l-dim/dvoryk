@@ -11,7 +11,7 @@ window.MECH = (() => {
   const gl = it => Math.min(GEN_MAX_LEVEL, it.gl || 1);
   const cap = it => GEN_CHARGE[gl(it) - 1];
   const restMs = it => GEN_REST_MIN[gl(it) - 1] * 60e3;
-  const mins = ms => { const m = Math.ceil(ms / 60e3); return m >= 60 ? Math.floor(m / 60) + " год " + (m % 60) + " хв" : m + " хв"; };
+  const mins = ms => { const m = Math.ceil(ms / 60e3); return m >= 60 ? Math.floor(m / 60) + tt` год ` + (m % 60) + tt` хв` : m + tt` хв`; };
 
   /* ---------- генератори ---------- */
   function refresh(it) {            // повертає true, якщо генератор щойно прокинувся
@@ -30,19 +30,19 @@ window.MECH = (() => {
     const it = S.board[i];
     if (!it || !resting(it)) return;
     const wp = (window.ECON ? ECON.price("wake", WAKE_COINS) : WAKE_COINS);
-    if (S.coins < wp) { sfx.nope(); toast("Не вистачає монеток 🪙"); return; }
+    if (S.coins < wp) { sfx.nope(); toast(tt`Не вистачає монеток 🪙`); return; }
     S.coins -= wp; window.ECON && ECON.bought("wake"); delete it.rest; it.ch = cap(it);
-    sfx.coin(); toast(GENS[it.g].icon + " " + GENS[it.g].name + " знову працює!");
+    sfx.coin(); toast(GENS[it.g].icon + " " + GENS[it.g].name + tt` знову працює!`);
     renderBoard(); renderTop(); renderInfo(); save();
   }
   function restModal(i) {
     const it = S.board[i];
     sfx.nope();
     modal({
-      title: "Відпочиває 💤",
-      html: `<div class="big-emoji">${GENS[it.g].icon}</div><p><b>${GENS[it.g].name}</b> відпочиває ще <b>${mins(it.rest - now())}</b> і знову буде повний сил.</p>
+      title: tt`Відпочиває 💤`,
+      html: tt`<div class="big-emoji">${GENS[it.g].icon}</div><p><b>${GENS[it.g].name}</b> відпочиває ще <b>${mins(it.rest - now())}</b> і знову буде повний сил.</p>
         <p class="hint-s">Поки що потапай інші генератори або об'єднай те, що вже є. Два однакові генератори зливаються в кращий — з більшим зарядом.</p>`,
-      buttons: [{ label: `Розбудити за ${(window.ECON ? ECON.price("wake", WAKE_COINS) : WAKE_COINS)} 🪙`, disabled: S.coins < (window.ECON ? ECON.price("wake", WAKE_COINS) : WAKE_COINS), onClick: () => wake(i) }, { label: "Хай відпочине", cls: "ghost" }]
+      buttons: [{ label: tt`Розбудити за ${(window.ECON ? ECON.price("wake", WAKE_COINS) : WAKE_COINS)} 🪙`, disabled: S.coins < (window.ECON ? ECON.price("wake", WAKE_COINS) : WAKE_COINS), onClick: () => wake(i) }, { label: tt`Хай відпочине`, cls: "ghost" }]
     });
   }
   function canMergeGens(A, B) { return A && B && A.g && B.g && A.g === B.g && gl(A) === gl(B) && gl(A) < GEN_MAX_LEVEL; }
@@ -56,10 +56,10 @@ window.MECH = (() => {
     sfx.merge(4); sparkle(b, "✨", 8); popIdx.add(b); mergedIdx.add(b); burstAt(b);
     selected = b;
     setTimeout(() => modal({
-      title: "Кращий генератор! ⭐",
-      html: `<div class="big-emoji">${GENS[A.g].icon}</div><p><b>${GENS[A.g].name}</b> тепер рівня ${nl}!</p>
+      title: tt`Кращий генератор! ⭐`,
+      html: tt`<div class="big-emoji">${GENS[A.g].icon}</div><p><b>${GENS[A.g].name}</b> тепер рівня ${nl}!</p>
         <p class="rewards">${GEN_CHARGE[nl - 1]} ⚡ заряду · відпочинок ${GEN_REST_MIN[nl - 1]} хв</p><p class="hint-s">І частіше дає одразу кращі предмети.</p>`,
-      buttons: [{ label: "Чудово! 💛" }]
+      buttons: [{ label: tt`Чудово! 💛` }]
     }), 300);
   }
   const tierBonus = it => (gl(it) - 1) * 0.08;
@@ -69,7 +69,7 @@ window.MECH = (() => {
     if (!pool.length) return false;
     const g = pick(pool);
     placeItem({ g, gl: 1, ch: GEN_CHARGE[0] }, near);
-    setTimeout(() => toast(`Ще один ${GENS[g].icon} ${GENS[g].name}! Об'єднай два однакові — буде кращий`), 600);
+    setTimeout(() => toast(tt`Ще один ${GENS[g].icon} ${GENS[g].name}! Об'єднай два однакові — буде кращий`), 600);
     return true;
   }
 
@@ -110,9 +110,9 @@ window.MECH = (() => {
   function lockModal(i) {
     const it = S.board[i];
     modal({
-      title: "Павутиння 🕸️",
-      html: `<div class="big-emoji">🕸️</div><p>Під павутинням щось є! Об'єднай предмети на сусідній клітинці — і воно зникне${it.lock > 1 ? ` (ще ${it.lock} рази)` : ""}.</p>`,
-      buttons: [{ label: `Розчистити за ${(window.ECON ? ECON.price("lock", LOCK_COINS) : LOCK_COINS)} 🪙`, disabled: S.coins < (window.ECON ? ECON.price("lock", LOCK_COINS) : LOCK_COINS), onClick: () => { S.coins -= (window.ECON ? ECON.price("lock", LOCK_COINS) : LOCK_COINS); window.ECON && ECON.bought("lock"); openLock(i, true); } }, { label: "Добре", cls: "ghost" }]
+      title: tt`Павутиння 🕸️`,
+      html: tt`<div class="big-emoji">🕸️</div><p>Під павутинням щось є! Об'єднай предмети на сусідній клітинці — і воно зникне${it.lock > 1 ? tt` (ще ${it.lock} рази)` : ""}.</p>`,
+      buttons: [{ label: tt`Розчистити за ${(window.ECON ? ECON.price("lock", LOCK_COINS) : LOCK_COINS)} 🪙`, disabled: S.coins < (window.ECON ? ECON.price("lock", LOCK_COINS) : LOCK_COINS), onClick: () => { S.coins -= (window.ECON ? ECON.price("lock", LOCK_COINS) : LOCK_COINS); window.ECON && ECON.bought("lock"); openLock(i, true); } }, { label: tt`Добре`, cls: "ghost" }]
     });
   }
 
@@ -137,35 +137,35 @@ window.MECH = (() => {
       if (at >= 0) popIdx.add(at);
       sfx.level(); sparkle(i, "✨", 8);
       window.QUEST && QUEST.track("cook");
-      toast("Готово: " + CHAINS.dish.items[l][0] + " " + CHAINS.dish.items[l][1] + "!");
+      toast(tt`Готово: ` + CHAINS.dish.items[l][0] + " " + CHAINS.dish.items[l][1] + "!");
       renderBoard(); renderOrders(); renderInfo(); save();
       return;
     }
     if (s === "cook") {
       const d = CHAINS.dish.items[it.r];
       modal({
-        title: "Піч 🔥",
-        html: `<div class="big-emoji">${d[0]}</div><p>Готується <b>${d[1]}</b> — ще <b>${mins(it.done - now())}</b>.</p>`,
-        buttons: [{ label: `Пришвидшити за ${(window.ECON ? ECON.price("rush", OVEN_RUSH_COINS) : OVEN_RUSH_COINS)} 🪙`, disabled: S.coins < (window.ECON ? ECON.price("rush", OVEN_RUSH_COINS) : OVEN_RUSH_COINS),
-          onClick: () => { S.coins -= (window.ECON ? ECON.price("rush", OVEN_RUSH_COINS) : OVEN_RUSH_COINS); window.ECON && ECON.bought("rush"); it.done = now(); renderBoard(); renderTop(); save(); } }, { label: "Зачекаю", cls: "ghost" }]
+        title: tt`Піч 🔥`,
+        html: tt`<div class="big-emoji">${d[0]}</div><p>Готується <b>${d[1]}</b> — ще <b>${mins(it.done - now())}</b>.</p>`,
+        buttons: [{ label: tt`Пришвидшити за ${(window.ECON ? ECON.price("rush", OVEN_RUSH_COINS) : OVEN_RUSH_COINS)} 🪙`, disabled: S.coins < (window.ECON ? ECON.price("rush", OVEN_RUSH_COINS) : OVEN_RUSH_COINS),
+          onClick: () => { S.coins -= (window.ECON ? ECON.price("rush", OVEN_RUSH_COINS) : OVEN_RUSH_COINS); window.ECON && ECON.bought("rush"); it.done = now(); renderBoard(); renderTop(); save(); } }, { label: tt`Зачекаю`, cls: "ghost" }]
       });
       return;
     }
     const rows = RECIPES.filter(recipeOpen).map(r => {
       const f = findItems(r.need), ok = f.every(x => x >= 0), d = CHAINS.dish.items[r.l];
       const ing = r.need.map((n, k) => `<span class="rc-ing${f[k] >= 0 ? " have" : ""}">${itemIcon(n)}</span>`).join("<b>+</b>");
-      return `<div class="rc-row"><span class="rc-out">${d[0]}</span><span class="rc-mid"><b>${d[1]}</b><span class="rc-need">${ing} · ⏱ ${r.min} хв</span></span>` +
-        `<button class="s-btn rc-go${ok ? "" : " dim"}" data-l="${r.l}">${ok ? "Готувати" : "Бракує"}</button></div>`;
-    }).join("") || `<p class="hint-s">Рецепти відкриються, коли з'являться нові генератори.</p>`;
-    modal({ title: "Піч 🔥", html: `<p class="hint-s">Поклади два інгредієнти — і за кілька хвилин буде страва. Страви просять сусіди за ⭐⭐ і багато монеток.</p><div class="rc-list">${rows}</div>`,
-      buttons: [{ label: "Закрити", cls: "ghost" }] });
+      return tt`<div class="rc-row"><span class="rc-out">${d[0]}</span><span class="rc-mid"><b>${d[1]}</b><span class="rc-need">${ing} · ⏱ ${r.min} хв</span></span>` +
+        `<button class="s-btn rc-go${ok ? "" : " dim"}" data-l="${r.l}">${ok ? tt`Готувати` : tt`Бракує`}</button></div>`;
+    }).join("") || tt`<p class="hint-s">Рецепти відкриються, коли з'являться нові генератори.</p>`;
+    modal({ title: tt`Піч 🔥`, html: tt`<p class="hint-s">Поклади два інгредієнти — і за кілька хвилин буде страва. Страви просять сусіди за ⭐⭐ і багато монеток.</p><div class="rc-list">${rows}</div>`,
+      buttons: [{ label: tt`Закрити`, cls: "ghost" }] });
     document.querySelectorAll(".rc-go").forEach(b => b.onclick = () => {
       const r = RECIPES.find(x => x.l === +b.dataset.l), f = findItems(r.need);
-      if (f.some(x => x < 0)) { sfx.nope(); toast("Бракує інгредієнтів — назбирай на дошці"); return; }
+      if (f.some(x => x < 0)) { sfx.nope(); toast(tt`Бракує інгредієнтів — назбирай на дошці`); return; }
       f.forEach(j => { flyFrom(j, document.querySelector(`.cell[data-i="${i}"]`)); S.board[j] = null; if (selected === j) selected = -1; });
       it.r = r.l; it.done = now() + r.min * 60e3;
       $("modal").classList.remove("show");
-      sfx.pop(); toast("🔥 " + CHAINS.dish.items[r.l][1] + " готується " + r.min + " хв");
+      sfx.pop(); toast("🔥 " + CHAINS.dish.items[r.l][1] + tt` готується ` + r.min + tt` хв`);
       renderBoard(); renderOrders(); renderInfo(); save();
     });
   }
@@ -195,7 +195,7 @@ window.MECH = (() => {
     const gone = S.orders.filter(o => o.until && now() >= o.until);
     if (!gone.length) return;
     S.orders = S.orders.filter(o => !gone.includes(o));
-    gone.forEach(o => { if (window.RARE) RARE.onExpire(o); toast(CHARS[o.ch].name + (o.rare ? " поїхав далі — скарбу так і не дочекався 🧐" : " вже не чекає — термінове замовлення минуло ⏰")); });
+    gone.forEach(o => { if (window.RARE) RARE.onExpire(o); toast(CHARS[o.ch].name + (o.rare ? tt` поїхав далі — скарбу так і не дочекався 🧐` : tt` вже не чекає — термінове замовлення минуло ⏰`)); });
     fillOrders(); renderOrders(); save();
   }
   const hhmm = ms => { const m = Math.max(0, Math.ceil(ms / 60e3)); return Math.floor(m / 60) + ":" + String(m % 60).padStart(2, "0"); };
@@ -221,7 +221,7 @@ window.MECH = (() => {
       if (resting(it)) {
         if (bar) bar.remove();
         if (!z) { z = document.createElement("span"); z.className = "gen-z"; t.appendChild(z); }
-        z.textContent = "💤 " + Math.ceil((it.rest - now()) / 60e3) + "хв";
+        z.textContent = "💤 " + Math.ceil((it.rest - now()) / 60e3) + tt`хв`;
         t.classList.add("tired");
       } else {
         if (z) z.remove(); t.classList.remove("tired");
@@ -240,7 +240,7 @@ window.MECH = (() => {
       let tm = t.querySelector(".oven-t");
       if (s === "idle") { if (tm) tm.remove(); return; }
       if (!tm) { tm = document.createElement("span"); tm.className = "oven-t"; t.appendChild(tm); }
-      tm.textContent = s === "done" ? "✅" : CHAINS.dish.items[it.r][0] + " " + Math.ceil((it.done - now()) / 60e3) + "хв";
+      tm.textContent = s === "done" ? "✅" : CHAINS.dish.items[it.r][0] + " " + Math.ceil((it.done - now()) / 60e3) + tt`хв`;
     }
   }
 
@@ -275,9 +275,9 @@ window.MECH = (() => {
     if (at >= 0) popIdx.add(at);
     renderBoard(); save();
     setTimeout(() => playDialog([
-      ["andriy", "{name}, я полагодив стару піч! 🔥 Тепер можна готувати справжні страви."],
-      ["andriy", "Тапни піч — там рецепти. Борщ, вареники з вишнями… Клади інгредієнти й чекай, поки зготується."],
-      ["halya", "Ох, і замовлятиму ж я в тебе вареники! За страви плататимемо щедро — і зірочками теж ⭐⭐"]
+      ["andriy", tt`{name}, я полагодив стару піч! 🔥 Тепер можна готувати справжні страви.`],
+      ["andriy", tt`Тапни піч — там рецепти. Борщ, вареники з вишнями… Клади інгредієнти й чекай, поки зготується.`],
+      ["halya", tt`Ох, і замовлятиму ж я в тебе вареники! За страви плататимемо щедро — і зірочками теж ⭐⭐`]
     ]), 800);
   }
 

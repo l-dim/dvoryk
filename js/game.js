@@ -76,8 +76,8 @@ function itemIcon(it) {
 }
 function itemName(it) {
   if (!it) return "";
-  if (it.lock) return "Павутиння";
-  if (it.st) return "Піч";
+  if (it.lock) return tt`Павутиння`;
+  if (it.st) return tt`Піч`;
   if (it.g) return GENS[it.g].name;
   return CHAINS[it.c].items[it.l][1];
 }
@@ -92,7 +92,7 @@ function face(ch, cls = "") {
   const [x, y, w] = PORTRAIT_FACE[ch.key] || [50, 22, 240];
   return `<span class="face mini"><img src="${src}" alt="" style="width:${w}%;transform:translate(-${x}%,-${y}%)"></span>`;
 }
-function fmtName(t) { return gx(t.replace(/\{name\}/g, S.name || "господинько")); }
+function fmtName(t) { return gx(t.replace(/\{name\}/g, S.name || tt`господинько`)); }
 /* Звертання до гравця — у чоловічому роді, якщо граєш чоловіком (S.sex === "m").
    Міняємо лише фрази, звернені до гравця; репліки сусідів про себе не чіпаємо. */
 const MALE_FORMS = [
@@ -108,9 +108,9 @@ const MALE_FORMS = [
   ["кулінарок із сусідніх сіл", "кулінарів із сусідніх сіл"], ["Готова?", "Готовий?"], ["справжня майстриня села", "справжній майстер села"], ["Почни, коли маєш", "Почни, коли маєш"]
 ];
 function gx(t) {
-  if (!t || !S || S.sex !== "m") return t;
+  if (!t || !S || S.sex !== "m" || LANG !== "uk") return t;   // інші мови мають окремі форми в словнику ({ f, m })
   MALE_FORMS.forEach(([a, b]) => { t = t.split(a).join(b); });
-  return t.replace(/ти (\d+)-а(?=[\s·,.!]|$)/g, "ти $1-й");
+  return t.replace(/ти (\d+)-а(?=[\s·,.!]|$)/g, tt`ти $1-й`);
 }
 
 /* ---------------- Звук (м'які тони WebAudio) ---------------- */
@@ -198,7 +198,7 @@ function discover(it) {
   if (!S.collection[k]) {
     S.collection[k] = 1;
     if (PRODUCT_CHAINS.includes(it.c) && S.started) {
-      toast("Нове у колекції: " + itemIcon(it) + " " + itemName(it) + (window.UNL && UNL.on("discover") ? " — 🎁 у 📖" : ""));
+      toast(tt`Нове у колекції: ` + itemIcon(it) + " " + itemName(it) + (window.UNL && UNL.on("discover") ? tt` — 🎁 у 📖` : ""));
       renderNavBadge();
     }
   }
@@ -214,7 +214,7 @@ function produce(i) {
   if (window.WH && !WH.canTap(i)) return;
   if (window.CRAFT && !CRAFT.canTap(i)) return;
   if (window.FARM2 && !FARM2.canTap(i)) return;
-  if (emptyNear(i) < 0) { sfx.nope(); toast("Немає місця 🙈 Об'єднай або продай щось"); return; }
+  if (emptyNear(i) < 0) { sfx.nope(); toast(tt`Немає місця 🙈 Об'єднай або продай щось`); return; }
   // сила ×2: 2 ⚡ і 2 заряди — зате предмет одразу на рівень вищий
   const x2 = window.XTRA && XTRA.boosted() && S.energy >= 2;
   if (!spendEnergy(x2 ? 2 : 1)) return;
@@ -246,7 +246,7 @@ function produce(i) {
   sfx.pop();
   bounce(i);
   if (S.tut === 0) setTut(1);
-  if (tired) setTimeout(() => toast("💤 " + gen.name + " відпочиватиме " + GEN_REST_MIN[MECH.gl(gIt) - 1] + " хв"), 400);
+  if (tired) setTimeout(() => toast("💤 " + gen.name + tt` відпочиватиме ` + GEN_REST_MIN[MECH.gl(gIt) - 1] + tt` хв`), 400);
   renderBoard(); renderTop(); renderOrders(); save();
   return at;
 }
@@ -272,8 +272,8 @@ function openChest(i) {
   window.QUEST && QUEST.onChest(k, i);
   window.DOG && DOG.onChest(i);
   window.ALB && ALB.onChest(k);
-  if (k >= 1 && window.CONTEST) CONTEST.give(k, null, k, "З подарунка");
-  if (k >= 1 && window.FASH) FASH.add(k * 2, "з подарунка");
+  if (k >= 1 && window.CONTEST) CONTEST.give(k, null, k, tt`З подарунка`);
+  if (k >= 1 && window.FASH) FASH.add(k * 2, tt`з подарунка`);
   sfx.open();
   sparkle(i, "✨", 8);
   renderBoard(); renderOrders(); save();
@@ -303,7 +303,7 @@ function handleDrop(a, b) {
   if (window.DOG && DOG.drop(a, b)) return;                    // кісточка — Бровкові
   if (MECH.canMergeGens(A, B)) { MECH.mergeGens(a, b); renderBoard(); renderOrders(); renderInfo(); save(); return; }
   if (B && !A.g && !B.g && A.c === B.c && A.l === B.l && window.WH && (!WH.usable(A) || !WH.usable(B))) {
-    sfx.nope(); toast(A.worm || B.worm ? "🐛 Там шашіль — спершу виведи його" : A.untested || B.untested || A.short || B.short ? "❔ Спершу перевір виріб — тапни на нього" : "💧 Клей ще сохне — зачекай трохи"); renderBoard(); return;
+    sfx.nope(); toast(A.worm || B.worm ? tt`🐛 Там шашіль — спершу виведи його` : A.untested || B.untested || A.short || B.short ? tt`❔ Спершу перевір виріб — тапни на нього` : tt`💧 Клей ще сохне — зачекай трохи`); renderBoard(); return;
   }
   if (!B) {
     S.board[b] = A; S.board[a] = null;
@@ -354,9 +354,9 @@ function gainXp(n) {
     sfx.level();
     confetti();
     setTimeout(() => modal({
-      title: "Рівень " + S.level + "! 🎉",
-      html: `<div class="big-emoji">🌟</div><p>Ти молодчинка! Тримай подарунки:</p><p class="rewards">+${ENERGY_BONUS.level} ⚡ &nbsp; ${S.level % 5 === 0 ? "📦" : "🎁"}</p>` + (window.UNL ? UNL.nextHtml() : ""),
-      buttons: [{ label: "Дякую! 💛" }]
+      title: tt`Рівень ` + S.level + "! 🎉",
+      html: tt`<div class="big-emoji">🌟</div><p>Ти молодчинка! Тримай подарунки:</p><p class="rewards">+${ENERGY_BONUS.level} ⚡ &nbsp; ${S.level % 5 === 0 ? "📦" : "🎁"}</p>` + (window.UNL ? UNL.nextHtml() : ""),
+      buttons: [{ label: tt`Дякую! 💛` }]
     }), 350);
   }
   renderTop();
@@ -436,7 +436,7 @@ function deliver(id) {
   const card = document.querySelector(`.order[data-id="${id}"]`);
   const stalePen = window.HARD ? HARD.stalePenalty(found) : 0;
   found.forEach((i, k) => { flyFrom(i, card, k * 70); S.board[i] = null; if (selected === i) selected = -1; });
-  if (stalePen) setTimeout(() => toast(`🥀 Частина продуктів зачерствіла — −${stalePen} 🪙`), 1200);
+  if (stalePen) setTimeout(() => toast(tt`🥀 Частина продуктів зачерствіла — −${stalePen} 🪙`), 1200);
   if (card && FARM) {
     const cr = card.getBoundingClientRect();
     setTimeout(() => { flyMany(cr, "🪙", "coins", 4); if (o.stars) flyMany(cr, "⭐", "stars", o.stars + 1, 120); }, 380);
@@ -478,8 +478,8 @@ function curChapter() { return STORY[Math.min(S.chapter, STORY.length - 1)]; }
 function doTask() {
   if (S.storyDone) return;
   const ch = STORY[S.chapter], t = ch.tasks[S.task];
-  if (window.ECON && !ECON.taskReady(S.chapter, S.task)) { sfx.nope(); toast("Бракує: " + ECON.taskMissing(S.chapter, S.task)); return; }
-  if (S.stars < t.cost) { sfx.nope(); toast("Потрібно ще " + (t.cost - S.stars) + " ⭐ — виконуй замовлення сусідів"); return; }
+  if (window.ECON && !ECON.taskReady(S.chapter, S.task)) { sfx.nope(); toast(tt`Бракує: ` + ECON.taskMissing(S.chapter, S.task)); return; }
+  if (S.stars < t.cost) { sfx.nope(); toast(tt`Потрібно ще ` + (t.cost - S.stars) + tt` ⭐ — виконуй замовлення сусідів`); return; }
   if (window.ECON) ECON.payTask(S.chapter, S.task);
   S.stars -= t.cost;
   S.task++;
@@ -504,14 +504,14 @@ function doTask() {
     if (S.chapter >= STORY.length) { S.storyDone = true; S.chapter = STORY.length - 1; S.task = STORY[S.chapter].tasks.length; }
     save();
     modal({
-      title: "Розділ завершено! 🎉",
-      html: `<p class="chapter-done">«${ch.title}»</p><p>Нагорода чекає на дошці:</p><p class="rewards">${parts.join(" &nbsp; ")}</p>` +
-        (r.gen ? `<p class="hint-s">Новий генератор! Тепер сусіди замовлятимуть і ${CHAINS[GENS[r.gen].chain].name.toLowerCase()}.</p>` : "") +
-        (window.PHOTO && window.Yard3D ? `<p class="hint-s">📷 Дворик сфотографовано — знімок у фотоальбомі (профіль).</p>` : ""),
-      buttons: [{ label: S.storyDone ? "Ура! 💛" : "Далі ›", onClick: () => {
+      title: tt`Розділ завершено! 🎉`,
+      html: tt`<p class="chapter-done">«${ch.title}»</p><p>Нагорода чекає на дошці:</p><p class="rewards">${parts.join(" &nbsp; ")}</p>` +
+        (r.gen ? tt`<p class="hint-s">Новий генератор! Тепер сусіди замовлятимуть і ${CHAINS[GENS[r.gen].chain].name.toLowerCase()}.</p>` : "") +
+        (window.PHOTO && window.Yard3D ? tt`<p class="hint-s">📷 Дворик сфотографовано — знімок у фотоальбомі (профіль).</p>` : ""),
+      buttons: [{ label: S.storyDone ? tt`Ура! 💛` : tt`Далі ›`, onClick: () => {
         renderAll();
         if (!S.storyDone) playDialog(STORY[S.chapter].intro);
-        else playDialog([["halya", "Це ще не кінець, {name}! Нові розділи вже пишуться 💌 А поки — сусіди чекають на замовлення!"]]);
+        else playDialog([["halya", tt`Це ще не кінець, {name}! Нові розділи вже пишуться 💌 А поки — сусіди чекають на замовлення!`]]);
       } }]
     });
   });
@@ -532,9 +532,9 @@ function checkDaily() {
   placeItem({ c: "chest", l: big ? 1 : 0 });
   save();
   modal({
-    title: "Щоденний подарунок 🎁",
-    html: `<div class="big-emoji">${big ? "📦" : "🎁"}</div><p>День ${S.streak} поспіль! ${big ? "Кожен третій день — велика посилка!" : ""}</p><p class="rewards">+${ENERGY_BONUS.daily} ⚡ &nbsp; ${big ? "📦" : "🎁"}</p>`,
-    buttons: [{ label: "Забрати 💛", onClick: () => { renderAll(); } }]
+    title: tt`Щоденний подарунок 🎁`,
+    html: tt`<div class="big-emoji">${big ? "📦" : "🎁"}</div><p>День ${S.streak} поспіль! ${big ? tt`Кожен третій день — велика посилка!` : ""}</p><p class="rewards">+${ENERGY_BONUS.daily} ⚡ &nbsp; ${big ? "📦" : "🎁"}</p>`,
+    buttons: [{ label: tt`Забрати 💛`, onClick: () => { renderAll(); } }]
   });
 }
 function teaReady() { return Date.now() - S.teaAt >= TEA_BREAK_MS; }
@@ -543,12 +543,12 @@ function takeTea() {
   S.teaAt = Date.now();
   addEnergy(TEA_BREAK_ENERGY);
   sfx.pop();                                   // не «монетковий» звук — чай дає лише енергію
-  toast("☕ Смачного! +" + TEA_BREAK_ENERGY + " ⚡ · наступна перерва за " + Math.round(TEA_BREAK_MS / 3600000) + " год");
+  toast(tt`☕ Смачного! +` + TEA_BREAK_ENERGY + tt` ⚡ · наступна перерва за ` + Math.round(TEA_BREAK_MS / 3600000) + tt` год`);
 }
 function hm(ms) {
   const m = Math.ceil(ms / 60000);
-  if (m < 60) return m + " хв";
-  return Math.floor(m / 60) + " год" + (m % 60 ? " " + (m % 60) + " хв" : "");
+  if (m < 60) return m + tt` хв`;
+  return Math.floor(m / 60) + tt` год` + (m % 60 ? " " + (m % 60) + tt` хв` : "");
 }
 function energyFullIn() {
   regen();
@@ -565,12 +565,12 @@ function energyPrice() {
 }
 function energyButtons(withWait) {
   const btns = [];
-  if (teaReady()) btns.push({ label: "☕ Перерва на чай: +" + TEA_BREAK_ENERGY + " ⚡ (раз на " + Math.round(TEA_BREAK_MS / 3600000) + " год)", onClick: takeTea });
-  else btns.push({ label: "☕ Чай буде за " + hm(TEA_BREAK_MS - (Date.now() - S.teaAt)), disabled: true });
+  if (teaReady()) btns.push({ label: tt`☕ Перерва на чай: +` + TEA_BREAK_ENERGY + tt` ⚡ (раз на ` + Math.round(TEA_BREAK_MS / 3600000) + tt` год)`, onClick: takeTea });
+  else btns.push({ label: tt`☕ Чай буде за ` + hm(TEA_BREAK_MS - (Date.now() - S.teaAt)), disabled: true });
   const p = energyPrice();
-  if (p) btns.push({ label: "Купити " + ENERGY_SHOP.amount + " ⚡ за " + p + " 🪙", cls: "ghost", disabled: S.coins < p, onClick: () => buy("energy") });
-  if (window.PAY) btns.push({ label: "💎 Більше енергії · від 39 ₴", cls: "ghost", onClick: () => PAY.offers(["en60", "en160", "unlim", "pack"], "Більше енергії ⚡") });
-  if (withWait) btns.push({ label: "Зачекаю 💤", cls: "ghost" });
+  if (p) btns.push({ label: tt`Купити ` + ENERGY_SHOP.amount + tt` ⚡ за ` + p + " 🪙", cls: "ghost", disabled: S.coins < p, onClick: () => buy("energy") });
+  if (window.PAY) btns.push({ label: tt`💎 Більше енергії · від 39 ₴`, cls: "ghost", onClick: () => PAY.offers(["en60", "en160", "unlim", "pack"], tt`Більше енергії ⚡`) });
+  if (withWait) btns.push({ label: tt`Зачекаю 💤`, cls: "ghost" });
   return btns;
 }
 let noEnergyTick = null;
@@ -579,10 +579,10 @@ function showNoEnergy() {
   regen();
   const next = () => mmss(Math.max(0, ENERGY_REGEN_MS - (Date.now() - S.energyAt)));
   modal({
-    title: "Енергія скінчилась 😴",
-    html: `<div class="big-emoji">🫖</div>
+    title: tt`Енергія скінчилась 😴`,
+    html: tt`<div class="big-emoji">🫖</div>
       <p>Город відпочиває. Наступна ⚡ буде за <b id="neNext">${next()}</b>,<br>повна шкала (${ENERGY_MAX} ⚡) — за <b id="neFull">${hm(energyFullIn())}</b>.</p>
-      <p class="hint-s">Поки чекаєш — об'єднуй те, що вже є на дошці, і виконуй замовлення.${energyPrice() ? "" : "<br>Енергію на сьогодні вже купувала — завтра крамничка знову відкриється."}</p>`,
+      <p class="hint-s">Поки чекаєш — об'єднуй те, що вже є на дошці, і виконуй замовлення.${energyPrice() ? "" : tt`<br>Енергію на сьогодні вже купувала — завтра крамничка знову відкриється.`}</p>`,
     buttons: energyButtons(true)
   });
   clearInterval(noEnergyTick);
@@ -595,24 +595,24 @@ function showNoEnergy() {
 
 /* ---------------- Крамничка (тільки ігрові монетки) ---------------- */
 const SHOP = [
-  { id: "energy", icon: "⚡", title: ENERGY_SHOP.amount + " енергії", price: 0 },
-  { id: "chest0", icon: "🎁", title: "Подарунок", price: 250 },
-  { id: "chest1", icon: "📦", title: "Посилка", price: 650 },
-  { id: "star",   icon: "⭐", title: "Зірочка для ремонту", price: 700 },
-  { id: "chest2", icon: "💝", title: "Скриня-сюрприз", price: 1400 }
+  { id: "energy", icon: "⚡", title: ENERGY_SHOP.amount + tt` енергії`, price: 0 },
+  { id: "chest0", icon: "🎁", title: tt`Подарунок`, price: 250 },
+  { id: "chest1", icon: "📦", title: tt`Посилка`, price: 650 },
+  { id: "star",   icon: "⭐", title: tt`Зірочка для ремонту`, price: 700 },
+  { id: "chest2", icon: "💝", title: tt`Скриня-сюрприз`, price: 1400 }
 ];
 function buy(id) {
   const s = SHOP.find(x => x.id === id);
   const price = id === "energy" ? energyPrice() : (window.ECON ? ECON.price("shop-" + id, s.price) : s.price);
-  if (!price) { sfx.nope(); toast("Енергію на сьогодні вже купила — завтра знову можна 🌙"); return; }
-  if (S.coins < price) { sfx.nope(); toast("Не вистачає монеток 🪙"); return; }
+  if (!price) { sfx.nope(); toast(tt`Енергію на сьогодні вже купила — завтра знову можна 🌙`); return; }
+  if (S.coins < price) { sfx.nope(); toast(tt`Не вистачає монеток 🪙`); return; }
   S.coins -= price;
   if (id === "energy") { regen(); S.energy += ENERGY_SHOP.amount; S.energyBuys.n++; }
   else if (id === "star") S.stars += 1;
   if (id !== "energy" && window.ECON) ECON.bought("shop-" + id);
   else placeItem({ c: "chest", l: +id.slice(-1) });
   sfx.coin();
-  toast("Куплено: " + s.icon + " " + s.title);
+  toast(tt`Куплено: ` + s.icon + " " + s.title);
   renderAll(); save();
 }
 
@@ -620,7 +620,7 @@ function buy(id) {
 function sellSelected() {
   const it = S.board[selected];
   if (!it || it.g) return;
-  if (window.ECON && !ECON.canSell()) { sfx.nope(); toast("Сьогодні вже продано 10 предметів — ярмарок закрився до завтра 🌙"); return; }
+  if (window.ECON && !ECON.canSell()) { sfx.nope(); toast(tt`Сьогодні вже продано 10 предметів — ярмарок закрився до завтра 🌙`); return; }
   window.ECON && ECON.onSold();
   const price = sellPrice(it);
   floatAt(selected, "+" + price + " 🪙");
@@ -677,18 +677,18 @@ function renderOrders() {
     el.dataset.id = o.id;
     const itemsHtml = `<div class="o-items">${o.items.map((it, k) => `<span class="o-item${found[k] >= 0 ? " have" : ""}">${itemIcon(it)}</span>`).join("")}</div>`;
     el.innerHTML = (pic
-      ? `<div class="o-who"><span class="o-name">${ch.name.split(" ").pop()}</span></div>` +
+      ? `<div class="o-who"><span class="o-name">${shortName(ch.name)}</span></div>` +
         `<div class="o-body"><div class="o-pic"><img src="portraits/${ch.key}.webp" alt=""></div>${itemsHtml}</div>`
-      : `<div class="o-who"><span class="o-ava">${face(ch, "mini")}</span><span class="o-name">${ch.name.split(" ").pop()}</span></div>` + itemsHtml) +
+      : `<div class="o-who"><span class="o-ava">${face(ch, "mini")}</span><span class="o-name">${shortName(ch.name)}</span></div>` + itemsHtml) +
       (ready
-        ? `<button class="o-btn">Віддати</button>`
+        ? tt`<button class="o-btn">Віддати</button>`
         : `<div class="o-rew">🪙${o.coins} · ${o.ev ? "❄️" + o.pts : o.paw ? "🐾" + XTRA.catProg() : "⭐".repeat(o.stars)}</div>`) +
       (o.paw ? `<span class="o-paw">${CAT_ICON}</span>` + (o.bonus ? `<span class="o-bonus">+${XTRA.bonusIcon(o)}</span>` : "") : "") +
       (window.TP ? TP.badge(o) : "") +
       (o.until || o.catUntil ? `<span class="o-timer" data-until="${o.until || o.catUntil}">⏰ ${MECH.hhmm((o.until || o.catUntil) - Date.now())}</span>` : "");
     el.addEventListener("click", e => {
       if (ready && e.target.closest(".o-btn")) { deliver(o.id); return; }
-      bubble(ch, ch.ask[o.line] + "  " + o.items.map(it => itemIcon(it) + " " + itemName(it)).join(", ") + (o.paw && o.bonus ? " · бонус: " + XTRA.bonusIcon(o) : ""), el);
+      bubble(ch, ch.ask[o.line] + "  " + o.items.map(it => itemIcon(it) + " " + itemName(it)).join(", ") + (o.paw && o.bonus ? tt` · бонус: ` + XTRA.bonusIcon(o) : ""), el);
     });
     box.appendChild(el);
   });
@@ -741,7 +741,7 @@ function renderBoard() {
       window.DOG && DOG.decorate(t, it);
     } catch (e) {
       cell.dataset.key = "";                       // наступного разу спробуємо намалювати знову
-      logErr(e, "клітинка " + i + (it ? " " + (it.g ? "g:" + it.g : it.c + ":" + it.l) : ""));
+      logErr(e, tt`клітинка ` + i + (it ? " " + (it.g ? "g:" + it.g : it.c + ":" + it.l) : ""));
     }
   }
   try { window.SOIL && SOIL.badge(); } catch (e) { logErr(e, "SOIL.badge"); }
@@ -774,39 +774,39 @@ function renderInfo() {
   if (!it) {
     const hb = window.XTRA ? XTRA.hintBtn() : "";
     // поруч із кнопкою сховку підказці тісно — тоді лишаємо тільки кнопку
-    box.innerHTML = (hb ? "" : `<span class="info-hint">Тапни на предмет — підкажу, що це</span>`) + hb;
+    box.innerHTML = (hb ? "" : tt`<span class="info-hint">Тапни на предмет — підкажу, що це</span>`) + hb;
     const so = $("storeOpen"); if (so) so.onclick = () => XTRA.openStore();
     return;
   }
   let text = "", btn = "";
   if (it.lock) {
-    text = `<b>Павутиння</b><small>Об'єднай щось поруч${it.lock > 1 ? " ще " + it.lock + " рази" : ""} — під ним сюрприз</small>`;
+    text = tt`<b>Павутиння</b><small>Об'єднай щось поруч${it.lock > 1 ? tt` ще ` + it.lock + tt` рази` : ""} — під ним сюрприз</small>`;
   } else if (it.st) {
-    text = `<b>Піч 🔥</b><small>Тапни, щоб приготувати страву</small>`;
+    text = tt`<b>Піч 🔥</b><small>Тапни, щоб приготувати страву</small>`;
   } else if (it.g && GENS[it.g] && GENS[it.g].pet && window.DOG) {
     text = DOG.info();
   } else if (it.g) {
     const ch = CHAINS[GENS[it.g].chain];
     MECH.refresh(it);
-    const lv = MECH.gl(it) > 1 ? ` <span class="lvl-tag">рів. ${MECH.gl(it)}</span>` : "";
+    const lv = MECH.gl(it) > 1 ? tt` <span class="lvl-tag">рів. ${MECH.gl(it)}</span>` : "";
     text = MECH.resting(it)
-      ? `<b>${GENS[it.g].name}</b>${lv}<small>💤 Відпочиває ще ${Math.ceil((it.rest - Date.now()) / 60e3)} хв</small>`
-      : `<b>${GENS[it.g].name}</b>${lv}<small>Заряд ${it.ch}/${MECH.cap(it)}${window.HARD ? HARD.genInfo(it) : ""}${window.WH ? WH.genInfo(it) : ""}${window.CRAFT ? CRAFT.genInfo(it) : ""}${window.FARM2 ? FARM2.genInfo(it) : ""}${window.SOIL ? SOIL.genInfo(it) : ""} · тапай, щоб отримати ${ch.items[0][0]} (−1 ⚡)</small>`;
+      ? tt`<b>${GENS[it.g].name}</b>${lv}<small>💤 Відпочиває ще ${Math.ceil((it.rest - Date.now()) / 60e3)} хв</small>`
+      : tt`<b>${GENS[it.g].name}</b>${lv}<small>Заряд ${it.ch}/${MECH.cap(it)}${window.HARD ? HARD.genInfo(it) : ""}${window.WH ? WH.genInfo(it) : ""}${window.CRAFT ? CRAFT.genInfo(it) : ""}${window.FARM2 ? FARM2.genInfo(it) : ""}${window.SOIL ? SOIL.genInfo(it) : ""} · тапай, щоб отримати ${ch.items[0][0]} (−1 ⚡)</small>`;
   } else if (it.c === "dish") {
-    text = `<b>${itemName(it)}</b><small>Страву просять сусіди за ⭐⭐</small>`;
-    btn = `<button class="sell${window.ECON && !ECON.canSell() ? " dim" : ""}" id="sellBtn"><small>продати</small><span>+${sellPrice(it)}🪙</span>${window.ECON && ECON.sellNote() ? `<i class="sell-n">${ECON.sellNote().split("/")[0]}</i>` : ""}</button>`;
+    text = tt`<b>${itemName(it)}</b><small>Страву просять сусіди за ⭐⭐</small>`;
+    btn = tt`<button class="sell${window.ECON && !ECON.canSell() ? " dim" : ""}" id="sellBtn"><small>продати</small><span>+${sellPrice(it)}🪙</span>${window.ECON && ECON.sellNote() ? `<i class="sell-n">${ECON.sellNote().split("/")[0]}</i>` : ""}</button>`;
   } else if (CHAINS[it.c].open) {
-    text = `<b>${itemName(it)}</b><small>Тапни ще раз, щоб відкрити!${isMax(it) ? "" : " Або об'єднай два однакові"}</small>`;
+    text = tt`<b>${itemName(it)}</b><small>Тапни ще раз, щоб відкрити!${isMax(it) ? "" : tt` Або об'єднай два однакові`}</small>`;
   } else if (CHAINS[it.c].trash) {
-    text = `<b>${itemName(it)}</b><small>Виснажена земля дала брак — його можна лише викинути</small>`;
-    btn = `<button class="sell" id="trashBtn"><small>викинути</small><span>🗑️</span></button>`;
+    text = tt`<b>${itemName(it)}</b><small>Виснажена земля дала брак — його можна лише викинути</small>`;
+    btn = tt`<button class="sell" id="trashBtn"><small>викинути</small><span>🗑️</span></button>`;
   } else if (CHAINS[it.c].collect) {
-    text = `<b>${itemName(it)}</b><small>Тапни ще раз, щоб забрати +${CHAINS[it.c].values[it.l]} ${it.c === "coin" ? "🪙" : "⚡"}</small>`;
+    text = tt`<b>${itemName(it)}</b><small>Тапни ще раз, щоб забрати +${CHAINS[it.c].values[it.l]} ${it.c === "coin" ? "🪙" : "⚡"}</small>`;
   } else {
     const ch = CHAINS[it.c];
-    const next = (isMax(it) ? "Найвищий рівень! 🏆" : `Два таких → ${ch.items[it.l + 1][0]} ${ch.items[it.l + 1][1]}`) + (window.HARD ? HARD.freshInfo(it) : "");
-    text = `<b>${itemName(it)} <span class="lvl-tag">рів. ${it.l + 1}</span></b><small>${next}</small>`;
-    btn = `<button class="sell${window.ECON && !ECON.canSell() ? " dim" : ""}" id="sellBtn"><small>продати</small><span>+${sellPrice(it)}🪙</span>${window.ECON && ECON.sellNote() ? `<i class="sell-n">${ECON.sellNote().split("/")[0]}</i>` : ""}</button>`;
+    const next = (isMax(it) ? tt`Найвищий рівень! 🏆` : tt`Два таких → ${ch.items[it.l + 1][0]} ${ch.items[it.l + 1][1]}`) + (window.HARD ? HARD.freshInfo(it) : "");
+    text = tt`<b>${itemName(it)} <span class="lvl-tag">рів. ${it.l + 1}</span></b><small>${next}</small>`;
+    btn = tt`<button class="sell${window.ECON && !ECON.canSell() ? " dim" : ""}" id="sellBtn"><small>продати</small><span>+${sellPrice(it)}🪙</span>${window.ECON && ECON.sellNote() ? `<i class="sell-n">${ECON.sellNote().split("/")[0]}</i>` : ""}</button>`;
   }
   box.innerHTML = `<span class="info-ic">${itemIcon(it)}</span><span class="info-txt">${text}</span>${window.XTRA ? XTRA.storeBtn(it) : ""}${window.WH && it.g ? WH.genButton(it) : ""}${btn}`;
   const shb = $("sharpBtn"); if (shb) shb.onclick = () => WH.sharpenModal(selected);
@@ -814,7 +814,7 @@ function renderInfo() {
   const tb = $("trashBtn"); if (tb && window.SOIL) tb.onclick = () => SOIL.trash(selected);
   const sb = $("sellBtn");
   if (sb) sb.onclick = () => {
-    if (it.l >= 3 && !sb.dataset.sure) { sb.dataset.sure = 1; sb.innerHTML = "<small>точно?</small>Так"; return; }
+    if (it.l >= 3 && !sb.dataset.sure) { sb.dataset.sure = 1; sb.innerHTML = tt`<small>точно?</small>Так`; return; }
     sellSelected();
   };
 }
@@ -827,9 +827,9 @@ function renderInbox() {
 }
 function takeInbox() {
   if (!S.inbox.length) return;
-  if (S.sideOn) { sfx.nope(); toast("Це для городу — повернись на город 🪴, щоб забрати"); return; }
+  if (S.sideOn) { sfx.nope(); toast(tt`Це для городу — повернись на город 🪴, щоб забрати`); return; }
   const i = emptyNear(Math.floor(N / 2));
-  if (i < 0) { sfx.nope(); toast("Звільни місце на дошці 🙂"); return; }
+  if (i < 0) { sfx.nope(); toast(tt`Звільни місце на дошці 🙂`); return; }
   const it = S.inbox.shift();
   S.board[i] = it; discover(it); popIdx.add(i);
   sfx.pop();
@@ -938,7 +938,7 @@ function renderStory(animateLast) {
     scene.innerHTML = `<div class="ground"></div>` + all.map(deco).join("");
   }
 
-  $("chapterTitle").textContent = `Розділ ${idx + 1}. ${ch.title}`;
+  $("chapterTitle").textContent = tt`Розділ ${idx + 1}. ${ch.title}`;
   const done = Math.min(doneN, ch.tasks.length);
   $("chapterBar").style.width = (done / ch.tasks.length * 100) + "%";
   $("chapterProg").textContent = done + "/" + ch.tasks.length;
@@ -960,7 +960,7 @@ function renderStory(animateLast) {
   if (idx < curIdx()) {
     const note = document.createElement("div");
     note.className = "loc-note";
-    note.innerHTML = `Цю місцину вже відновлено 💛 <button class="btn small">↩ До поточного розділу</button>`;
+    note.innerHTML = tt`Цю місцину вже відновлено 💛 <button class="btn small">↩ До поточного розділу</button>`;
     note.querySelector("button").onclick = () => { viewCh = null; renderStory(); };
     list.appendChild(note);
   }
@@ -979,7 +979,7 @@ function renderShop() {
     if (s.id === "energy") {
       price = energyPrice();
       const left = ENERGY_SHOP.prices.length - energyBuysToday();
-      title += `<small class="s-sub">${left ? "сьогодні ще " + left + " з " + ENERGY_SHOP.prices.length : "завтра знову"}</small>`;
+      title += `<small class="s-sub">${left ? tt`сьогодні ще ` + left + tt` з ` + ENERGY_SHOP.prices.length : tt`завтра знову`}</small>`;
     }
     if (s.id !== "energy" && window.ECON) price = ECON.price("shop-" + s.id, s.price);
     lbl = price ? price + " 🪙" : "🌙";
@@ -991,8 +991,8 @@ function renderShop() {
   const pb = $("payBox");
   if (pb && window.PAY && !pb.dataset.ok) { pb.innerHTML = PAY.html(); PAY.bind(pb); pb.dataset.ok = 1; }
   const tb = $("teaBtn");
-  if (teaReady()) { tb.textContent = "☕ Перерва на чай: +" + TEA_BREAK_ENERGY + " ⚡ безкоштовно"; tb.classList.remove("dim"); }
-  else { tb.textContent = "☕ Наступна перерва на чай за " + hm(TEA_BREAK_MS - (Date.now() - S.teaAt)); tb.classList.add("dim"); }
+  if (teaReady()) { tb.textContent = tt`☕ Перерва на чай: +` + TEA_BREAK_ENERGY + tt` ⚡ безкоштовно`; tb.classList.remove("dim"); }
+  else { tb.textContent = tt`☕ Наступна перерва на чай за ` + hm(TEA_BREAK_MS - (Date.now() - S.teaAt)); tb.classList.add("dim"); }
 }
 
 function renderCollection() {
@@ -1000,7 +1000,7 @@ function renderCollection() {
   let have = 0, total = 0;
   const dn = window.XTRA ? XTRA.discCount() : 0;
   box.innerHTML = (window.ALB ? ALB.entryHtml() : "") +
-    (dn ? `<button class="btn small disc-all" id="discAll">🎁 Забрати нагороди за нові предмети (${dn})</button>` : "") +
+    (dn ? tt`<button class="btn small disc-all" id="discAll">🎁 Забрати нагороди за нові предмети (${dn})</button>` : "") +
     (window.QUEST ? QUEST.friendsPanelHtml() : "");
   box.querySelectorAll(".fr-row").forEach(b => b.onclick = () => QUEST.friendModal(b.dataset.who));
   const ao = $("albOpen"); if (ao) ao.onclick = () => ALB.panel();
@@ -1016,7 +1016,7 @@ function renderCollection() {
       return `<span class="coll-it${got ? "" : " no"}${gift ? " gift" : ""}" data-k="${c}:${l}" title="${got ? x[1] : "?"}">${got ? x[0] : "❔"}</span>`;
     }).join("");
     const locked = !unlockedChains().includes(c);
-    sec.innerHTML = `<div class="coll-h">${ch.name}${locked ? " <small>🔒 відкриється за сюжетом</small>" : ""}</div><div class="coll-row">${items}</div>`;
+    sec.innerHTML = `<div class="coll-h">${ch.name}${locked ? tt` <small>🔒 відкриється за сюжетом</small>` : ""}</div><div class="coll-row">${items}</div>`;
     box.appendChild(sec);
   });
   if (window.UNL) box.insertAdjacentHTML("beforeend", UNL.roadHtml());
@@ -1038,10 +1038,10 @@ function renderNavBadge() {
 
 /* ---------------- Підказки-навчання ---------------- */
 const TUT = [
-  "👆 Тапни на 🪴 Грядку — вона дасть насіннячко",
-  "✌️ Перетягни 🌱 на такий самий 🌱 — вийде 🌿",
-  "🧺 Збери, що просять сусіди, і натисни «Віддати»",
-  "🏡 Зірочки ⭐ витрачай у «Дворику» на ремонт"
+  tt`👆 Тапни на 🪴 Грядку — вона дасть насіннячко`,
+  tt`✌️ Перетягни 🌱 на такий самий 🌱 — вийде 🌿`,
+  tt`🧺 Збери, що просять сусіди, і натисни «Віддати»`,
+  tt`🏡 Зірочки ⭐ витрачай у «Дворику» на ремонт`
 ];
 function setTut(n) { S.tut = n; renderTut(); }
 function renderTut() {
@@ -1168,7 +1168,7 @@ function modal({ title, html, buttons }) {
   m.querySelector(".m-body").innerHTML = gx(html);
   const bb = m.querySelector(".m-btns");
   bb.innerHTML = "";
-  (buttons || [{ label: "Добре" }]).forEach(b => {
+  (buttons || [{ label: tt`Добре` }]).forEach(b => {
     const el = document.createElement("button");
     el.className = "btn " + (b.cls || "");
     el.textContent = b.label;
@@ -1227,56 +1227,69 @@ async function showExport() {
   const code = await makeBackup();
   window.GUIDE && GUIDE.exported();
   modal({
-    title: "Зберегти прогрес 💾",
-    html: `<p>Це твій код прогресу (рівень ${S.level}, розділ ${Math.min(S.chapter, STORY.length - 1) + 1}). Збережи його в Нотатки або надішли собі в месенджер.</p>
+    title: tt`Зберегти прогрес 💾`,
+    html: tt`<p>Це твій код прогресу (рівень ${S.level}, розділ ${Math.min(S.chapter, STORY.length - 1) + 1}). Збережи його в Нотатки або надішли собі в месенджер.</p>
       <textarea class="backup-code" id="bkCode" readonly>${code}</textarea>`,
     buttons: [
-      ...(navigator.share ? [{ label: "📤 Поділитися (Нотатки, Telegram…)", onClick: () => navigator.share({ title: "Затишний дворик — прогрес", text: code }).catch(() => {}) }] : []),
-      { label: "📋 Скопіювати", cls: navigator.share ? "ghost" : "", onClick: () => copyText(code) },
-      { label: "Закрити", cls: "ghost" }
+      ...(navigator.share ? [{ label: tt`📤 Поділитися (Нотатки, Telegram…)`, onClick: () => navigator.share({ title: tt`Затишний дворик — прогрес`, text: code }).catch(() => {}) }] : []),
+      { label: tt`📋 Скопіювати`, cls: navigator.share ? "ghost" : "", onClick: () => copyText(code) },
+      { label: tt`Закрити`, cls: "ghost" }
     ]
   });
   const ta = $("bkCode"); ta.onfocus = () => ta.select();
 }
 function copyText(t) {
-  const ok = () => toast("Скопійовано 📋 Встав у Нотатки");
+  const ok = () => toast(tt`Скопійовано 📋 Встав у Нотатки`);
   if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, () => fallbackCopy(t, ok));
   else fallbackCopy(t, ok);
 }
 function fallbackCopy(t, ok) {
   const ta = document.createElement("textarea"); ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0";
-  document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); ok(); } catch (e) { toast("Не вдалося скопіювати — виділи код вручну"); }
+  document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); ok(); } catch (e) { toast(tt`Не вдалося скопіювати — виділи код вручну`); }
   ta.remove();
 }
 /* у застосунку сейв дублюється в нативне сховище — перед перезавантаженням дочекатися запису */
 function reloadAfterSave() { (window.NATIVE ? NATIVE.flush() : Promise.resolve()).then(() => location.reload()); }
 function showImport() {
   modal({
-    title: "Відновити прогрес 📥",
-    html: `<p>Встав сюди код прогресу, який ти зберігала раніше.</p>
+    title: tt`Відновити прогрес 📥`,
+    html: tt`<p>Встав сюди код прогресу, який ти зберігала раніше.</p>
       <textarea class="backup-code" id="bkIn" placeholder="DVORYK1:…"></textarea>
       <p class="hint-s">Увага: поточна гра на цьому телефоні заміниться збереженою.</p>`,
     buttons: [
-      { label: "Відновити", onClick: async () => {
+      { label: tt`Відновити`, onClick: async () => {
         const code = $("bkIn").value;
         try {
           const data = await readBackup(code);
-          if (!confirm(`Відновити гру: рівень ${data.level}, розділ ${(data.chapter || 0) + 1}? Поточний прогрес на цьому телефоні заміниться.`)) return;
+          if (!confirm(tt`Відновити гру: рівень ${data.level}, розділ ${(data.chapter || 0) + 1}? Поточний прогрес на цьому телефоні заміниться.`)) return;
           S = null; // щоб автозбереження не перезаписало відновлене
           localStorage.setItem(SAVE_KEY, JSON.stringify(data));
           reloadAfterSave();
-        } catch (e) { toast("Код не підходить 🙈 Перевір, що скопіювала його повністю"); }
+        } catch (e) { toast(tt`Код не підходить 🙈 Перевір, що скопіювала його повністю`); }
       } },
-      { label: "Скасувати", cls: "ghost" }
+      { label: tt`Скасувати`, cls: "ghost" }
     ]
   });
 }
 
 /* ---------------- Налаштування ---------------- */
+/* ---------------- Мова ---------------- */
+function langRow(id) {
+  const opts = Object.entries(LANGS).map(([k, v]) => `<option value="${k}"${k === LANG ? " selected" : ""}>${v}</option>`).join("");
+  return `<label class="set-row">🌐 ${tt`Мова`}${LANG !== "uk" ? "" : " · Language"} <select id="${id}" class="lang-pick">${opts}</select></label>`;
+}
+function bindLang(id) {
+  const sel = $(id); if (!sel) return;
+  sel.onchange = () => {
+    if (!I18NX.setLang(sel.value)) return;
+    if (S && S.started) saveNow();
+    reloadAfterSave();
+  };
+}
 function openSettings() {
   modal({
-    title: "Налаштування ⚙️",
-    html: `
+    title: tt`Налаштування ⚙️`,
+    html: langRow("setLang") + tt`
       <label class="set-row">Ім'я <input id="setName" value="${(S.name || "").replace(/"/g, "&quot;")}" maxlength="20"></label>
       <label class="set-row"><span id="setSoundIc">${S.sound ? "🔊" : "🔇"}</span> Звук <input type="checkbox" id="setSound" ${S.sound ? "checked" : ""}></label>
       <div class="set-backup">
@@ -1290,7 +1303,7 @@ function openSettings() {
       <p class="hint-s">Справжні покупки поки не підключені — гроші гра не списує 💛</p>
       <button class="btn ghost small" id="setReset">Почати гру спочатку</button>
       <p class="hint-s" style="text-align:center;opacity:.6">Версія гри: ${APP_VER}</p>${errsHtml()}`,
-    buttons: [{ label: "Зберегти", onClick: () => {
+    buttons: [{ label: tt`Зберегти`, onClick: () => {
       S.name = $("setName").value.trim();
       S.sound = $("setSound").checked;
       renderAll(); save();
@@ -1300,9 +1313,10 @@ function openSettings() {
   $("setExport").onclick = showExport;
   $("setImport").onclick = showImport;
   $("setGuide").onclick = () => window.GUIDE && GUIDE.open();
+  bindLang("setLang");
   if (window.CLOUD) CLOUD.bindSettings();
   $("setReset").onclick = () => {
-    if (!confirm("Точно почати спочатку? Весь прогрес буде видалено.")) return;
+    if (!confirm(tt`Точно почати спочатку? Весь прогрес буде видалено.`)) return;
     localStorage.removeItem(SAVE_KEY);
     reloadAfterSave();
   };
@@ -1311,7 +1325,7 @@ function openSettings() {
 /* ============================================================
    ВЗАЄМОДІЯ З ДОШКОЮ (тап і перетягування)
    ============================================================ */
-const APP_VER = "v153";   // разом із VERSION у sw.js
+const APP_VER = "v154";   // разом із VERSION у sw.js
 let drag = null, dragAnim = false, dragGhost = null, envKeyShown = "";
 /* привид створюється один раз і живе весь час (новий шар на кожен дотик змушував дошку блимати) */
 function ghostEl() {
@@ -1496,11 +1510,11 @@ function startGame() {
     save();
     renderAll();
     const n = STORY.length - S.chapter;
-    const what = n === 1 ? "новий розділ" : n < 5 ? "нові розділи" : "нових розділів";
+    const what = n === 1 ? tt`новий розділ` : n < 5 ? tt`нові розділи` : tt`нових розділів`;
     modal({
-      title: n === 1 ? "Новий розділ! 💌" : "Нові розділи! 💌",
-      html: `<div class="big-emoji">🏡</div><p>Історія дворика продовжується — на тебе ${n === 1 ? "чекає" : "чекають"} ${n} ${what}: «${STORY[S.chapter].title}»${n > 1 ? " і далі" : ""}!</p>`,
-      buttons: [{ label: "Читати ›", onClick: () => playDialog(STORY[S.chapter].intro, checkDaily) }]
+      title: n === 1 ? tt`Новий розділ! 💌` : tt`Нові розділи! 💌`,
+      html: tt`<div class="big-emoji">🏡</div><p>Історія дворика продовжується — на тебе ${n === 1 ? tt`чекає` : tt`чекають`} ${n} ${what}: «${STORY[S.chapter].title}»${n > 1 ? tt` і далі` : ""}!</p>`,
+      buttons: [{ label: tt`Читати ›`, onClick: () => playDialog(STORY[S.chapter].intro, checkDaily) }]
     });
   } else {
     checkDaily();
@@ -1514,6 +1528,7 @@ function init() {
   S.board.forEach(it => { if (it && !it.g) S.collection[it.c + ":" + it.l] = 1; });
   if (fresh || !S.started) {
     S.lastDaily = todayStr(); S.streak = 1;
+    $("startLangBox").innerHTML = langRow("startLang"); bindLang("startLang");
     $("start").classList.add("show");
     $("installHint").hidden = !(isIOS() && !isStandalone());
     if (window.HERO) HERO.startRow();
@@ -1616,10 +1631,10 @@ function init() {
 function showNoEnergyInfo() {
   const full = energyFullIn();
   modal({
-    title: "Енергія ⚡",
-    html: `<p>+1 ⚡ кожні ${ENERGY_REGEN_MS / 60000} хвилини, до ${ENERGY_MAX} ⚡.<br>${full ? "Повна шкала за <b>" + hm(full) + "</b>." : "Шкала повна — саме час садити! 🌱"}</p>
+    title: tt`Енергія ⚡`,
+    html: tt`<p>+1 ⚡ кожні ${ENERGY_REGEN_MS / 60000} хвилини, до ${ENERGY_MAX} ⚡.<br>${full ? tt`Повна шкала за <b>` + hm(full) + "</b>." : tt`Шкала повна — саме час садити! 🌱`}</p>
       <p class="hint-s">Ще трохи енергії дають ⚡🔋☀️ на дошці (зрідка), нові рівні, щоденний подарунок і перерва на чай (раз на ${TEA_BREAK_MS / 3600000} год).</p>` + (window.REST ? REST.line() : ""),
-    buttons: [...energyButtons(false), { label: "Зрозуміло", cls: "ghost" }]
+    buttons: [...energyButtons(false), { label: tt`Зрозуміло`, cls: "ghost" }]
   });
 }
 

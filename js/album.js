@@ -7,12 +7,12 @@
    Стан: S.alb = { have: { id: кількість }, stamps, sets: { набір: true }, all }
    ============================================================ */
 const ALBUM = [
-  { id: "garden", name: "Город",       icon: "🌻", cards: [["🥕", "Морквина"], ["🍅", "Помідор"], ["🥒", "Огірочок"], ["🌽", "Качанчик"], ["🎃", "Гарбуз"], ["🌻", "Соняшник"]] },
-  { id: "home",   name: "Хата",        icon: "🏡", cards: [["🫖", "Чайник"], ["🧺", "Кошик"], ["🕯️", "Свічечка"], ["🧸", "Ведмедик"], ["🖼️", "Картина"], ["🛏️", "Перина"]] },
-  { id: "nature", name: "Природа",     icon: "🌳", cards: [["🐞", "Сонечко"], ["🐝", "Бджілка"], ["🦋", "Метелик"], ["🦔", "Їжачок"], ["🌳", "Старий дуб"], ["🦢", "Лебідь"]] },
-  { id: "craft",  name: "Ремесла",     icon: "🧵", cards: [["🧵", "Нитки"], ["🪡", "Голка"], ["🧶", "Клубок"], ["🧣", "Шарф"], ["🏺", "Глечик"], ["🎻", "Скрипка"]] },
-  { id: "food",   name: "Смаколики",   icon: "🥟", cards: [["🍞", "Паляниця"], ["🥛", "Молоко"], ["🍒", "Вишні"], ["🥞", "Млинці"], ["🥟", "Вареники"], ["🍰", "Торт"]] },
-  { id: "holy",   name: "Свята",       icon: "🎄", cards: [["🔔", "Дзвіночок"], ["🍯", "Мед"], ["🥚", "Писанка"], ["🎄", "Ялинка"], ["🕊️", "Голубка"], ["⭐", "Різдвяна зірка"]] }
+  { id: "garden", name: tt`Город`,       icon: "🌻", cards: [["🥕", tt`Морквина`], ["🍅", tt`Помідор`], ["🥒", tt`Огірочок`], ["🌽", tt`Качанчик`], ["🎃", tt`Гарбуз`], ["🌻", tt`Соняшник`]] },
+  { id: "home",   name: tt`Хата`,        icon: "🏡", cards: [["🫖", tt`Чайник`], ["🧺", tt`Кошик`], ["🕯️", tt`Свічечка`], ["🧸", tt`Ведмедик`], ["🖼️", tt`Картина`], ["🛏️", tt`Перина`]] },
+  { id: "nature", name: tt`Природа`,     icon: "🌳", cards: [["🐞", tt`Сонечко`], ["🐝", tt`Бджілка`], ["🦋", tt`Метелик`], ["🦔", tt`Їжачок`], ["🌳", tt`Старий дуб`], ["🦢", tt`Лебідь`]] },
+  { id: "craft",  name: tt`Ремесла`,     icon: "🧵", cards: [["🧵", tt`Нитки`], ["🪡", tt`Голка`], ["🧶", tt`Клубок`], ["🧣", tt`Шарф`], ["🏺", tt`Глечик`], ["🎻", tt`Скрипка`]] },
+  { id: "food",   name: tt`Смаколики`,   icon: "🥟", cards: [["🍞", tt`Паляниця`], ["🥛", tt`Молоко`], ["🍒", tt`Вишні`], ["🥞", tt`Млинці`], ["🥟", tt`Вареники`], ["🍰", tt`Торт`]] },
+  { id: "holy",   name: tt`Свята`,       icon: "🎄", cards: [["🔔", tt`Дзвіночок`], ["🍯", tt`Мед`], ["🥚", tt`Писанка`], ["🎄", tt`Ялинка`], ["🕊️", tt`Голубка`], ["⭐", tt`Різдвяна зірка`]] }
 ];
 const ALB_RARE = k => (k < 3 ? 1 : k < 5 ? 2 : 3);        // позиція в наборі → кількість зірок
 const ALB_SET_REWARD = { coins: 150, chest: 1, stars: 2 };
@@ -51,7 +51,7 @@ window.ALB = (() => {
     got.forEach(g => checkSet(g.s));
     if (n === 1) {
       const g = got[0], c = g.s.cards[g.k];
-      setTimeout(() => toast(g.fresh ? `💌 Нова листівка: ${c[0]} ${c[1]}!` : `💌 ${c[0]} ${c[1]} — повтор, +${ALB_RARE(g.k)} 📮`), 1200);
+      setTimeout(() => toast(g.fresh ? tt`💌 Нова листівка: ${c[0]} ${c[1]}!` : tt`💌 ${c[0]} ${c[1]} — повтор, +${ALB_RARE(g.k)} 📮`), 1200);
     } else pending.push({ got, why });
     renderNavBadge();
     return got;
@@ -77,23 +77,23 @@ window.ALB = (() => {
     if (!p) return false;
     if (p.got) {
       sfx.open();
-      modal({ title: "Листівки! 💌",
-        html: `<p>${p.why ? p.why + " — " : ""}${p.got.length} ${p.got.length < 5 ? "листівки" : "листівок"} у твій альбом:</p><div class="pc-row">${p.got.map(g => cardHtml(g.s, g.k, g.fresh ? " fresh" : "")).join("")}</div>` +
-          (p.got.some(g => !g.fresh) ? `<p class="hint-s">Повтори перетворилися на марочки 📮 — за ${ALB_SWAP} 📮 можна обміняти нову листівку.</p>` : ""),
-        buttons: [{ label: "До альбому 💌", onClick: () => panel() }, { label: "Добре", cls: "ghost" }] });
+      modal({ title: tt`Листівки! 💌`,
+        html: tt`<p>${p.why ? p.why + " — " : ""}${p.got.length} ${p.got.length < 5 ? tt`листівки` : tt`листівок`} у твій альбом:</p><div class="pc-row">${p.got.map(g => cardHtml(g.s, g.k, g.fresh ? " fresh" : "")).join("")}</div>` +
+          (p.got.some(g => !g.fresh) ? tt`<p class="hint-s">Повтори перетворилися на марочки 📮 — за ${ALB_SWAP} 📮 можна обміняти нову листівку.</p>` : ""),
+        buttons: [{ label: tt`До альбому 💌`, onClick: () => panel() }, { label: tt`Добре`, cls: "ghost" }] });
     } else if (p.set) {
       const r = ALB_SET_REWARD;
       placeItem({ c: "chest", l: r.chest }); S.coins += r.coins; S.stars += r.stars;
       save(); renderAll(); confetti(); sfx.level();
-      modal({ title: "Набір зібрано! 💌",
-        html: `<div class="big-emoji">${p.set.icon}</div><p>Набір «${p.set.name}» повний!</p><p class="rewards">📦 &nbsp; +${r.coins} 🪙 &nbsp; +${r.stars} ⭐</p>`,
-        buttons: [{ label: "Ура! 💛" }] });
+      modal({ title: tt`Набір зібрано! 💌`,
+        html: tt`<div class="big-emoji">${p.set.icon}</div><p>Набір «${p.set.name}» повний!</p><p class="rewards">📦 &nbsp; +${r.coins} 🪙 &nbsp; +${r.stars} ⭐</p>`,
+        buttons: [{ label: tt`Ура! 💛` }] });
     } else if (p.all) {
       const r = ALB_ALL_REWARD;
       placeItem({ c: "chest", l: r.chest }); S.coins += r.coins; S.stars += r.stars;
       save(); renderAll(); confetti(); sfx.level();
-      playDialog([["ivan", "Увесь альбом зібрала?! {name}, такого на нашій пошті ще не бачили! 📮💛"]], () =>
-        modal({ title: "Альбом повний! 🏆", html: `<div class="big-emoji">📮</div><p>Усі ${total} листівок — твої!</p><p class="rewards">💝 &nbsp; +${r.coins} 🪙 &nbsp; +${r.stars} ⭐</p>`, buttons: [{ label: "Неймовірно! 💛" }] }));
+      playDialog([["ivan", tt`Увесь альбом зібрала?! {name}, такого на нашій пошті ще не бачили! 📮💛`]], () =>
+        modal({ title: tt`Альбом повний! 🏆`, html: tt`<div class="big-emoji">📮</div><p>Усі ${total} листівок — твої!</p><p class="rewards">💝 &nbsp; +${r.coins} 🪙 &nbsp; +${r.stars} ⭐</p>`, buttons: [{ label: tt`Неймовірно! 💛` }] }));
     }
     return true;
   }
@@ -109,7 +109,7 @@ window.ALB = (() => {
     const [s, k] = pick(low);
     a.have[cid(s, k)] = 1;
     save(); sfx.open();
-    toast(`📮 Обмін: ${s.cards[k][0]} ${s.cards[k][1]}!`);
+    toast(tt`📮 Обмін: ${s.cards[k][0]} ${s.cards[k][1]}!`);
     checkSet(s);
     panel();
   }
@@ -117,19 +117,19 @@ window.ALB = (() => {
     const a = st();
     const sets = ALBUM.map(s => {
       const n = s.cards.filter((_, k) => a.have[cid(s, k)]).length;
-      return `<div class="pc-set${a.sets[s.id] ? " done" : ""}"><div class="pc-h"><b>${s.icon} ${s.name}</b><small>${a.sets[s.id] ? "✅ зібрано" : n + "/6 · 📦 +" + ALB_SET_REWARD.coins + "🪙"}</small></div>` +
+      return `<div class="pc-set${a.sets[s.id] ? " done" : ""}"><div class="pc-h"><b>${s.icon} ${s.name}</b><small>${a.sets[s.id] ? tt`✅ зібрано` : n + "/6 · 📦 +" + ALB_SET_REWARD.coins + "🪙"}</small></div>` +
         `<div class="pc-row">${s.cards.map((_, k) => cardHtml(s, k)).join("")}</div></div>`;
     }).join("");
     const canSwap = a.stamps >= ALB_SWAP && haveN() < total;
-    modal({ title: `Альбом листівок 💌 ${haveN()}/${total}`,
-      html: `<div class="pc-stamps">📮 Марочки: <b>${a.stamps}</b> <button class="s-btn${canSwap ? "" : " dim"}" id="pcSwap">Обміняти за ${ALB_SWAP} 📮</button></div>` +
-        `<div class="pc-sets">${sets}</div><p class="hint-s">Листівки дають за замовлення сусідів, подарунки, завдання й котика 🐾. ★★★ — найрідкісніші.</p>`,
-      buttons: [{ label: "Закрити", cls: "ghost" }] });
-    $("pcSwap").onclick = () => { if (a.stamps < ALB_SWAP) { sfx.nope(); toast(`Треба ${ALB_SWAP} 📮 — повтори листівок дають марочки`); return; } swap(); };
+    modal({ title: tt`Альбом листівок 💌 ${haveN()}/${total}`,
+      html: tt`<div class="pc-stamps">📮 Марочки: <b>${a.stamps}</b> <button class="s-btn${canSwap ? "" : " dim"}" id="pcSwap">Обміняти за ${ALB_SWAP} 📮</button></div>` +
+        tt`<div class="pc-sets">${sets}</div><p class="hint-s">Листівки дають за замовлення сусідів, подарунки, завдання й котика 🐾. ★★★ — найрідкісніші.</p>`,
+      buttons: [{ label: tt`Закрити`, cls: "ghost" }] });
+    $("pcSwap").onclick = () => { if (a.stamps < ALB_SWAP) { sfx.nope(); toast(tt`Треба ${ALB_SWAP} 📮 — повтори листівок дають марочки`); return; } swap(); };
   }
   function entryHtml() {
     if (!on()) return "";
-    return `<button class="alb-entry" id="albOpen"><span class="alb-ic">💌</span><span class="alb-mid"><b>Альбом листівок</b><small>${haveN()} з ${total} · 📮 ${st().stamps}</small></span><span class="alb-go">›</span></button>`;
+    return tt`<button class="alb-entry" id="albOpen"><span class="alb-ic">💌</span><span class="alb-mid"><b>Альбом листівок</b><small>${haveN()} з ${total} · 📮 ${st().stamps}</small></span><span class="alb-go">›</span></button>`;
   }
 
   /* ---------- звідки падають ---------- */
@@ -141,7 +141,7 @@ window.ALB = (() => {
   function onChest(level) {
     if (!on()) return;
     const n = [Math.random() < 0.15 ? 1 : 0, 1, 2][level] || 0;
-    if (n) give(n, n > 1 ? "Зі скрині" : "");
+    if (n) give(n, n > 1 ? tt`Зі скрині` : "");
   }
 
   const busyUI = () => $("modal").classList.contains("show") || $("dialog").classList.contains("show");

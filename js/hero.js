@@ -10,18 +10,18 @@
    Картинки: portraits/<id>-full.webp (на повний зріст). Стан: S.hero = id, S.sex
    ============================================================ */
 const HEROES = [
-  { id: "hero1", sex: "f", e: "👱‍♀️", title: "Світла коса",      look: "світла коса, блакитний сарафан" },
-  { id: "hero2", sex: "f", e: "👩",   title: "Темне каре",        look: "темне каре, зелена сукня з фартушком" },
-  { id: "hero3", sex: "f", e: "👩‍🦰", title: "Руді кучері",       look: "руді кучері, гірчичний кардиган" },
-  { id: "hero4", sex: "f", e: "👩‍🦱", title: "Гулька",            look: "темна гулька, червона сукня в горошок" },
-  { id: "hero5", sex: "f", e: "👩‍🌾", title: "Хвостик",           look: "русявий хвостик, комбінезон і картата сорочка" },
-  { id: "hero6", sex: "f", e: "👒",   title: "Солом'яний капелюх", look: "коротка стрижка, лавандова блузка й бриль" },
-  { id: "man1", sex: "m", e: "👱‍♂️", title: "Русявий чуб", look: "русявий чуб, вишиванка й джинси" },
-  { id: "man2", sex: "m", e: "🧔",   title: "Борода",      look: "темна борідка, картата фланелева сорочка" },
-  { id: "man3", sex: "m", e: "👨‍🦰", title: "Рудий",       look: "руді кучері, ластовиння, гірчичний светр" },
-  { id: "man4", sex: "m", e: "👨",   title: "Вуса",        look: "чорне волосся, охайні вуса, вишиванка з червоним поясом" },
-  { id: "man5", sex: "m", e: "👨‍🌾", title: "Кашкет",      look: "кашкет, картата сорочка й комбінезон" },
-  { id: "man6", sex: "m", e: "🧑‍🦱", title: "Бриль",       look: "солом'яний бриль, лляна сорочка з закатаними рукавами" }
+  { id: "hero1", sex: "f", e: "👱‍♀️", title: tt`Світла коса`,      look: tt`світла коса, блакитний сарафан` },
+  { id: "hero2", sex: "f", e: "👩",   title: tt`Темне каре`,        look: tt`темне каре, зелена сукня з фартушком` },
+  { id: "hero3", sex: "f", e: "👩‍🦰", title: tt`Руді кучері`,       look: tt`руді кучері, гірчичний кардиган` },
+  { id: "hero4", sex: "f", e: "👩‍🦱", title: tt`Гулька`,            look: tt`темна гулька, червона сукня в горошок` },
+  { id: "hero5", sex: "f", e: "👩‍🌾", title: tt`Хвостик`,           look: tt`русявий хвостик, комбінезон і картата сорочка` },
+  { id: "hero6", sex: "f", e: "👒",   title: tt`Солом'яний капелюх`, look: tt`коротка стрижка, лавандова блузка й бриль` },
+  { id: "man1", sex: "m", e: "👱‍♂️", title: tt`Русявий чуб`, look: tt`русявий чуб, вишиванка й джинси` },
+  { id: "man2", sex: "m", e: "🧔",   title: tt`Борода`,      look: tt`темна борідка, картата фланелева сорочка` },
+  { id: "man3", sex: "m", e: "👨‍🦰", title: tt`Рудий`,       look: tt`руді кучері, ластовиння, гірчичний светр` },
+  { id: "man4", sex: "m", e: "👨",   title: tt`Вуса`,        look: tt`чорне волосся, охайні вуса, вишиванка з червоним поясом` },
+  { id: "man5", sex: "m", e: "👨‍🌾", title: tt`Кашкет`,      look: tt`кашкет, картата сорочка й комбінезон` },
+  { id: "man6", sex: "m", e: "🧑‍🦱", title: tt`Бриль`,       look: tt`солом'яний бриль, лляна сорочка з закатаними рукавами` }
 ];
 const HERO_ART = ["hero1", "hero2", "hero3", "hero4", "hero5", "hero6", "man1", "man2", "man3", "man4", "man5", "man6"];   // намальовані (portraits/<id>-full.webp)
 /* де обличчя на картинці (знайдено Apple Vision): центр x, центр y (% від ширини/висоти), ширина лиця (%), пропорції картинки */
@@ -69,11 +69,11 @@ window.HERO = (() => {
   /* вибір у профілі */
   function picker(back) {
     const c = cur();
-    modal({ title: "Моя зовнішність",
-      html: sexHtml() + `<p class="hint-s">Так тебе бачитимуть сусіди — у дворику, в аватарці й на конкурсах.</p><div class="hr-grid">${cards(c && c.id)}</div>` +
+    modal({ title: tt`Моя зовнішність`,
+      html: sexHtml() + tt`<p class="hint-s">Так тебе бачитимуть сусіди — у дворику, в аватарці й на конкурсах.</p><div class="hr-grid">${cards(c && c.id)}</div>` +
         (c ? `<p class="hr-look">${c.look}</p>` : "") + looksHtml() +
-        (HERO_ART.length ? "" : `<p class="hint-s">Мальовані героїні скоро з'являться 🎨 Поки — значки.</p>`),
-      buttons: [{ label: "Готово", onClick: back }] });
+        (HERO_ART.length ? "" : tt`<p class="hint-s">Мальовані героїні скоро з'являться 🎨 Поки — значки.</p>`),
+      buttons: [{ label: tt`Готово`, onClick: back }] });
     document.querySelectorAll(".hr-card").forEach(b => b.onclick = () => { set(b.dataset.id); picker(back); });
     document.querySelectorAll(".hr-lk").forEach(b => b.onclick = () => { S.heroLook = b.dataset.k; save(); sfx.pop(); if (!$("tab-story").hidden) renderStory(); picker(back); });
     document.querySelectorAll(".hr-sex").forEach(b => b.onclick = () => { setSex(b.dataset.s); sfx.pop(); if (!$("tab-story").hidden) renderStory(); picker(back); });
@@ -114,13 +114,13 @@ window.HERO = (() => {
     return out;
   }
   const married = () => !!(S.fam && S.fam.wedAt);
-  const lookNames = () => [["auto", "✨ Само"], ["day", "👕 Звичайне"], ["fest", "🌻 Святкове"], ["winter", "❄️ Зимове"], ...(married() ? [["wed", "💍 Весільне"]] : [])];
+  const lookNames = () => [["auto", tt`✨ Само`], ["day", tt`👕 Звичайне`], ["fest", tt`🌻 Святкове`], ["winter", tt`❄️ Зимове`], ...(married() ? [["wed", tt`💍 Весільне`]] : [])];
   const looksHtml = () => !has(cur()) || !HERO_LOOKS.includes(cur().id) ? "" :
-    `<p class="hr-lbl">Вбрання в дворику</p><div class="hr-looks">${lookNames().map(([k, n]) => `<button class="hr-lk${(S.heroLook || "auto") === k ? " on" : ""}" data-k="${k}">${n}</button>`).join("")}</div>` +
+    tt`<p class="hr-lbl">Вбрання в дворику</p><div class="hr-looks">${lookNames().map(([k, n]) => `<button class="hr-lk${(S.heroLook || "auto") === k ? " on" : ""}" data-k="${k}">${n}</button>`).join("")}</div>` +
     `<div class="hr-prev">${["full", "fest", "winter", ...(married() && HERO_WED.includes(cur().id) ? ["wed"] : [])].map(v => `<img src="portraits/${cur().id}-${v}.webp" alt="">`).join("")}</div>` +
-    `<p class="hint-s">«Само»: узимку — у теплому, на свята — у вишиванці, а в будні — як завжди.</p>`;
+    tt`<p class="hint-s">«Само»: узимку — у теплому, на свята — у вишиванці, а в будні — як завжди.</p>`;
   /* стартовий екран */
-  const sexHtml = () => `<div class="hr-sexes"><button class="hr-sex${sex() === "f" ? " on" : ""}" data-s="f">👩 Жінка</button><button class="hr-sex${sex() === "m" ? " on" : ""}" data-s="m">👨 Чоловік</button></div>`;
+  const sexHtml = () => tt`<div class="hr-sexes"><button class="hr-sex${sex() === "f" ? " on" : ""}" data-s="f">👩 Жінка</button><button class="hr-sex${sex() === "m" ? " on" : ""}" data-s="m">👨 Чоловік</button></div>`;
   function startRow() {
     const box = $("heroPick"); if (!box) return;
     S.heroAsked = true;          // нова гра: героя обирають тут, окремо питати не треба
@@ -134,7 +134,7 @@ window.HERO = (() => {
     if (!S || !S.started || S.heroAsked || !HERO_ART.length || S.sideOn) return;
     if ($("modal").classList.contains("show") || $("dialog").classList.contains("show")) return;
     S.heroAsked = true; save();
-    playDialog([["halya", "{name}, а покажися-но сусідам — щоб і в дворику тебе бачили! 💛"]], () => picker(() => { render(); if (!$("tab-story").hidden) renderStory(); }));
+    playDialog([["halya", tt`{name}, а покажися-но сусідам — щоб і в дворику тебе бачили! 💛`]], () => picker(() => { render(); if (!$("tab-story").hidden) renderStory(); }));
   }
   return { faceHtml, emoji, picker, render, yard, startRow, cur, tick };
 })();

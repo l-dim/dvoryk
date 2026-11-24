@@ -56,6 +56,9 @@ input { font-family: inherit; }
   background: linear-gradient(#cdeeff, #fff4e6 55%, #c9e8b4); }
 .start.show { display: flex; }
 .start-card { width: 100%; max-width: 380px; text-align: center; }
+.start-lang { display: flex; justify-content: flex-end; margin-bottom: 4px; }
+.start-lang .set-row { display: inline-flex; gap: 6px; align-items: center; font-size: 14px; color: var(--ink-soft); border: 0; padding: 0; margin: 0; }
+.lang-pick { font: inherit; font-size: 15px; padding: 6px 8px; border-radius: 10px; border: 2px solid var(--line); background: #fff; color: var(--ink); }
 .start-art { font-family: var(--emoji); font-size: 96px; line-height: 1; position: relative; display: inline-block; margin-bottom: 8px; animation: float 3s ease-in-out infinite; }
 .start-art span { position: absolute; font-size: 36px; bottom: 0; }
 .start-art span:first-child { left: -30px; }

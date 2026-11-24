@@ -12,10 +12,10 @@
       Стан на предметі: it.t (коли з'явився), it.old (зачерствів)
    ============================================================ */
 const BOARD_STRIPS = [
-  { cells: Array.from({ length: ROWS - 2 }, (_, k) => (k + 1) * COLS + COLS - 1), stars: 3, coins: 150, name: "праву грядку" },
-  { cells: Array.from({ length: ROWS - 2 }, (_, k) => (k + 1) * COLS), stars: 5, coins: 300, name: "ліву грядку" },
-  { cells: Array.from({ length: COLS }, (_, c) => (ROWS - 1) * COLS + c), stars: 8, coins: 500, name: "нижній ряд" },
-  { cells: Array.from({ length: COLS }, (_, c) => c), stars: 12, coins: 800, name: "верхній ряд" }
+  { cells: Array.from({ length: ROWS - 2 }, (_, k) => (k + 1) * COLS + COLS - 1), stars: 3, coins: 150, name: tt`праву грядку` },
+  { cells: Array.from({ length: ROWS - 2 }, (_, k) => (k + 1) * COLS), stars: 5, coins: 300, name: tt`ліву грядку` },
+  { cells: Array.from({ length: COLS }, (_, c) => (ROWS - 1) * COLS + c), stars: 8, coins: 500, name: tt`нижній ряд` },
+  { cells: Array.from({ length: COLS }, (_, c) => c), stars: 12, coins: 800, name: tt`верхній ряд` }
 ];
 const WEAR_MAX = gl => 90 + 30 * (gl - 1);
 const PERISH = ["dairy", "fruit", "bake"], SPOIL_MS = 24 * 3600e3;
@@ -55,21 +55,22 @@ window.HARD = (() => {
   /* ---------- 1. розширення дошки ---------- */
   const nextStrip = () => { const st = boardStage(); if (st >= BOARD_STRIPS.length) return null;
     const s = BOARD_STRIPS[st]; if (!S.woodOn) return s;
-    const p = WOOD.stripPrice(st); return Object.assign({}, s, { stars: p[0], coins: p[1], name: s.name.replace("грядку", "стіну").replace("ряд", "ряд майстерні") }); };
+    const p = WOOD.stripPrice(st); return Object.assign({}, s, { stars: p[0], coins: p[1], name: LANG === "uk" ? s.name.replace("грядку", tt`стіну`).replace("ряд", tt`ряд майстерні`)
+      : s.name.replace(/\bbed\b/, tt`стіну`).replace(/\brow\b/, tt`ряд майстерні`) }); };
   const isNextLabel = i => { const s = nextStrip(); return !!s && s.cells[Math.floor(s.cells.length / 2)] === i; };
   function expandModal() {
     const s = nextStrip(); if (!s) return;
     const ok = S.stars >= s.stars && S.coins >= s.coins;
-    modal({ title: "Більше місця 🌱",
-      html: `<div class="big-emoji">${face(CHARS.stepan, "big")}</div><p>Дід Степан розчистить <b>${s.name}</b> — це ще ${s.cells.length} клітинок для городу.</p>` +
+    modal({ title: tt`Більше місця 🌱`,
+      html: tt`<div class="big-emoji">${face(CHARS.stepan, "big")}</div><p>Дід Степан розчистить <b>${s.name}</b> — це ще ${s.cells.length} клітинок для городу.</p>` +
         `<p class="rewards">${s.stars} ⭐ &nbsp; + &nbsp; ${s.coins} 🪙</p>` +
-        `<p class="hint-s">Відкрито ${boardStage()} з ${BOARD_STRIPS.length}. Зірочки потрібні й для ремонту дворика — обирай, що важливіше 🙂</p>`,
-      buttons: [{ label: ok ? "Розчистити" : `Бракує ${S.stars < s.stars ? (s.stars - S.stars) + " ⭐" : ""}${S.stars < s.stars && S.coins < s.coins ? " і " : ""}${S.coins < s.coins ? (s.coins - S.coins) + " 🪙" : ""}`, disabled: !ok, onClick: () => {
+        tt`<p class="hint-s">Відкрито ${boardStage()} з ${BOARD_STRIPS.length}. Зірочки потрібні й для ремонту дворика — обирай, що важливіше 🙂</p>`,
+      buttons: [{ label: ok ? tt`Розчистити` : tt`Бракує ${S.stars < s.stars ? (s.stars - S.stars) + " ⭐" : ""}${S.stars < s.stars && S.coins < s.coins ? tt` і ` : ""}${S.coins < s.coins ? (s.coins - S.coins) + " 🪙" : ""}`, disabled: !ok, onClick: () => {
         S.stars -= s.stars; S.coins -= s.coins; if (S.woodOn) S.wood.stage++; else S.bstage++;
         s.cells.forEach(i => popIdx.add(i));
-        sfx.level(); confetti(); toast("🌱 Дошка більшає: +" + s.cells.length + " клітинок!");
+        sfx.level(); confetti(); toast(tt`🌱 Дошка більшає: +` + s.cells.length + tt` клітинок!`);
         renderAll(); save();
-      } }, { label: "Пізніше", cls: "ghost" }] });
+      } }, { label: tt`Пізніше`, cls: "ghost" }] });
   }
   /* для renderBoard: що показати в закритій клітинці */
   function shutKey(i) { return cellOpen(i) ? null : isNextLabel(i) ? "shut:lbl" : nextStrip() && nextStrip().cells.includes(i) ? "shut:next" : "shut"; }
@@ -86,8 +87,8 @@ window.HARD = (() => {
       it.broken = true;
       const own = GENS[it.g].chain, others = S.gens.map(g => GENS[g].chain).filter(c => c !== own);
       it.fix = [{ c: own, l: Math.min(CHAINS[own].items.length - 1, 3) }, { c: others.length ? pick(others) : own, l: 2 }];
-      setTimeout(() => toast(`🔧 ${GENS[it.g].name} зламалась! Тапни — дід Степан скаже, що треба для ремонту`), 500);
-    } else if (it.wr === Math.round(max * 0.8)) setTimeout(() => toast(`🔧 ${GENS[it.g].name} уже скрипить — скоро треба буде лагодити`), 500);
+      setTimeout(() => toast(tt`🔧 ${GENS[it.g].name} зламалась! Тапни — дід Степан скаже, що треба для ремонту`), 500);
+    } else if (it.wr === Math.round(max * 0.8)) setTimeout(() => toast(tt`🔧 ${GENS[it.g].name} уже скрипить — скоро треба буде лагодити`), 500);
   }
   const fixCoins = it => { const b = 200 + 100 * MECH.gl(it); return window.ECON ? ECON.price("repair", b) : b; };
   function findFix(fix) {
@@ -97,26 +98,26 @@ window.HARD = (() => {
   function repairModal(i) {
     const it = S.board[i], f = findFix(it.fix), ok = f.every(x => x >= 0), price = fixCoins(it);
     sfx.nope();
-    modal({ title: "Ремонт 🔧",
-      html: `<div class="big-emoji">${GENS[it.g].icon}</div><p><b>${GENS[it.g].name}</b> зламалась. Дід Степан полагодить, якщо принесеш:</p>` +
+    modal({ title: tt`Ремонт 🔧`,
+      html: tt`<div class="big-emoji">${GENS[it.g].icon}</div><p><b>${GENS[it.g].name}</b> зламалась. Дід Степан полагодить, якщо принесеш:</p>` +
         `<div class="fx-need">${it.fix.map((n, k) => `<span class="fx-it${f[k] >= 0 ? " have" : ""}"><b>${itemIcon(n)}</b><small>${itemName(n)}</small></span>`).join("")}</div>` +
-        `<p class="hint-s">Або заплати майстрові з міста. А ще два однакові генератори, злиті разом, дають новенький.</p>`,
-      buttons: [{ label: ok ? "Полагодити 🔧" : "Бракує предметів", disabled: !ok, onClick: () => {
+        tt`<p class="hint-s">Або заплати майстрові з міста. А ще два однакові генератори, злиті разом, дають новенький.</p>`,
+      buttons: [{ label: ok ? tt`Полагодити 🔧` : tt`Бракує предметів`, disabled: !ok, onClick: () => {
           f.forEach(j => { S.board[j] = null; if (selected === j) selected = -1; }); fixed(i);
         } },
-        { label: `Майстер за ${price} 🪙`, cls: "ghost", disabled: S.coins < price, onClick: () => { S.coins -= price; window.ECON && ECON.bought("repair"); fixed(i); } },
-        { label: "Пізніше", cls: "ghost" }] });
+        { label: tt`Майстер за ${price} 🪙`, cls: "ghost", disabled: S.coins < price, onClick: () => { S.coins -= price; window.ECON && ECON.bought("repair"); fixed(i); } },
+        { label: tt`Пізніше`, cls: "ghost" }] });
   }
   function fixed(i) {
     const it = S.board[i]; delete it.broken; delete it.fix; it.wr = 0;
     sfx.level(); sparkle(i, "✨", 8); popIdx.add(i);
-    playDialog([["stepan", "Готово! Як новенька — ще послужить 🔧"]]);
+    playDialog([["stepan", tt`Готово! Як новенька — ще послужить 🔧`]]);
     renderBoard(); renderTop(); renderInfo(); renderOrders(); save();
   }
   function genInfo(it) {
     if (!on("wear") || !wears(it)) return "";
-    if (it.broken) return " · 🔧 зламана — тапни для ремонту";
-    return ` · знос ${it.wr || 0}/${WEAR_MAX(MECH.gl(it))}`;
+    if (it.broken) return tt` · 🔧 зламана — тапни для ремонту`;
+    return tt` · знос ${it.wr || 0}/${WEAR_MAX(MECH.gl(it))}`;
   }
 
   /* ---------- 4. продукти, що черствіють ---------- */
@@ -126,9 +127,9 @@ window.HARD = (() => {
   const stale = it => on("spoil") && perish(it) && !!it.old;
   function freshInfo(it) {
     if (!on("spoil") || !perish(it)) return "";
-    if (it.old) return " · 🍞‍🥀 зачерствіло — коштує вдвічі менше";
+    if (it.old) return tt` · 🍞‍🥀 зачерствіло — коштує вдвічі менше`;
     const h = Math.max(1, Math.ceil((SPOIL_MS - (now() - (it.t || now()))) / 36e5));
-    return ` · свіже ще ${h} год`;
+    return tt` · свіже ще ${h} год`;
   }
   let lastSpoil = 0;
   function spoilTick() {
@@ -136,7 +137,7 @@ window.HARD = (() => {
     lastSpoil = Date.now();
     let ch = false;
     S.board.forEach((it, i) => { if (perish(it) && !it.old && it.t && now() - it.t >= SPOIL_MS) { it.old = 1; ch = true; popIdx.add(i); } });
-    if (ch) { renderBoard(); renderInfo(); save(); toast("🍞‍🥀 Частина продуктів на дошці зачерствіла — віддай чи продай свіжими!"); }
+    if (ch) { renderBoard(); renderInfo(); save(); toast(tt`🍞‍🥀 Частина продуктів на дошці зачерствіла — віддай чи продай свіжими!`); }
   }
   /* скільки монет зняти з замовлення за зачерствілі предмети */
   function stalePenalty(idx) {

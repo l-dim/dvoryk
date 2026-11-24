@@ -8,14 +8,14 @@
      Стан: S.seasonId (поточний сезон), S.seasonWarn (день останнього нагадування)
    ============================================================ */
 const SEASONS = [
-  { id: "winter", months: [11, 0, 1], name: "Зима", title: "Бурштинові сніжинки", icon: "❄️",
-    items: [["❄️", "Сніжинка"], ["🧊", "Крижинка"], ["🔶", "Бурштинова сніжинка"], ["🏮", "Бурштиновий ліхтарик"], ["🌟", "Зимове сяйво"]] },
-  { id: "spring", months: [2, 3, 4], name: "Весна", title: "Писанки", icon: "🥚",
-    items: [["🥚", "Крашанка"], ["🎨", "Писанка-заготовка"], ["🪺", "Гніздо писанок"], ["🧺", "Великодній кошик"], ["🌸", "Писанка-оберіг"]] },
-  { id: "summer", months: [5, 6, 7], name: "Літо", title: "Липовий мед", icon: "🐝",
-    items: [["🐝", "Бджілка"], ["🍯", "Стільник"], ["🌻", "Медовий соняшник"], ["🕯️", "Воскова свічка"], ["🏺", "Глечик липового меду"]] },
-  { id: "autumn", months: [8, 9, 10], name: "Осінь", title: "Золота осінь", icon: "🍂",
-    items: [["🍂", "Листочок"], ["🍁", "Кленовий лист"], ["🌰", "Каштан"], ["🎃", "Гарбузик"], ["🌾", "Осінній вінок"]] }
+  { id: "winter", months: [11, 0, 1], name: tt`Зима`, title: tt`Бурштинові сніжинки`, icon: "❄️",
+    items: [["❄️", tt`Сніжинка`], ["🧊", tt`Крижинка`], ["🔶", tt`Бурштинова сніжинка`], ["🏮", tt`Бурштиновий ліхтарик`], ["🌟", tt`Зимове сяйво`]] },
+  { id: "spring", months: [2, 3, 4], name: tt`Весна`, title: tt`Писанки`, icon: "🥚",
+    items: [["🥚", tt`Крашанка`], ["🎨", tt`Писанка-заготовка`], ["🪺", tt`Гніздо писанок`], ["🧺", tt`Великодній кошик`], ["🌸", tt`Писанка-оберіг`]] },
+  { id: "summer", months: [5, 6, 7], name: tt`Літо`, title: tt`Липовий мед`, icon: "🐝",
+    items: [["🐝", tt`Бджілка`], ["🍯", tt`Стільник`], ["🌻", tt`Медовий соняшник`], ["🕯️", tt`Воскова свічка`], ["🏺", tt`Глечик липового меду`]] },
+  { id: "autumn", months: [8, 9, 10], name: tt`Осінь`, title: tt`Золота осінь`, icon: "🍂",
+    items: [["🍂", tt`Листочок`], ["🍁", tt`Кленовий лист`], ["🌰", tt`Каштан`], ["🎃", tt`Гарбузик`], ["🌾", tt`Осінній вінок`]] }
 ];
 const SEAS_DROP = [1 / 400, 1 / 2000], SEAS_VALS = [12, 30, 70, 160, 360];
 const SEAS_ART = ["winter", "spring", "summer", "autumn"].flatMap(s => [0, 1, 2, 3, 4].map(l => `seas-${s}-${l}`));   // усі мальовані
@@ -49,7 +49,7 @@ window.SEAS = (() => {
     if (l < 0) return;
     const at = placeItem({ c: chain(), l }, near);
     if (at >= 0) { spawnFrom.set(at, near); setTimeout(() => sparkle(at, "✨", 8), 250); }
-    setTimeout(() => toast(`${cur().icon} Сезонна знахідка: ${CHAINS[chain()].items[l][1]}! Злий до кінця сезону — потім розтане`), 300);
+    setTimeout(() => toast(tt`${cur().icon} Сезонна знахідка: ${CHAINS[chain()].items[l][1]}! Злий до кінця сезону — потім розтане`), 300);
   }
 
   /* сезонне замовлення: хтось із сусідів просить сезонну річ */
@@ -83,20 +83,20 @@ window.SEAS = (() => {
       const n = had ? sweep() : 0;
       save(); renderAll();
       if (had) modal({ title: `${cur().name}! ${cur().icon}`,
-        html: `<div class="big-emoji">${cur().icon}</div>${n ? `<p>Минулий сезон закінчився — ${n} ${n % 10 === 1 && n % 100 !== 11 ? "сезонна річ зникла" : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? "сезонні речі зникли" : "сезонних речей зникли"} 🍃</p>` : ""}<p>Новий сезонний ланцюжок: <b>${cur().title}</b>. Шукай у генераторах до ${new Date(endsAt() - 1).toLocaleDateString("uk-UA", { day: "numeric", month: "long" })}!</p>`,
-        buttons: [{ label: "Шукатиму! ✨" }] });
+        html: tt`<div class="big-emoji">${cur().icon}</div>${n ? tt`<p>Минулий сезон закінчився — ${n} ${n % 10 === 1 && n % 100 !== 11 ? tt`сезонна річ зникла` : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? tt`сезонні речі зникли` : tt`сезонних речей зникли`} 🍃</p>` : ""}<p>Новий сезонний ланцюжок: <b>${cur().title}</b>. Шукай у генераторах до ${new Date(endsAt() - 1).toLocaleDateString("uk-UA", { day: "numeric", month: "long" })}!</p>`,
+        buttons: [{ label: tt`Шукатиму! ✨` }] });
       return;
     }
     const d = daysLeft(), key = new Date(now()).toDateString();
     if (d <= 7 && S.seasonWarn !== key && (S.board.some(isSeas) || (S.store && S.store.items.some(isSeas)))) {
       S.seasonWarn = key; save();
-      toast(`${cur().icon} Сезон закінчується через ${d} ${d === 1 ? "день" : d < 5 ? "дні" : "днів"} — сезонні речі розтануть! Злий і віддай їх`);
+      toast(tt`${cur().icon} Сезон закінчується через ${d} ${d === 1 ? tt`день` : d < 5 ? tt`дні` : tt`днів`} — сезонні речі розтануть! Злий і віддай їх`);
     }
   }
   function card() {
     if (!on()) return null;
     const c = chain(), row = CHAINS[c].items.map((x, l) => S.collection[c + ":" + l] ? x[0] : "❔").join("");
-    return { icon: cur().icon, title: `Сезон: ${cur().title}`, sub: `${row} · ще ${daysLeft()} дн., потім розтане`, btn: "", act: "" };
+    return { icon: cur().icon, title: tt`Сезон: ${cur().title}`, sub: tt`${row} · ще ${daysLeft()} дн., потім розтане`, btn: "", act: "" };
   }
   return { onTap, order, tick, card, isSeas, cur };
 })();

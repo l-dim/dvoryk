@@ -46,24 +46,24 @@ window.QUEST = (() => {
     if (!S.wq || S.wq.week !== weekKey()) newWeek();
     let fin = false;
     S.wq.list.forEach(q => { if (q.k === k && q.n < q.t) { q.n = Math.min(q.t, q.n + n); if (q.n >= q.t) fin = true; } });
-    if (fin && weekDone() && !S.wq.claimed) setTimeout(() => toast("🗓️ Усі завдання тижня виконано — забери велику нагороду!"), 2600);
+    if (fin && weekDone() && !S.wq.claimed) setTimeout(() => toast(tt`🗓️ Усі завдання тижня виконано — забери велику нагороду!`), 2600);
   }
   function claimWeek() {
     if (!weekDone() || S.wq.claimed) return;
     S.wq.claimed = true;
     const r = WEEKLY_REWARD;
     placeItem({ c: "chest", l: r.chest }); S.coins += r.coins; S.stars += r.stars; regen(); S.energy += r.energy;
-    if (window.ALB) ALB.give(5, "За тиждень", 2);
+    if (window.ALB) ALB.give(5, tt`За тиждень`, 2);
     if (window.PATH) PATH.add(PATH_PTS.week);
-    if (window.CONTEST) CONTEST.give(8, null, 3, "За тиждень");
-    if (window.FASH) FASH.add(15, "за тиждень");
+    if (window.CONTEST) CONTEST.give(8, null, 3, tt`За тиждень`);
+    if (window.FASH) FASH.add(15, tt`за тиждень`);
     save(); renderAll(); renderButton();
     confetti(); sfx.level();
     modal({
-      title: "Тиждень виконано! 🗓️",
-      html: `<div class="big-emoji">💝</div><p>Ти впоралася з усіма завданнями тижня — ти неймовірна!</p>` +
-        `<p class="rewards">💝 &nbsp; +${r.coins} 🪙 &nbsp; +${r.stars} ⭐ &nbsp; +${r.energy} ⚡</p><p class="hint-s">Нові завдання тижня — з понеділка.</p>`,
-      buttons: [{ label: "Дякую! 💛" }]
+      title: tt`Тиждень виконано! 🗓️`,
+      html: tt`<div class="big-emoji">💝</div><p>Ти впоралася з усіма завданнями тижня — ти неймовірна!</p>` +
+        tt`<p class="rewards">💝 &nbsp; +${r.coins} 🪙 &nbsp; +${r.stars} ⭐ &nbsp; +${r.energy} ⚡</p><p class="hint-s">Нові завдання тижня — з понеділка.</p>`,
+      buttons: [{ label: tt`Дякую! 💛` }]
     });
   }
 
@@ -88,9 +88,9 @@ window.QUEST = (() => {
     if (window.EV && EV.active()) c.push({ k: "snow", t: lvl < 8 ? 10 : 16 });
     return c;
   }
-  const TO = { halya: "бабусі Галі", stepan: "дідові Степану", olya: "Олі", marichka: "Марічці", andriy: "Андрієві",
-    liza: "Лізі", cat: "котику Пиріжку", ivan: "Іванові", taras: "Тарасові", iryna: "Ірині" };
-  const qText = q => q.k === "heart" ? `Віддай ${q.t > 1 ? q.t + " замовлення" : "замовлення"} ${TO[q.who] || CHARS[q.who].name}` : DAILY[q.k].text;
+  const TO = { halya: tt`бабусі Галі`, stepan: tt`дідові Степану`, olya: tt`Олі`, marichka: tt`Марічці`, andriy: tt`Андрієві`,
+    liza: tt`Лізі`, cat: tt`котику Пиріжку`, ivan: tt`Іванові`, taras: tt`Тарасові`, iryna: tt`Ірині` };
+  const qText = q => q.k === "heart" ? tt`Віддай ${q.t > 1 ? q.t + tt` замовлення` : tt`замовлення`} ${TO[q.who] || CHARS[q.who].name}` : DAILY[q.k].text;
   const qIcon = q => q.k === "heart" ? face(CHARS[q.who], "mini") : DAILY[q.k].icon;
   function newDay() {
     const old = S.dq || {};
@@ -110,11 +110,11 @@ window.QUEST = (() => {
     if (d.swapped || d.claimed || !d.list[i] || d.list[i].n >= d.list[i].t) return;
     const busy = d.list.map(q => q.k);
     const opts = dayCandidates().filter(q => !busy.includes(q.k) && !(busy.includes("merge") && q.k === "tap") && !(busy.includes("tap") && q.k === "merge"));
-    if (!opts.length) { toast("Поки що немає іншого завдання на заміну 🙈"); return; }
+    if (!opts.length) { toast(tt`Поки що немає іншого завдання на заміну 🙈`); return; }
     const q = pick(opts);
     d.list[i] = { k: q.k, t: q.t, n: 0, who: q.who };
     d.swapped = true;
-    sfx.pop(); toast("🔄 Завдання замінено!");
+    sfx.pop(); toast(tt`🔄 Завдання замінено!`);
     save(); renderButton(); panel("day");
   }
   function track(k, n = 1, who) {
@@ -130,8 +130,8 @@ window.QUEST = (() => {
       if (q.n >= q.t) finished = q;
     });
     if (finished) {
-      toast("✅ Завдання дня: " + qText(finished).toLowerCase() + "!");
-      if (allDone()) setTimeout(() => toast("📋 Усі три завдання виконано — забери нагороду!"), 2400);
+      toast(tt`✅ Завдання дня: ` + qText(finished).toLowerCase() + "!");
+      if (allDone()) setTimeout(() => toast(tt`📋 Усі три завдання виконано — забери нагороду!`), 2400);
     }
     renderButton(); save();
   }
@@ -146,18 +146,18 @@ window.QUEST = (() => {
     placeItem({ c: "chest", l: big ? 2 : 0 });
     regen(); S.energy += 5;
     if (big) d.streak = 0;     // після тижня серія починається знову
-    if (window.ALB) ALB.give(big ? 4 : 2, "За завдання дня");
+    if (window.ALB) ALB.give(big ? 4 : 2, tt`За завдання дня`);
     if (window.PATH) PATH.add(PATH_PTS.daily);
     if (window.TOLOKA) TOLOKA.add(TOL_SPOONS.daily);
-    if (window.CONTEST) CONTEST.give(3, null, 2, "За завдання дня");
-    if (window.FASH) FASH.add(5, "за завдання дня");
+    if (window.CONTEST) CONTEST.give(3, null, 2, tt`За завдання дня`);
+    if (window.FASH) FASH.add(5, tt`за завдання дня`);
     save(); renderAll(); renderButton();
     confetti(); sfx.level();
     modal({
-      title: big ? "Тиждень поспіль! 🏆" : "Завдання дня виконано! ✅",
-      html: `<div class="big-emoji">${big ? "💝" : "🎁"}</div><p>${big ? "Сім днів поспіль — ти неймовірна! Тримай скриню-сюрприз:" : "Тримай подарунок — він уже на дошці:"}</p>` +
-        `<p class="rewards">${big ? "💝" : "🎁"} &nbsp; +5 ⚡</p><p class="hint-s">Нові завдання — завтра. ${big ? "" : "Виконуй щодня 7 днів поспіль — і отримаєш скриню-сюрприз 💝"}</p>`,
-      buttons: [{ label: "Дякую! 💛" }]
+      title: big ? tt`Тиждень поспіль! 🏆` : tt`Завдання дня виконано! ✅`,
+      html: `<div class="big-emoji">${big ? "💝" : "🎁"}</div><p>${big ? tt`Сім днів поспіль — ти неймовірна! Тримай скриню-сюрприз:` : tt`Тримай подарунок — він уже на дошці:`}</p>` +
+        tt`<p class="rewards">${big ? "💝" : "🎁"} &nbsp; +5 ⚡</p><p class="hint-s">Нові завдання — завтра. ${big ? "" : tt`Виконуй щодня 7 днів поспіль — і отримаєш скриню-сюрприз 💝`}</p>`,
+      buttons: [{ label: tt`Дякую! 💛` }]
     });
   }
 
@@ -166,7 +166,7 @@ window.QUEST = (() => {
   function heartsTag(who) {
     if (!FRIENDS[who]) return "";
     const h = hearts(who);
-    if (window.WD && WD.isSick(who)) return `<span class="fr-tag">🤒 на лікарняному</span>`;
+    if (window.WD && WD.isSick(who)) return tt`<span class="fr-tag">🤒 на лікарняному</span>`;
     return `<span class="fr-tag">💛 ${h}/${FRIEND_STEPS[2]}</span>`;
   }
   function onDeliver(o) {
@@ -190,10 +190,10 @@ window.QUEST = (() => {
       save(); renderAll();
       confetti(); sfx.level();
       modal({
-        title: r.gift ? "Найкращі друзі! 💛" : "Дружба міцнішає 💛",
+        title: r.gift ? tt`Найкращі друзі! 💛` : tt`Дружба міцнішає 💛`,
         html: `<div class="big-emoji">${r.gift ? f.gift : "💛"}</div><p><b>${CHARS[who].name}</b> — ${FRIEND_STEPS[step]} 💛</p><p class="rewards">${p.join(" &nbsp; ")}</p>` +
-          (r.gift ? `<p class="hint-s">«${f.giftName}» тепер стоїть у твоєму дворику 🏡</p>` : `<p class="hint-s">Наступна історія — на ${FRIEND_STEPS[step + 1]} 💛</p>`),
-        buttons: [{ label: "Дякую! 💛" }]
+          (r.gift ? tt`<p class="hint-s">«${f.giftName}» тепер стоїть у твоєму дворику 🏡</p>` : tt`<p class="hint-s">Наступна історія — на ${FRIEND_STEPS[step + 1]} 💛</p>`),
+        buttons: [{ label: tt`Дякую! 💛` }]
       });
     });
   }
@@ -205,16 +205,16 @@ window.QUEST = (() => {
         `<span class="fr-mid"><b>${CHARS[k].name}</b><span class="fr-dots">${dots}</span></span>` +
         `<span class="fr-n">${window.WD && WD.isSick(k) ? "🤒" : h >= max ? FRIENDS[k].gift : h + "/" + max}</span></button>`;
     }).join("");
-    return `<div class="coll-sec"><div class="coll-h">Сусіди 💛 <small>сердечка за кожне замовлення</small></div><div class="fr-list">${rows}</div></div>`;
+    return tt`<div class="coll-sec"><div class="coll-h">Сусіди 💛 <small>сердечка за кожне замовлення</small></div><div class="fr-list">${rows}</div></div>`;
   }
   function friendModal(who) {
     const seen = S.frSeen[who] || 0, f = FRIENDS[who];
-    const items = FRIEND_STEPS.map((s, k) => `<button class="btn ${k < seen ? "" : "ghost"} small fr-sc" data-k="${k}" ${k < seen ? "" : "disabled"}>${k < seen ? "📜 Історія " + (k + 1) : "🔒 на " + s + " 💛"}</button>`).join("");
+    const items = FRIEND_STEPS.map((s, k) => `<button class="btn ${k < seen ? "" : "ghost"} small fr-sc" data-k="${k}" ${k < seen ? "" : "disabled"}>${k < seen ? tt`📜 Історія ` + (k + 1) : tt`🔒 на ` + s + " 💛"}</button>`).join("");
     modal({
       title: CHARS[who].name,
-      html: `<div class="big-emoji">${face(CHARS[who], "big")}</div><p>💛 ${hearts(who)} з ${FRIEND_STEPS[2]} — сердечко за кожне виконане замовлення.</p>` +
-        `<p class="hint-s">На 10 💛 — подарунок для дворика: «${f.giftName}» ${f.gift}</p>${items}`,
-      buttons: [{ label: "Закрити", cls: "ghost" }]
+      html: tt`<div class="big-emoji">${face(CHARS[who], "big")}</div><p>💛 ${hearts(who)} з ${FRIEND_STEPS[2]} — сердечко за кожне виконане замовлення.</p>` +
+        tt`<p class="hint-s">На 10 💛 — подарунок для дворика: «${f.giftName}» ${f.gift}</p>${items}`,
+      buttons: [{ label: tt`Закрити`, cls: "ghost" }]
     });
     document.querySelectorAll(".fr-sc").forEach(b => b.onclick = () => { $("modal").classList.remove("show"); playDialog(f.scenes[+b.dataset.k]); });
   }
@@ -229,7 +229,7 @@ window.QUEST = (() => {
     setTimeout(() => {
       const r = cellRect(near), b = $("qBtn");
       if (r && b && typeof flyIcon === "function") flyIcon("🗺️", r, b.getBoundingClientRect(), { size: 34, dur: 800, end: 0.5, lift: 90 });
-      toast("🗺️ Шматочок карти! " + S.map.n + "/" + TREASURE.pieces);
+      toast(tt`🗺️ Шматочок карти! ` + S.map.n + "/" + TREASURE.pieces);
       renderButton();
     }, 500);
     if (!S.map.seen) { S.map.seen = true; queue.push(() => playDialog(TREASURE.first)); }
@@ -243,9 +243,9 @@ window.QUEST = (() => {
       placeItem({ c: "chest", l: r.chest }); S.coins += r.coins; S.stars += r.stars;
       save(); renderAll(); renderButton();
       confetti(); sfx.level();
-      modal({ title: "Скарб знайдено! 🗺️",
-        html: `<div class="big-emoji">${TREASURE.gift}</div><p>Дідова скриня тепер стоїть у твоєму дворику.</p><p class="rewards">💝 &nbsp; +${r.coins} 🪙 &nbsp; +${r.stars} ⭐</p>`,
-        buttons: [{ label: "Неймовірно! 💛" }] });
+      modal({ title: tt`Скарб знайдено! 🗺️`,
+        html: tt`<div class="big-emoji">${TREASURE.gift}</div><p>Дідова скриня тепер стоїть у твоєму дворику.</p><p class="rewards">💝 &nbsp; +${r.coins} 🪙 &nbsp; +${r.stars} ⭐</p>`,
+        buttons: [{ label: tt`Неймовірно! 💛` }] });
     });
   }
 
@@ -282,7 +282,7 @@ window.QUEST = (() => {
   let panelTab = "day";
   const qRows = (list, canSwap) => list.map((q, i) => `<div class="dq-row${q.n >= q.t ? " ok" : ""}"><span class="dq-ic">${qIcon(q)}</span>` +
     `<span class="dq-mid"><b>${qText(q)}</b><i class="dq-bar"><b style="width:${q.n / q.t * 100}%"></b></i></span>` +
-    `<span class="dq-n">${q.n >= q.t ? "✅" : q.n + "/" + q.t}${canSwap && q.n < q.t ? `<button class="dq-swap" data-i="${i}" title="Замінити">🔄</button>` : ""}</span></div>`).join("");
+    `<span class="dq-n">${q.n >= q.t ? "✅" : q.n + "/" + q.t}${canSwap && q.n < q.t ? tt`<button class="dq-swap" data-i="${i}" title="Замінити">🔄</button>` : ""}</span></div>`).join("");
   function panel(tab) {
     if (S.dq.day !== today()) newDay();
     if (!S.wq || S.wq.week !== weekKey()) newWeek();
@@ -302,25 +302,25 @@ window.QUEST = (() => {
       : `<button class="btn dq-claim" disabled>${claimed ? done : todo}</button>`;
     const canSwap = !d.swapped && !d.claimed;
     const dayHtml = `<div class="dq-list">${qRows(d.list, canSwap)}</div>` +
-      (canSwap ? `<p class="dq-hint">🔄 Не подобається завдання? Одне можна замінити — раз на день.</p>` : "") +
-      `<div class="dq-week"><span>Днів поспіль:</span><span class="dq-days">${week}</span></div>` +
-      btn(dayReady, d.claimed, "Забрати нагороду 🎁", "Нагороду забрано ✓ Нові завдання завтра", "Виконай усі 3 — отримаєш 🎁") +
-      (mapOn ? `<div class="dq-map"><span>🗺️ <b>Таємниця старої скрині</b><br><small>${m.done ? "Скарб знайдено! Скриня — у дворику 🧰" : m.n ? "Шматочки карти: " + m.n + " з " + TREASURE.pieces : "Шматочки карти іноді трапляються в подарунках"}</small></span><span class="dq-pieces">${pieces}</span></div>` : "");
+      (canSwap ? tt`<p class="dq-hint">🔄 Не подобається завдання? Одне можна замінити — раз на день.</p>` : "") +
+      tt`<div class="dq-week"><span>Днів поспіль:</span><span class="dq-days">${week}</span></div>` +
+      btn(dayReady, d.claimed, tt`Забрати нагороду 🎁`, tt`Нагороду забрано ✓ Нові завдання завтра`, tt`Виконай усі 3 — отримаєш 🎁`) +
+      (mapOn ? tt`<div class="dq-map"><span>🗺️ <b>Таємниця старої скрині</b><br><small>${m.done ? tt`Скарб знайдено! Скриня — у дворику 🧰` : m.n ? tt`Шматочки карти: ` + m.n + tt` з ` + TREASURE.pieces : tt`Шматочки карти іноді трапляються в подарунках`}</small></span><span class="dq-pieces">${pieces}</span></div>` : "");
     const left = daysToSunday();
-    const wkHtml = `<p class="dq-when">До кінця тижня: <b>${left === 1 ? "останній день!" : left + (left < 5 ? " дні" : " днів")}</b></p>` +
+    const wkHtml = tt`<p class="dq-when">До кінця тижня: <b>${left === 1 ? tt`останній день!` : left + (left < 5 ? tt` дні` : tt` днів`)}</b></p>` +
       `<div class="dq-list">${qRows(w.list)}</div>` +
-      `<p class="dq-prize">Нагорода: 💝 · +${WEEKLY_REWARD.coins} 🪙 · +${WEEKLY_REWARD.stars} ⭐ · +${WEEKLY_REWARD.energy} ⚡</p>` +
-      btn(wkReady, w.claimed, "Забрати велику нагороду 💝", "Нагороду тижня забрано ✓ Нові — з понеділка", "Виконай усі 4 — отримаєш 💝");
+      tt`<p class="dq-prize">Нагорода: 💝 · +${WEEKLY_REWARD.coins} 🪙 · +${WEEKLY_REWARD.stars} ⭐ · +${WEEKLY_REWARD.energy} ⚡</p>` +
+      btn(wkReady, w.claimed, tt`Забрати велику нагороду 💝`, tt`Нагороду тижня забрано ✓ Нові — з понеділка`, tt`Виконай усі 4 — отримаєш 💝`);
     modal({
-      title: "Завдання 📋",
-      html: `<div class="dq-tabs"><button class="dq-tab${panelTab === "day" ? " on" : ""}" data-t="day">Сьогодні${dayReady ? " ❗" : ""}</button>` +
-        (weekOn ? `<button class="dq-tab${panelTab === "week" ? " on" : ""}" data-t="week">Тиждень${wkReady ? " ❗" : ""}</button>` : "") +
-        (pathOn ? `<button class="dq-tab${panelTab === "path" ? " on" : ""}" data-t="path">Стежка${PATH.ready() ? " ❗" : ""}</button>` : "") +
-        (winterOn ? `<button class="dq-tab${panelTab === "winter" ? " on" : ""}" data-t="winter">Зима${WD.readyAny() ? " ❗" : ""}</button>` : "") + `</div>` +
+      title: tt`Завдання 📋`,
+      html: tt`<div class="dq-tabs"><button class="dq-tab${panelTab === "day" ? " on" : ""}" data-t="day">Сьогодні${dayReady ? " ❗" : ""}</button>` +
+        (weekOn ? tt`<button class="dq-tab${panelTab === "week" ? " on" : ""}" data-t="week">Тиждень${wkReady ? " ❗" : ""}</button>` : "") +
+        (pathOn ? tt`<button class="dq-tab${panelTab === "path" ? " on" : ""}" data-t="path">Стежка${PATH.ready() ? " ❗" : ""}</button>` : "") +
+        (winterOn ? tt`<button class="dq-tab${panelTab === "winter" ? " on" : ""}" data-t="winter">Зима${WD.readyAny() ? " ❗" : ""}</button>` : "") + `</div>` +
         (panelTab === "day" ? dayHtml : panelTab === "week" ? wkHtml : panelTab === "path" ? PATH.html() : WD.html()),
       buttons: [
-        { label: "💛 Мої сусіди", cls: "ghost", onClick: () => { showTab("coll"); $("tab-coll").scrollTop = 0; } },
-        { label: "Закрити", cls: "ghost" }
+        { label: tt`💛 Мої сусіди`, cls: "ghost", onClick: () => { showTab("coll"); $("tab-coll").scrollTop = 0; } },
+        { label: tt`Закрити`, cls: "ghost" }
       ]
     });
     document.querySelectorAll(".dq-tab").forEach(b => b.onclick = () => { sfx.pop(); panel(b.dataset.t); });

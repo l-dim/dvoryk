@@ -584,7 +584,7 @@ function mount(el) {
   if (renderer) { if (renderer.domElement.parentNode !== el) el.appendChild(renderer.domElement); return; }
   init(el);
   let seen = false; try { seen = !!localStorage.getItem("dvoryk_hint3d"); } catch (e) {}
-  if (!seen) { hintEl = document.createElement("div"); hintEl.className = "yard-hint"; hintEl.textContent = "👆 Крути дворик пальцем"; el.appendChild(hintEl); }
+  if (!seen) { hintEl = document.createElement("div"); hintEl.className = "yard-hint"; hintEl.textContent = tt`👆 Крути дворик пальцем`; el.appendChild(hintEl); }
 }
 
 try {
