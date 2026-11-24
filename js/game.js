@@ -63,6 +63,7 @@ function save() {
 function saveNow() {
   if (!S) return;
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* немає сховища */ }
+  if (window.CLOUD) CLOUD.changed();
 }
 
 /* ---------------- Довідка по предметах ---------------- */
@@ -1284,6 +1285,7 @@ function openSettings() {
         <button class="btn small" id="setExport">💾 Зберегти прогрес</button>
         <button class="btn ghost small" id="setImport">📥 Відновити прогрес</button>
       </div>
+      ${window.CLOUD ? CLOUD.settingsHtml() : ""}
       <button class="btn ghost small" id="setGuide">📖 Довідник господині</button>
       <p class="hint-s">Справжні покупки поки не підключені — гроші гра не списує 💛</p>
       <button class="btn ghost small" id="setReset">Почати гру спочатку</button>
@@ -1298,6 +1300,7 @@ function openSettings() {
   $("setExport").onclick = showExport;
   $("setImport").onclick = showImport;
   $("setGuide").onclick = () => window.GUIDE && GUIDE.open();
+  if (window.CLOUD) CLOUD.bindSettings();
   $("setReset").onclick = () => {
     if (!confirm("Точно почати спочатку? Весь прогрес буде видалено.")) return;
     localStorage.removeItem(SAVE_KEY);
@@ -1308,7 +1311,7 @@ function openSettings() {
 /* ============================================================
    ВЗАЄМОДІЯ З ДОШКОЮ (тап і перетягування)
    ============================================================ */
-const APP_VER = "v151";   // разом із VERSION у sw.js
+const APP_VER = "v152";   // разом із VERSION у sw.js
 let drag = null, dragAnim = false, dragGhost = null, envKeyShown = "";
 /* привид створюється один раз і живе весь час (новий шар на кожен дотик змушував дошку блимати) */
 function ghostEl() {
@@ -1621,5 +1624,5 @@ function showNoEnergyInfo() {
 }
 
 /* у застосунку спершу відновлюємо сейв із нативного сховища (js/native.js) */
-document.addEventListener("DOMContentLoaded", () => (window.NATIVE ? NATIVE.ready : Promise.resolve()).then(init));
+document.addEventListener("DOMContentLoaded", () => (window.NATIVE ? NATIVE.ready : Promise.resolve()).then(init).then(() => window.CLOUD && CLOUD.start()));
 window.addEventListener("yard3d-ready", () => { if (S && S.started) renderStory(); });
