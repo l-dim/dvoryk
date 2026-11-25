@@ -661,6 +661,7 @@ function renderTop() {
   } else t.hidden = true;
   $("coins").textContent = S.coins;
   $("stars").textContent = S.stars;
+  renderNavBadge();          // позначка над «Двориком» — завжди за поточними зірочками й монетами
 }
 
 function renderOrders() {
@@ -1331,7 +1332,7 @@ function openSettings() {
 /* ============================================================
    ВЗАЄМОДІЯ З ДОШКОЮ (тап і перетягування)
    ============================================================ */
-const APP_VER = "v156";   // разом із VERSION у sw.js
+const APP_VER = "v157";   // разом із VERSION у sw.js
 let drag = null, dragAnim = false, dragGhost = null, envKeyShown = "";
 /* привид створюється один раз і живе весь час (новий шар на кожен дотик змушував дошку блимати) */
 function ghostEl() {
