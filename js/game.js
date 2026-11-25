@@ -692,6 +692,7 @@ function renderOrders() {
       (o.until || o.catUntil ? `<span class="o-timer" data-until="${o.until || o.catUntil}">⏰ ${MECH.hhmm((o.until || o.catUntil) - Date.now())}</span>` : "");
     el.addEventListener("click", e => {
       if (ready && e.target.closest(".o-btn")) { deliver(o.id); return; }
+      if (!ready && window.TOUR && !S.woodOn) { TOUR.recipe(o); return; }   // «Як зібрати» — ланцюжок крок за кроком
       bubble(ch, ch.ask[o.line] + "  " + o.items.map(it => itemIcon(it) + " " + itemName(it)).join(", ") + (o.paw && o.bonus ? tt` · бонус: ` + XTRA.bonusIcon(o) : ""), el);
     });
     box.appendChild(el);
@@ -1330,7 +1331,7 @@ function openSettings() {
 /* ============================================================
    ВЗАЄМОДІЯ З ДОШКОЮ (тап і перетягування)
    ============================================================ */
-const APP_VER = "v155";   // разом із VERSION у sw.js
+const APP_VER = "v156";   // разом із VERSION у sw.js
 let drag = null, dragAnim = false, dragGhost = null, envKeyShown = "";
 /* привид створюється один раз і живе весь час (новий шар на кожен дотик змушував дошку блимати) */
 function ghostEl() {

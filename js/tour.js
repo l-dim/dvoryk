@@ -11,7 +11,7 @@
 window.TOUR = (() => {
   const STEPS = ["merge", "gen", "make", "give", "yard"], DONE = STEPS.length;
   const IDLE_MS = 20e3, IDLE_LVL = 8, QUIET_MS = 900;
-  let hand = null, rings = [], tip = null, doneMsg = false, lastKey = "", idleAt = Date.now(), quietUntil = 0, finger = false;
+  let hand = null, rings = [], tip = null, doneMsg = false, focusId = 0, focusUntil = 0, lastKey = "", idleAt = Date.now(), quietUntil = 0, finger = false;
 
   const busy = () => ["modal", "dialog", "start"].some(id => { const el = $(id); return el && el.classList.contains("show"); });
   const onTab = name => { const t = $("tab-" + name); return t && !t.hidden; };
@@ -54,8 +54,8 @@ window.TOUR = (() => {
   const anyGen = () => { const v = genOf("veg"); return v >= 0 ? v : S.board.findIndex((x, i) => x && x.g && open(i) && GENS[x.g] && !GENS[x.g].pet); };
   const has = need => S.board.some((x, i) => x && !x.g && x.c === need.c && x.l === need.l && open(i));
   const ic = it => itemIcon(it);
-  function want() {                                               // перше, чого бракує сусідам
-    for (const o of (S.orders || [])) for (const need of (o.items || [])) if (CHAINS[need.c] && !has(need)) return { o, need };
+  function want(only) {                                           // перше, чого бракує сусідам
+    for (const o of (S.orders || [])) if (!only || o.id === only) for (const need of (o.items || [])) if (CHAINS[need.c] && !has(need)) return { o, need };
     return null;
   }
   function readyBtn() {                                         // «Віддати» на справжньому замовленні (не «докупити місце»)
@@ -66,13 +66,15 @@ window.TOUR = (() => {
   const cell = i => $("board").children[i];
 
   /* що порадити, щоб наблизитись до замовлення */
-  function advise() {
-    const btn = readyBtn();
+  function advise(only) {
+    const btn = only ? document.querySelector(`#orders .order.ready[data-id="${only}"] .o-btn`) : readyBtn();
     if (btn) return { text: tt`🧺 Усе є! Натисни «Віддати» — сусіди чекають`, tap: btn };
-    const w = want();
+    const w = want(only);
     if (w) {
       const who = CHARS[w.o.ch] ? CHARS[w.o.ch].name : "";
       const p = pairs(w.need.c, w.need.l)[0];
+      const best = best1(w.need);
+      if (p && best && best.single) return { text: tt`${who} просить ${ic(w.need)}. Є ${ic({ c: w.need.c, l: best.l })} — злий два ${ic(S.board[p[0]])}, щоб вийшов ще один`, drag: p };
       if (p) return { text: tt`${who} просить ${ic(w.need)}. Перетягни ${ic(S.board[p[0]])} на такий самий ${ic(S.board[p[1]])}`, drag: p };
       const g = genOf(w.need.c);
       if (g >= 0) return { text: tt`${who} просить ${ic(w.need)}. Тапни на генератор «${GENS[S.board[g].g].name}» — з'явиться ${ic({ c: w.need.c, l: 0 })}`, tap: cell(g) };
@@ -82,6 +84,64 @@ window.TOUR = (() => {
     const g = anyGen();
     if (g >= 0) return { text: tt`Тапни на генератор «${GENS[S.board[g].g].name}», щоб отримати нові предмети`, tap: cell(g) };
     return null;
+  }
+
+  /* найвищий рівень цього ланцюжка, що вже є на дошці (нижче за потрібний) — і чи він один */
+  function best1(need) {
+    let l = -1, n = 0;
+    S.board.forEach((x, i) => { if (plain(x) && open(i) && x.c === need.c && x.l < need.l) { if (x.l > l) { l = x.l; n = 1; } else if (x.l === l) n++; } });
+    return l < 0 ? null : { l, single: n === 1 };
+  }
+  const genKey = c => { const b = genOf(c); if (b >= 0) return S.board[b].g; return Object.keys(GENS).find(g => GENS[g].chain === c && !GENS[g].pet) || null; };
+
+  /* ---------- «Як зібрати» — картка замовлення: ланцюжок крок за кроком ---------- */
+  function nextFor(need) {
+    if (has(need)) return tt`✅ Уже є на дошці`;
+    const ch = CHAINS[need.c], g = genKey(need.c);
+    if (need.c === "dish") return tt`🔥 Страви готують у печі — тапни на піч`;
+    if (ch.nomerge || need.l === 0)
+      return g ? tt`👆 Тапни на генератор «${GENS[g].name}» — з'явиться ${ic(need)}` : tt`🎁 Такі трапляються в подарунках і скринях`;
+    for (let k = need.l - 1; k >= 0; k--) {
+      if (pairs(need.c).some(p => S.board[p[0]].l === k)) return tt`✌️ Злий два ${ic({ c: need.c, l: k })} — вийде ${ic({ c: need.c, l: k + 1 })}`;
+      const one = S.board.some((x, i) => plain(x) && open(i) && x.c === need.c && x.l === k);
+      if (one) return k === 0
+        ? (g ? tt`Є один ${ic({ c: need.c, l: 0 })} — тапни на генератор «${GENS[g].name}», щоб з'явився другий` : tt`Є один ${ic({ c: need.c, l: 0 })} — потрібен ще один`)
+        : tt`Є один ${ic({ c: need.c, l: k })} — зроби ще один: злий два ${ic({ c: need.c, l: k - 1 })}`;
+    }
+    return g ? tt`👆 Почни з генератора «${GENS[g].name}»: тапай, поки не буде два ${ic({ c: need.c, l: 0 })}` : tt`🎁 Такі трапляються в подарунках і скринях`;
+  }
+  function recipe(o) {
+    const ch = CHARS[o.ch];
+    if (!S.tourRecipe) { S.tourRecipe = 1; save(); }
+    const row = need => {
+      const c = CHAINS[need.c]; if (!c) return "";
+      const g = genKey(need.c), chain = !c.nomerge && need.c !== "dish" && need.l > 0;
+      const cnt = l => S.board.filter((x, i) => x && !x.g && open(i) && x.c === need.c && x.l === l).length;
+      const chip = l => { const n = cnt(l); return `<span class="rc-s${l === need.l ? " goal" : ""}${n ? " have" : ""}">${ic({ c: need.c, l })}${n ? `<i>${n}</i>` : ""}</span>`; };
+      let steps = (chain && g ? `<span class="rc-s gen">${GENS[g].icon}</span><b class="rc-a">›</b>` : "") +
+        (chain ? Array.from({ length: need.l + 1 }, (_, l) => chip(l)).join(`<b class="rc-a">›</b>`) : chip(need.l));
+      let bar = "";
+      if (chain) {
+        const want = 2 ** need.l;
+        let got = 0; S.board.forEach((x, i) => { if (x && !x.g && open(i) && x.c === need.c && x.l <= need.l) got += 2 ** x.l; });
+        got = Math.min(want, got);
+        bar = `<div class="rc-bar"><i style="width:${Math.round(got / want * 100)}%"></i></div>` +
+          `<p class="rc-cnt">${tt`Зібрано ${got} з ${want}`} ${ic({ c: need.c, l: 0 })}</p>`;
+      }
+      return `<div class="rc"><p class="rc-name">${ic(need)} <b>${itemName(need)}</b></p><div class="rc-chain">${steps}</div>${bar}<p class="rc-next">${nextFor(need)}</p></div>`;
+    };
+    modal({ title: tt`Як зібрати замовлення`,
+      html: `<p class="rc-who">${face(ch, "mini")} <b>${ch.name}:</b> ${fmtName(ch.ask[o.line] || "")}</p>` + o.items.map(row).join("") +
+        `<p class="hint-s">${tt`Збирай по черзі: два однакові предмети зливаються в один наступний. Тож для кращого предмета спершу зроби два попередні.`}</p>`,
+      buttons: [{ label: tt`👆 Покажи на дошці`, onClick: () => { focusId = o.id; focusUntil = Date.now() + 12e3; idleAt = Date.now(); lastKey = ""; render(); } },
+        { label: tt`Добре`, cls: "ghost" }] });
+  }
+  /* одноразова підказка: тапни на замовлення, щоб побачити ланцюжок */
+  function recipeNudge() {
+    if (S.tourRecipe || S.level > 10 || !onTab("board")) return null;
+    const o = (S.orders || []).find(o => o.items && o.items.some(n => n.l >= 2 && CHAINS[n.c] && !CHAINS[n.c].nomerge) && !matchOrder(o).every(i => i >= 0));
+    const card = o && document.querySelector(`#orders .order[data-id="${o.id}"]`);
+    return card ? { text: tt`💡 Тапни на замовлення — покажу, як його зібрати крок за кроком`, tap: card, board: 1, banner: 1 } : null;
   }
 
   /* підказка для поточного кроку */
@@ -160,9 +220,11 @@ window.TOUR = (() => {
     const tutoring = active();
     let p = null;
     if (tutoring) p = plan();
+    else if (focusUntil > Date.now() && onTab("board")) { p = advise(focusId); if (!p) focusUntil = 0; else p.banner = 1; }
+    else if ((p = recipeNudge())) {}
     else if (S.level < IDLE_LVL && Date.now() - idleAt > IDLE_MS && onTab("board")) p = advise();
     // текст: на дошці — у смужці над дошкою, на інших вкладках — плашкою зверху
-    if (h) { h.hidden = !(tutoring && p && p.text && onTab("board")); if (!h.hidden) h.textContent = gx(p.text); }
+    if (h) { h.hidden = !((tutoring || (p && p.banner)) && p && p.text && onTab("board")); if (!h.hidden) h.textContent = gx(p.text); }
     if (tip) { tip.hidden = !(tutoring && p && p.text && p.top && !onTab("board")); if (!tip.hidden) tip.textContent = gx(p.text); }
     const quiet = busy() || finger || (typeof drag !== "undefined" && drag) || (typeof dragAnim !== "undefined" && dragAnim) || Date.now() < quietUntil;
     if (!p || quiet || (p.board && !onTab("board"))) { hide(); return; }
@@ -171,11 +233,11 @@ window.TOUR = (() => {
 
   // рука ховається, щойно торкаєшся екрана, і повертається, коли відпустиш
   document.addEventListener("pointerdown", () => { finger = true; idleAt = Date.now(); hide(); }, true);
-  const up = () => { finger = false; idleAt = Date.now(); quietUntil = Date.now() + QUIET_MS; };
+  const up = () => { finger = false; idleAt = Date.now(); quietUntil = Date.now() + QUIET_MS; if (focusUntil > Date.now()) focusUntil = Date.now() + 12e3; };
   document.addEventListener("pointerup", up, true);
   document.addEventListener("pointercancel", up, true);
   window.addEventListener("resize", () => { lastKey = ""; });
   setInterval(() => { try { render(); } catch (e) { window.logErr && logErr(e, "TOUR"); } }, 250);
 
-  return { ev, render, active, steps: STEPS };
+  return { ev, render, active, recipe, steps: STEPS };
 })();
