@@ -246,6 +246,7 @@ function produce(i) {
   sfx.pop();
   bounce(i);
   if (S.tut === 0) setTut(1);
+  window.TOUR && TOUR.ev("gen");
   if (tired) setTimeout(() => toast("💤 " + gen.name + tt` відпочиватиме ` + GEN_REST_MIN[MECH.gl(gIt) - 1] + tt` хв`), 400);
   renderBoard(); renderTop(); renderOrders(); save();
   return at;
@@ -331,6 +332,7 @@ function handleDrop(a, b) {
     if (bonus < 0.008) placeItem({ c: "energy", l: 0 }, b);
     else if (bonus < 0.025 && nl >= 3) placeItem({ c: "coin", l: 0 }, b);
     if (S.tut === 1) setTut(2);
+    window.TOUR && TOUR.ev("merge");
   } else {
     S.board[b] = A; S.board[a] = B;
     if (selected === a) selected = b; else if (selected === b) selected = a;
@@ -466,6 +468,7 @@ function deliver(id) {
   if (S.ordersDone % 7 === 0) placeItem({ c: "chest", l: 0 });          // подарунок — за кожне 7-ме замовлення
   gainXp(o.xp);
   if (S.tut === 2) setTut(3);
+  window.TOUR && TOUR.ev("give");
   renderBoard(); renderTop(); renderInfo();
   if (card) { card.classList.add("got"); setTimeout(() => card.classList.add("leaving"), FARM ? 420 : 0); }
   setTimeout(() => { fillOrders(); renderOrders(); save(); }, FARM ? 850 : 450);
@@ -484,6 +487,7 @@ function doTask() {
   S.stars -= t.cost;
   S.task++;
   if (S.tut === 3) setTut(4);
+  window.TOUR && TOUR.ev("task");
   sfx.deliver();
   renderTop(); renderStory(true);
   $("tab-story").scrollTo({ top: 0, behavior: "smooth" });
@@ -1045,6 +1049,7 @@ const TUT = [
 ];
 function setTut(n) { S.tut = n; renderTut(); }
 function renderTut() {
+  if (window.TOUR) { TOUR.render(); return; }      // покрокове навчання з рукою — js/tour.js
   const h = $("tutHint");
   if (S.tut < TUT.length && !S.sideOn) { h.textContent = TUT[S.tut]; h.hidden = false; }
   else h.hidden = true;
@@ -1325,7 +1330,7 @@ function openSettings() {
 /* ============================================================
    ВЗАЄМОДІЯ З ДОШКОЮ (тап і перетягування)
    ============================================================ */
-const APP_VER = "v154";   // разом із VERSION у sw.js
+const APP_VER = "v155";   // разом із VERSION у sw.js
 let drag = null, dragAnim = false, dragGhost = null, envKeyShown = "";
 /* привид створюється один раз і живе весь час (новий шар на кожен дотик змушував дошку блимати) */
 function ghostEl() {

@@ -302,3 +302,31 @@ body.td .start-art .e3d { width: 1.1em; height: 1.1em; filter: drop-shadow(0 8px
 .scene .yard3d { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .yard-hint { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); background: rgba(90, 66, 50, .78); color: #fff;
   font-weight: 800; font-size: 13px; padding: 6px 12px; border-radius: 12px; pointer-events: none; white-space: nowrap; animation: pulse 1.6s ease-in-out infinite; }
+
+/* ---------- Покрокове навчання (js/tour.js): рука й підсвітка ---------- */
+.tour-ring { position: fixed; z-index: 44; pointer-events: none; border-radius: 14px; border: 3px solid #fff;
+  box-shadow: 0 0 0 3px rgba(255, 170, 40, .85), 0 0 18px 4px rgba(255, 200, 80, .75); animation: tourRing 1.2s ease-in-out infinite; }
+.tour-ring[hidden], .tour-hand[hidden], .tour-tip[hidden] { display: none; }
+@keyframes tourRing { 0%, 100% { opacity: .55; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); } }
+.tour-hand { position: fixed; z-index: 44; width: 0; height: 0; pointer-events: none; font-family: var(--emoji); }
+.tour-hand .th-f { position: absolute; left: -16px; top: 0; font-size: 50px; line-height: 1; filter: drop-shadow(0 3px 3px rgba(60, 30, 0, .45)); }
+.tour-hand .th-f img, .tour-hand .th-item img { width: 1em; height: 1em; }
+.tour-hand .th-item { position: absolute; left: -20px; top: -20px; font-size: 40px; line-height: 1; opacity: 0; }
+.tour-hand.tap { animation: tourTap 1.1s ease-in-out infinite; }
+.tour-hand.drag { animation: tourDrag 2s ease-in-out infinite; }
+.tour-hand.drag .th-item { animation: tourItem 2s ease-in-out infinite; }
+.tour-hand.low .th-f { top: -58px; }
+.tour-hand.tap.low { animation-name: tourTapLow; }
+@keyframes tourTapLow { 0%, 100% { transform: translate(6px, -14px); } 45% { transform: translate(0, 0) scale(.92); } 60% { transform: translate(0, 0) scale(.92); } }
+@keyframes tourTap { 0%, 100% { transform: translate(6px, 14px); } 45% { transform: translate(0, 0) scale(.92); } 60% { transform: translate(0, 0) scale(.92); } }
+@keyframes tourDrag {
+  0% { transform: translate(0, 12px); opacity: 0; }
+  12% { transform: translate(0, 0); opacity: 1; }
+  22% { transform: translate(0, 0) scale(.92); }
+  70% { transform: translate(var(--dx), var(--dy)) scale(.92); opacity: 1; }
+  85% { transform: translate(var(--dx), var(--dy)); opacity: 0; }
+  100% { transform: translate(var(--dx), var(--dy)); opacity: 0; } }
+@keyframes tourItem { 0%, 18% { opacity: 0; } 24%, 68% { opacity: .9; } 76%, 100% { opacity: 0; } }
+.tour-tip { position: fixed; z-index: 44; left: 12px; right: 12px; top: calc(env(safe-area-inset-top) + 58px); pointer-events: none;
+  text-align: center; font-size: 14px; font-weight: 800; color: #fff; background: linear-gradient(#ff9d57, #f26d2d); border: 2px solid #b5440f;
+  border-radius: 14px; padding: 7px 10px; box-shadow: 0 3px 0 #8a330a; text-shadow: 0 1px 0 rgba(120, 40, 0, .8); }
