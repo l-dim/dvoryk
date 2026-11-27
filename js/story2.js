@@ -7,9 +7,12 @@
    згенеровані «розділи села» йдуть уже після 38-го.
    Нові місця: «У Ярослава», «Луг», «Пагорб», «Ярмарок».
    Мальовані споруди: vil-* (млин, місток, верба, човен, ятка…), reb-school;
-   Вітряк і скирта поки без мальованих картинок — 3D-замінники (🛖, 🌾).
+   Вітряк і скирта — vil-windmill, vil-haystack (аркуш art/sheet-act6-props.webp).
    ============================================================ */
 const SKY_SUMMER = ["#bfe6ff", "#fff6dc"], SKY_AUTUMN = ["#ffd9b0", "#fff1dc"], SKY_WINTER = ["#dfeeff", "#f4f8ff"], SKY_SPRING = ["#cdeeff", "#fffbe6"];
+// мальовані споруди й фігури, які дворик (yard3d.js) може показати
+if (typeof VILLAGE_ART !== "undefined") ["vil-windmill", "vil-haystack", "reb-school"].forEach(a => { if (!VILLAGE_ART.includes(a)) VILLAGE_ART.push(a); });
+if (typeof YARD_PICS !== "undefined") ["natalia-full", "yaroslav-full"].forEach(p => { if (!YARD_PICS.includes(p)) YARD_PICS.push(p); });
 if (typeof LOCS !== "undefined") LOCS.push(
   { id: "neighbor", icon: "🏠", name: tt`У Ярослава` }, { id: "meadow", icon: "🐄", name: tt`Луг` },
   { id: "hill", icon: "🌅", name: tt`Пагорб` }, { id: "fair", icon: "🎪", name: tt`Ярмарок` });
@@ -117,7 +120,7 @@ STORY.push(
       { title: tt`Рятуємо сіно від грози`, cost: 13, add: [{ e: "🌧️", x: 20, y: 14, s: 8 }],
         lines: [["stepan", tt`Хмара із заходу! Швидше, згрібаймо в копиці! ⛈️`],
                 ["yaroslav", tt`Я ніколи так швидко не бігав! Навіть за останньою маршруткою 😅`]] },
-      { title: tt`Скирта до неба`, cost: 14, add: [{ e: "🌾", x: 50, y: 56, s: 16 }],
+      { title: tt`Скирта до неба`, cost: 14, add: [{ e: "🌾", art: "vil-haystack", x: 50, y: 56, s: 16 }],
         lines: [["vasyl", tt`Встигли! Гроза пройшла стороною, а скирта стоїть 💪`],
                 ["vasyl", tt`Ну що, {name}, заспіваймо, як косарі співали? 🎶`],
                 ["halya", tt`Ой на горі та й женці жнуть… Ох, аж серце защеміло 🥹`]] }
@@ -146,7 +149,7 @@ STORY.push(
         lines: [["vasyl", tt`Стежка готова — можна возити мішки з зерном.`]] },
       { title: tt`Кам'яний фундамент`, cost: 13, add: [{ e: "🪨", x: 42, y: 62, s: 6 }, { e: "🪨", x: 58, y: 62, s: 6 }],
         lines: [["bohdan", tt`Камінь до каменя — стоятиме ще сто років.`]] },
-      { title: tt`Дерев'яний зруб`, cost: 13, add: [{ e: "🛖", x: 50, y: 48, s: 18 }],
+      { title: tt`Дерев'яний зруб`, cost: 13, add: [{ e: "🛖", art: "vil-windmill", x: 50, y: 48, s: 18 }],
         lines: [["yaroslav", tt`У місті я робив сайти, а тут — справжній вітряк. Це набагато крутіше!`]] },
       { title: tt`Крила для вітряка`, cost: 13, add: [{ e: "🪵", x: 30, y: 80, s: 6 }],
         lines: [["bohdan", tt`Крила з ясена, а вісь — моя, кована ⚒️`], ["stepan", tt`Точнісінько як у батька… 🥹`]] },
