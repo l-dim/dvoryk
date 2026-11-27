@@ -67,7 +67,12 @@ Google в усіх випадках іде через сторінку Supabase,
 1. **Identifiers → App IDs**: `ua.dvoryk.app` (створити, якщо ще немає) → увімкнути **Sign in with Apple** → Save.
 2. Xcode → App → Signing & Capabilities: вибрати свою Team (entitlement `App.entitlements` уже в проєкті).
 
-Services ID і ключ .p8 не потрібні — на iPhone вхід нативний.
+Services ID не потрібен — на iPhone вхід нативний.
+
+3. **Keys → +** (ключ для відкликання входу під час видалення акаунта, вимога App Review 5.1.1(v)):
+   назва «Dvoryk Sign in with Apple», галочка **Sign in with Apple** → Configure → Primary App ID `ua.dvoryk.app`
+   → Save → Continue → Register → **Download** (файл `AuthKey_XXXXXXXXXX.p8` дають завантажити лише один раз).
+   Запамʼятати **Key ID** (10 символів).
 
 ### 3. Supabase — [панель проєкту](https://supabase.com/dashboard/project/irfvpbnkfovedzyqeudq/auth/providers)
 
@@ -80,10 +85,29 @@ Services ID і ключ .p8 не потрібні — на iPhone вхід на�
    - **Redirect URLs** (Add URL по одному):
      `ua.dvoryk.app://auth`, `https://l-dim.github.io/dvoryk/`, `http://localhost:8765/`, `http://127.0.0.1:8765/`
 
+## Видалення акаунта і відкликання Apple
+
+Налаштування → «Хмара» → «Видалити акаунт і дані з хмари». Якщо до акаунта привʼязано Apple, iPhone ще раз
+показує вікно Apple, і edge-функція `functions/apple-revoke` відкликає вхід (гра зникає з
+«Налаштування → Apple ID → Вхід через Apple»). Потім `delete_me()` видаляє акаунт і дані.
+Якщо відкликати не вдалося (немає інтернету до Apple, ключ не налаштовано) — акаунт однаково видаляється.
+
+Розгортання (один раз):
+
+1. **Edge Functions → Secrets** (Add new secret):
+   - `APPLE_TEAM_ID` = `B2CZV435TJ`
+   - `APPLE_KEY_ID` = Key ID із кроку «Apple Developer → Keys»
+   - `APPLE_PRIVATE_KEY` = увесь вміст файлу `.p8` (разом із рядками `-----BEGIN/END PRIVATE KEY-----`)
+2. Функція:
+   ```bash
+   supabase functions deploy apple-revoke --no-verify-jwt --project-ref irfvpbnkfovedzyqeudq
+   ```
+   Або в панелі: **Edge Functions → Deploy a new function → Via Editor**, назва `apple-revoke`, вставити
+   `functions/apple-revoke/index.ts` → Deploy, потім у налаштуваннях функції вимкнути **Verify JWT**
+   (сесію функція перевіряє сама).
+
 ## Далі
 
-- Apple: під час видалення акаунта відкликати токен Apple (вимога App Review 5.1.1(v)) — потрібен ключ .p8
-  і edge-функція.
 - Власний домен для Supabase (платна опція), щоб у вікні Google було «дворик», а не `irfvpbnkfovedzyqeudq.supabase.co`.
 - Покупки (RevenueCat → вебхук → таблиця `purchases`, видача товару за `transaction_id` без дублів).
 - Захист від ботів для анонімних акаунтів: Authentication → Attack Protection → CAPTCHA (Turnstile),

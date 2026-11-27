@@ -5,6 +5,7 @@ import CryptoKit
 
 /// Вхід для js/cloud.js без сторонніх SDK:
 /// • apple({ nonce })        — Sign in with Apple, повертає identity token (nonce хешується тут, як вимагає Apple)
+///                              і authorization code (ним сервер відкликає вхід під час видалення акаунта)
 /// • webAuth({ url, scheme }) — системне вікно входу (ASWebAuthenticationSession) для Google через Supabase,
 ///                              повертає адресу, на яку Supabase перенаправив після входу
 @objc(NativeAuthPlugin)
@@ -51,7 +52,8 @@ public class NativeAuthPlugin: CAPPlugin, CAPBridgedPlugin, ASAuthorizationContr
             call.reject("Apple did not return a token")
             return
         }
-        call.resolve(["idToken": token, "email": credential.email ?? ""])
+        let code = credential.authorizationCode.flatMap { String(data: $0, encoding: .utf8) } ?? ""
+        call.resolve(["idToken": token, "email": credential.email ?? "", "code": code])
     }
 
     public func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {

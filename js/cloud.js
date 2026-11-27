@@ -209,9 +209,22 @@
 
   /* ---------- видалення акаунта (вимога магазинів) ---------- */
   async function deleteAccount() {
+    if (meta.s && meta.s.rt) {
+      if (needsAppleRevoke()) await revokeApple();     // скасувала вікно Apple — акаунт не чіпаємо
+      await call("/rest/v1/rpc/delete_me", { method: "POST", body: {} });
+    }
     clearTimeout(timer); timer = null;
-    if (meta.s && meta.s.rt) await call("/rest/v1/rpc/delete_me", { method: "POST", body: {} });
     meta = { off: true }; writeMeta(); setState("off");
+  }
+  /* Apple вимагає відкликати Sign in with Apple разом з акаунтом (App Review 5.1.1(v)).
+     Потрібен свіжий код: гравчиня ще раз підтверджує вхід через Apple, а сервер
+     (supabase/functions/apple-revoke) міняє код на токен і відкликає його. */
+  const needsAppleRevoke = () => canApple && account().providers.includes("apple");
+  async function revokeApple() {
+    const { code } = await NativeAuth.apple({ nonce: b64url(rand(24)) });
+    if (!code) return;                                  // стара збірка застосунку без коду
+    try { await call("/functions/v1/apple-revoke", { method: "POST", body: { code } }); }
+    catch (e) { console.warn("apple revoke", e); }     // акаунт і дані однаково видаляємо
   }
   function enable() {
     meta = { dirty: true, rev: 0 }; writeMeta(); setState("new");
@@ -240,11 +253,11 @@
     } catch (e) { return {}; }
   }
   function account() {
-    if (!meta.s) return { signed: false };
+    if (!meta.s) return { signed: false, providers: [] };
     const c = claims(meta.s.at);
     const prov = ((c.app_metadata && c.app_metadata.providers) || []).filter(p => p !== "anonymous");
     const via = prov.map(p => ({ apple: "Apple", google: "Google" })[p] || p).join(tt` і `);
-    return { signed: !c.is_anonymous && prov.length > 0, anon: !!c.is_anonymous, email: c.email || "", via };
+    return { signed: !c.is_anonymous && prov.length > 0, anon: !!c.is_anonymous, email: c.email || "", via, providers: prov };
   }
 
   const rand = n => crypto.getRandomValues(new Uint8Array(n));
@@ -471,10 +484,12 @@
       if (confirm(tt`Вийти з акаунта? Гра на цьому пристрої залишиться, а хмара почне нову копію.`)) signOut();
     };
     if (del) del.onclick = async () => {
-      if (!confirm(tt`Видалити акаунт і всі збереження з хмари? Цього не скасувати. Гра на цьому пристрої залишиться.`)) return;
+      const ask = tt`Видалити акаунт і всі збереження з хмари? Цього не скасувати. Гра на цьому пристрої залишиться.` +
+        (needsAppleRevoke() ? " " + tt`Apple попросить ще раз підтвердити вхід.` : "");
+      if (!confirm(ask)) return;
       del.disabled = true;
       try { await deleteAccount(); toast(tt`Акаунт і хмарні дані видалено`); }
-      catch (e) { del.disabled = false; toast(tt`Не вдалося видалити 🙈 Перевір інтернет і спробуй ще раз`); }
+      catch (e) { del.disabled = false; if (!canceled(e)) toast(tt`Не вдалося видалити 🙈 Перевір інтернет і спробуй ще раз`); }
     };
     bindSignin();
   }

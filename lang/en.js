@@ -101,6 +101,7 @@
   "Вийти з акаунта? Гра на цьому пристрої залишиться, а хмара почне нову копію.": "Sign out? The game stays on this device, and the cloud will start a new copy.",
   "Видалити акаунт і всі збереження з хмари? Цього не скасувати. Гра на цьому пристрої залишиться.": "Delete your account and all cloud saves? This can't be undone. The game will stay on this device.",
   "Акаунт і хмарні дані видалено": "Account and cloud data deleted",
+  "Apple попросить ще раз підтвердити вхід.": "Apple will ask you to confirm sign-in once more.",
   "Не вдалося видалити 🙈 Перевір інтернет і спробуй ще раз": "Couldn't delete 🙈 Check your internet and try again",
   "Баба Явдоха": "Granny Yavdokha",
   "Вишневе": "Vyshneve",
