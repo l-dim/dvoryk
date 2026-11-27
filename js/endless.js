@@ -78,7 +78,7 @@ window.ENDLESS = (() => {
     const clutter = (src.clutter || []).map((d, k) => Object.assign({}, d, { id: "c" + k }));
     const ids = clutter.map(d => d.id);
     const base = (src.base || []).filter(d => !d.pic && !d.who).map(d => Object.assign({}, d));
-    const host = pickR(EL_HOSTS), base0 = 10 + Math.floor(n / 2);
+    const host = pickR(EL_HOSTS), base0 = 14 + Math.floor(n / 2);   // продовжує ціни прописаних розділів (38-й ≈ 15–18 ⭐ за завдання)
     const tasks = [];
     const deck = arr => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
     const cleanT = deck(EL_CLEAN), buildT = deck(EL_BUILD);

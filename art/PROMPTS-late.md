@@ -50,3 +50,18 @@ Game item icon sheet for a cozy mobile farm game, in the same hand-painted carto
 - sheet-late1 → items/gen-apiary, apiary-0..5, gen-berries, berries-0..5 (15-ту пропускаємо)
 - sheet-late2 → items/gen-weave, weave-0..5, gen-stable, stable-0..5 (15-ту пропускаємо)
 Після нарізки — дописати id у LATE_ART (js/late.js) і шляхи в FILES (sw.js).
+
+---
+
+# Акт 6 — дві споруди для дворика (аркуш 2×1)
+
+Прикріпи як зразок картинку водяного млина з «Старого млина» (items/vil-mill.webp) або будь-який аркуш vil-*.
+
+```
+Two scene objects for a cozy mobile farm game, in the same hand-painted cartoon art style and warm lighting as the attached image. Glossy, chunky, cute, soft painterly shading, subtle rim light, rich saturated colors, slight 3/4 front view. Arrange them side by side in a strict grid of 2 columns by 1 row of equal square cells. Each object centered in its own cell, fully inside it with a generous white margin. Plain solid pure white background, no cell borders, no shadows on the background, no text.
+1 an old Ukrainian wooden windmill (vitriak) on a stone base, with four big lattice sails, a small door and a little ladder, a few wildflowers at its foot,
+2 a big golden haystack (skyrta) with a wooden pole on top and a hay fork leaning against it.
+```
+
+## Ріжемо (для мене)
+- 2×1 → items/vil-windmill, items/vil-haystack; повернути `art: "vil-windmill"` / `art: "vil-haystack"` у js/story2.js (розділи 31–32).
