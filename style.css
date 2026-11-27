@@ -58,7 +58,9 @@ input { font-family: inherit; }
 .start-card { width: 100%; max-width: 380px; text-align: center; }
 .start-lang { display: flex; justify-content: flex-end; margin-bottom: 4px; }
 .start-lang .set-row { display: inline-flex; gap: 6px; align-items: center; font-size: 14px; color: var(--ink-soft); border: 0; padding: 0; margin: 0; }
-.lang-pick { font: inherit; font-size: 15px; padding: 6px 8px; border-radius: 10px; border: 2px solid var(--line); background: #fff; color: var(--ink); }
+.lang-pick { display: inline-flex; flex: none; padding: 3px; gap: 2px; border-radius: 12px; border: 2px solid var(--line); background: #fff; }
+.lang-pill { font: inherit; font-size: 14px; font-weight: 800; padding: 5px 9px; border: 0; border-radius: 9px; background: transparent; color: var(--ink-soft); cursor: pointer; }
+.lang-pill.on { background: var(--green); color: #fff; }
 .start-art { font-family: var(--emoji); font-size: 96px; line-height: 1; position: relative; display: inline-block; margin-bottom: 8px; animation: float 3s ease-in-out infinite; }
 .start-art span { position: absolute; font-size: 36px; bottom: 0; }
 .start-art span:first-child { left: -30px; }
@@ -205,9 +207,12 @@ main { flex: 1; min-height: 0; position: relative; }
 .d-next { font-size: 12px; color: var(--ink-soft); font-weight: 700; }
 
 /* ---------- Модалка ---------- */
-.modal { position: fixed; inset: 0; z-index: 45; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(70, 45, 25, .35); }
+/* висока модалка (налаштування) прокручується; margin:auto центрує низьку й не ховає верх високої */
+.modal { position: fixed; inset: 0; z-index: 45; display: none; align-items: flex-start; justify-content: center; background: rgba(70, 45, 25, .35);
+  padding: calc(env(safe-area-inset-top) + 14px) 20px calc(env(safe-area-inset-bottom) + 14px);
+  overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
 .modal.show { display: flex; }
-.m-box { width: 100%; max-width: 360px; background: var(--card); border-radius: 24px; padding: 20px; text-align: center; animation: pop .3s cubic-bezier(.3, 1.5, .5, 1); }
+.m-box { margin: auto 0; flex: none; width: 100%; max-width: 360px;background: var(--card); border-radius: 24px; padding: 20px; text-align: center; animation: pop .3s cubic-bezier(.3, 1.5, .5, 1); }
 .m-title { margin: 0 0 8px; font-size: 22px; }
 .m-body p { margin: 6px 0; line-height: 1.4; }
 .m-btns { margin-top: 14px; }

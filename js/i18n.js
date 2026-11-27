@@ -147,6 +147,7 @@
   window.ordinal = ordinal;
   window.plural = plural;
   window.LANG = LANG;
+  window.LOCALE = LANG === "uk" ? "uk-UA" : LANG;   // для дат: toLocaleDateString(LOCALE, …)
   window.LANGS = LANGS;
   window.I18NX = { translateDom, setLang, norm, lookup };
 

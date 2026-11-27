@@ -237,7 +237,7 @@ window.HOL = (() => {
     HOL_ALL.forEach(h => { const y = new Date(t).getFullYear(); [y, y + 1].forEach(yy => { const w = h.window(yy); if (w.start > t && w.start < bt) { bt = w.start; best = h; } }); });
     return best;
   }
-  const fmt = ts => new Date(ts).toLocaleDateString("uk-UA", { day: "numeric", month: "long" });
+  const fmt = ts => new Date(ts).toLocaleDateString(LOCALE, { day: "numeric", month: "long" });
   function finished(id) { S.evDone = (S.evDone || []).concat(id).slice(-20); }
   /* прикраси свята в дворику */
   function yard() {

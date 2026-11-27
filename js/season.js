@@ -83,7 +83,7 @@ window.SEAS = (() => {
       const n = had ? sweep() : 0;
       save(); renderAll();
       if (had) modal({ title: `${cur().name}! ${cur().icon}`,
-        html: tt`<div class="big-emoji">${cur().icon}</div>${n ? tt`<p>Минулий сезон закінчився — ${n} ${n % 10 === 1 && n % 100 !== 11 ? tt`сезонна річ зникла` : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? tt`сезонні речі зникли` : tt`сезонних речей зникли`} 🍃</p>` : ""}<p>Новий сезонний ланцюжок: <b>${cur().title}</b>. Шукай у генераторах до ${new Date(endsAt() - 1).toLocaleDateString("uk-UA", { day: "numeric", month: "long" })}!</p>`,
+        html: tt`<div class="big-emoji">${cur().icon}</div>${n ? tt`<p>Минулий сезон закінчився — ${n} ${plural(n, "сезонна річ зникла", "сезонні речі зникли", "сезонних речей зникли")} 🍃</p>` : ""}<p>Новий сезонний ланцюжок: <b>${cur().title}</b>. Шукай у генераторах до ${new Date(endsAt() - 1).toLocaleDateString(LOCALE, { day: "numeric", month: "long" })}!</p>`,
         buttons: [{ label: tt`Шукатиму! ✨` }] });
       return;
     }

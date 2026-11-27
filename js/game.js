@@ -1184,6 +1184,7 @@ function modal({ title, html, buttons }) {
     bb.appendChild(el);
   });
   m.classList.add("show");
+  m.scrollTop = 0;
 }
 let dlgQueue = [], dlgDone = null;
 function playDialog(lines, done) {
@@ -1282,16 +1283,20 @@ function showImport() {
 /* ---------------- Налаштування ---------------- */
 /* ---------------- Мова ---------------- */
 function langRow(id) {
-  const opts = Object.entries(LANGS).map(([k, v]) => `<option value="${k}"${k === LANG ? " selected" : ""}>${v}</option>`).join("");
-  return `<label class="set-row">🌐 ${tt`Мова`}${LANG !== "uk" ? "" : " · Language"} <select id="${id}" class="lang-pick">${opts}</select></label>`;
+  // кнопки замість <select>: системний список у WKWebView на iOS не відкривався
+  const pills = Object.entries(LANGS).map(([k, v]) =>
+    `<button type="button" class="lang-pill${k === LANG ? " on" : ""}" data-lang="${k}">${v}</button>`).join("");
+  return `<div class="set-row">🌐 ${tt`Мова`}${LANG !== "uk" ? "" : " · Language"} <span id="${id}" class="lang-pick">${pills}</span></div>`;
 }
 function bindLang(id) {
-  const sel = $(id); if (!sel) return;
-  sel.onchange = () => {
-    if (!I18NX.setLang(sel.value)) return;
+  const box = $(id); if (!box) return;
+  box.querySelectorAll("[data-lang]").forEach(b => b.onclick = e => {
+    e.preventDefault();
+    if (!I18NX.setLang(b.dataset.lang)) return;
+    box.querySelectorAll("[data-lang]").forEach(x => x.classList.toggle("on", x === b));
     if (S && S.started) saveNow();
     reloadAfterSave();
-  };
+  });
 }
 function openSettings() {
   modal({
@@ -1332,7 +1337,7 @@ function openSettings() {
 /* ============================================================
    ВЗАЄМОДІЯ З ДОШКОЮ (тап і перетягування)
    ============================================================ */
-const APP_VER = "v157";   // разом із VERSION у sw.js
+const APP_VER = "v158";   // разом із VERSION у sw.js
 let drag = null, dragAnim = false, dragGhost = null, envKeyShown = "";
 /* привид створюється один раз і живе весь час (новий шар на кожен дотик змушував дошку блимати) */
 function ghostEl() {

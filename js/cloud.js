@@ -90,6 +90,21 @@
     if (!checked) { if (hasGame()) check(); return; }
     schedule(PUSH_DELAY);
   }
+  /* відбиток збереження, що не залежить від порядку ключів (jsonb у базі їх переставляє) */
+  function canon(v) {
+    if (Array.isArray(v)) return "[" + v.map(canon).join(",") + "]";
+    if (v && typeof v === "object") return "{" + Object.keys(v).sort().map(k => JSON.stringify(k) + ":" + canon(v[k])).join(",") + "}";
+    return JSON.stringify(v);
+  }
+  function fingerprint(data) {
+    const str = canon(data);
+    let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+    for (let i = 0; i < str.length; i++) { const c = str.charCodeAt(i); h1 = Math.imul(h1 ^ c, 2654435761); h2 = Math.imul(h2 ^ c, 1597334677); }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return (h2 >>> 0).toString(36) + (h1 >>> 0).toString(36);
+  }
+
   async function push({ force = false, keepalive = false } = {}) {
     clearTimeout(timer); timer = null;
     if (meta.off || busy || (waiting && !force) || !hasGame()) return;
@@ -97,17 +112,22 @@
     busy = true;
     const g = gen;
     try {
+      const data = JSON.stringify(S);
+      // запамʼятовуємо, що відправили: якщо сторінка закриється раніше, ніж прийде відповідь
+      // (зміна мови, перезапуск), під час наступного запуску впізнаємо своє ж збереження в хмарі
+      meta.sent = { base: meta.rev || 0, fp: fingerprint(JSON.parse(data)) }; writeMeta();
       const rows = await call("/rest/v1/rpc/push_save", {
         method: "POST", keepalive,
-        body: '{"p_data":' + JSON.stringify(S) + ',"p_base_rev":' + (meta.rev || 0) +
+        body: '{"p_data":' + data + ',"p_base_rev":' + (meta.rev || 0) +
               ',"p_device":"' + device() + '","p_force":' + (force ? "true" : "false") + "}"
       });
       const r = rows && rows[0];
       if (r && r.ok) {
-        meta.rev = r.rev; meta.last = Date.now();
+        meta.rev = r.rev; meta.last = Date.now(); delete meta.sent;
         if (gen === g) meta.dirty = false;
         writeMeta(); setState("ok");
       } else if (r) {
+        delete meta.sent; writeMeta();
         resolveConflict(r);
       }
     } catch (e) {
@@ -127,11 +147,23 @@
       const r = rows && rows[0];
       if (!r) { meta.rev = 0; meta.dirty = true; writeMeta(); return push(); }
       if (r.rev === meta.rev) { setState("ok"); return push(); }
+      if (await ownLostPush(r)) { meta.rev = r.rev; meta.last = Date.parse(r.updated_at) || Date.now(); delete meta.sent; writeMeta(); setState("ok"); return push(); }
       resolveConflict(r);
     } catch (e) {
       checked = false;   // повторимо з наступною зміною в грі
       setState("err");
     }
+  }
+
+  /* хмара на одну версію попереду, і це рівно те, що цей телефон відправив перед закриттям */
+  async function ownLostPush(r) {
+    const sent = meta.sent;
+    if (!sent || sent.base !== (meta.rev || 0) || r.rev !== sent.base + 1) return false;
+    try {
+      const rows = await call("/rest/v1/saves?select=data,rev");
+      const c = rows && rows[0];
+      return !!(c && c.rev === r.rev && c.data && fingerprint(c.data) === sent.fp);
+    } catch (e) { return false; }
   }
 
   /* у хмарі інша версія, ніж та, від якої йде цей телефон: питаємо, яку залишити */
@@ -140,7 +172,7 @@
     whenIdle(() => {
       const here = hasGame() ? tt`рівень ${S.level}, розділ ${Math.min(S.chapter, STORY.length - 1) + 1}` : tt`нова гра`;
       const there = tt`рівень ${r.level || 1}, розділ ${(r.chapter || 0) + 1}`;
-      const when = r.updated_at ? new Date(r.updated_at).toLocaleString("uk-UA", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }) : "";
+      const when = r.updated_at ? new Date(r.updated_at).toLocaleString(LOCALE, { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }) : "";
       modal({
         title: tt`Два різні збереження ☁️`,
         html: tt`<p>У хмарі є прогрес з іншого пристрою, і він відрізняється від цього.</p>
@@ -403,7 +435,7 @@
     if (state === "conflict") return tt`У хмарі інша версія гри — вибери, яку залишити.`;
     if (state === "err") return tt`Немає звʼязку з хмарою — збережемо, щойно зʼявиться інтернет.`;
     if (meta.last) {
-      const t = new Date(meta.last).toLocaleString("uk-UA", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
+      const t = new Date(meta.last).toLocaleString(LOCALE, { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
       return tt`Прогрес зберігається в хмарі ☁️ Востаннє: ${t}.`;
     }
     return tt`Підключаємось до хмари…`;
