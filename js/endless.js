@@ -82,23 +82,36 @@ window.ENDLESS = (() => {
     const tasks = [];
     const deck = arr => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
     const cleanT = deck(EL_CLEAN), buildT = deck(EL_BUILD);
+    // жива тема розділу (js/village.js): свої завдання, репліки, прикраси й сувенір
+    const th = window.VILLAGE && VILLAGE.themes[n % EL_TITLES.length], cyc = Math.floor(n / EL_TITLES.length);
     const nClean = Math.min(3, Math.ceil(ids.length / 2));
     for (let k = 0; k < 7; k++) {
       const clean = k < nClean;
       const remove = clean ? ids.filter((_, j) => j % nClean === k) : [];
       const add = clean ? [] : [0, 1].slice(0, 1 + Math.floor(r() * 2)).map(() => ({ e: pickR(addPool), x: 15 + Math.round(r() * 70), y: 48 + Math.round(r() * 40), s: 5 + Math.round(r() * 3) }));
-      tasks.push({ title: clean ? cleanT[k % cleanT.length] : buildT[k % buildT.length], cost: Math.round((base0 + (k >> 1)) * (window.PACE ? PACE.story : 1)), remove, add,
-        lines: [[pickR(EL_HOSTS), pickR(EL_LINES)]] });
+      const task = { title: clean ? cleanT[k % cleanT.length] : buildT[k % buildT.length], cost: Math.round((base0 + (k >> 1)) * (window.PACE ? PACE.story : 1)), remove, add,
+        lines: [[pickR(EL_HOSTS), pickR(EL_LINES)]] };
+      const tk = th && th.tasks[k];
+      if (tk) {
+        task.title = tk[0]; task.lines = [[tk[2], tk[3]]];
+        if (!clean) task.add = tk[1].split(" ").filter(Boolean).map((e, j) => {
+          const p = add[j] || { x: 15 + Math.round(r() * 70), y: 48 + Math.round(r() * 40), s: 5 + Math.round(r() * 3) };
+          return { e, x: p.x, y: p.y, s: p.s };
+        });
+      }
+      tasks.push(task);
     }
     return {
       title, act: tt`Розбудова села`, generated: true, loc: src.loc, river: src.river, ice: src.ice, winter: src.winter,
       sky: src.sky, ground: src.ground, base, clutter, tasks,
-      intro: [[host, tt`{name}, у селі нова справа — «${title}»! Без тебе не впораємось 💛`], ["halya", tt`Замовлення сусідів — це зірочки, а зірочки — це наше свято. До роботи!`]],
-      reward: { chest: (n + 1) % 5 === 0 ? 2 : 1 }
+      intro: th ? (cyc ? [th.again] : th.intro).concat([["halya", tt`Замовлення сусідів — це зірочки, а зірочки — це наше свято. До роботи!`]])
+        : [[host, tt`{name}, у селі нова справа — «${title}»! Без тебе не впораємось 💛`], ["halya", tt`Замовлення сусідів — це зірочки, а зірочки — це наше свято. До роботи!`]],
+      reward: { chest: (n + 1) % 5 === 0 ? 2 : 1, souv: th && th.souv }
     };
   }
   /* добудувати розділи до потрібного номера */
   function ensure(upTo) {
+    if (window.VILLAGE) VILLAGE.register();
     while (STORY.length <= upTo) STORY.push(make(STORY.length - ENDLESS_FROM));
   }
 

@@ -502,6 +502,7 @@ function doTask() {
     const parts = [];
     if (r.gen && !S.gens.includes(r.gen)) { S.gens.push(r.gen); placeItem({ g: r.gen }); parts.push(GENS[r.gen].icon + " " + GENS[r.gen].name); }
     if (r.chest !== undefined) { placeItem({ c: "chest", l: r.chest }); parts.push(CHAINS.chest.items[r.chest][0]); }
+    if (r.souv && window.VILLAGE) parts.push(VILLAGE.give(r.souv));          // сувенір розділу села — у «Двір на свій смак»
     regen(); S.energy += ENERGY_BONUS.chapter; parts.push("+" + ENERGY_BONUS.chapter + " ⚡");
     S.chapter++; S.task = 0;
     if (window.ENDLESS) ENDLESS.ensure(S.chapter + 5);
@@ -511,6 +512,7 @@ function doTask() {
       title: tt`Розділ завершено! 🎉`,
       html: tt`<p class="chapter-done">«${ch.title}»</p><p>Нагорода чекає на дошці:</p><p class="rewards">${parts.join(" &nbsp; ")}</p>` +
         (r.gen ? tt`<p class="hint-s">Новий генератор! Тепер сусіди замовлятимуть і ${CHAINS[GENS[r.gen].chain].name.toLowerCase()}.</p>` : "") +
+        (r.souv ? tt`<p class="hint-s">🎨 Сувенір розділу — у «Двір на свій смак» (кнопка 🎨 у «Дворику»).</p>` : "") +
         (window.PHOTO && window.Yard3D ? tt`<p class="hint-s">📷 Дворик сфотографовано — знімок у фотоальбомі (профіль).</p>` : ""),
       buttons: [{ label: S.storyDone ? tt`Ура! 💛` : tt`Далі ›`, onClick: () => {
         renderAll();
