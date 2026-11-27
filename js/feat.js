@@ -106,7 +106,10 @@ window.UNL = (() => {
   }
   const next = () => UNLOCKS.find(u => !on(u.id));
   function nextHtml() {
-    const n = UNLOCKS.find(u => !on(u.id) && u.lvl > S.level);
+    let n = UNLOCKS.find(u => !on(u.id) && u.lvl > S.level);
+    // генератори, що приходять із рівнем (Лісова стежка, Пасіка, Стайня…) — теж «далі»
+    const g = typeof NEW_GENS !== "undefined" && NEW_GENS.filter(x => x.lvl > S.level && !S.gens.includes(x.id)).sort((a, b) => a.lvl - b.lvl)[0];
+    if (g && (!n || g.lvl < n.lvl)) n = { lvl: g.lvl, icon: g.gen[0], title: g.gen[1] };
     return n ? tt`<p class="hint-s unl-next">Далі, на рівні ${n.lvl}: ${n.icon} ${n.title}</p>` : "";
   }
   function open(u) {
